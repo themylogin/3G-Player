@@ -1,0 +1,287 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		84C10BEB1782E08E004220BC /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C10BEA1782E08D004220BC /* UIKit.framework */; };
+		84C10BED1782E08E004220BC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C10BEC1782E08E004220BC /* Foundation.framework */; };
+		84C10BEF1782E08E004220BC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C10BEE1782E08E004220BC /* CoreGraphics.framework */; };
+		84C10BF51782E08E004220BC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 84C10BF31782E08E004220BC /* InfoPlist.strings */; };
+		84C10BF71782E08E004220BC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C10BF61782E08E004220BC /* main.m */; };
+		84C10BFB1782E08E004220BC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C10BFA1782E08E004220BC /* AppDelegate.m */; };
+		84C10BFD1782E08E004220BC /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C10BFC1782E08E004220BC /* Default.png */; };
+		84C10BFF1782E08E004220BC /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C10BFE1782E08E004220BC /* Default@2x.png */; };
+		84C10C011782E08E004220BC /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C10C001782E08E004220BC /* Default-568h@2x.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		84C10BE71782E08D004220BC /* 3G Player.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "3G Player.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		84C10BEA1782E08D004220BC /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		84C10BEC1782E08E004220BC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		84C10BEE1782E08E004220BC /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		84C10BF21782E08E004220BC /* 3G Player-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "3G Player-Info.plist"; sourceTree = "<group>"; };
+		84C10BF41782E08E004220BC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		84C10BF61782E08E004220BC /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		84C10BF81782E08E004220BC /* 3G Player-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "3G Player-Prefix.pch"; sourceTree = "<group>"; };
+		84C10BF91782E08E004220BC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		84C10BFA1782E08E004220BC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		84C10BFC1782E08E004220BC /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		84C10BFE1782E08E004220BC /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		84C10C001782E08E004220BC /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		84C10BE41782E08D004220BC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				84C10BEB1782E08E004220BC /* UIKit.framework in Frameworks */,
+				84C10BED1782E08E004220BC /* Foundation.framework in Frameworks */,
+				84C10BEF1782E08E004220BC /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		84C10BDE1782E08D004220BC = {
+			isa = PBXGroup;
+			children = (
+				84C10BF01782E08E004220BC /* 3G Player */,
+				84C10BE91782E08D004220BC /* Frameworks */,
+				84C10BE81782E08D004220BC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		84C10BE81782E08D004220BC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				84C10BE71782E08D004220BC /* 3G Player.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		84C10BE91782E08D004220BC /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				84C10BEA1782E08D004220BC /* UIKit.framework */,
+				84C10BEC1782E08E004220BC /* Foundation.framework */,
+				84C10BEE1782E08E004220BC /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		84C10BF01782E08E004220BC /* 3G Player */ = {
+			isa = PBXGroup;
+			children = (
+				84C10BF91782E08E004220BC /* AppDelegate.h */,
+				84C10BFA1782E08E004220BC /* AppDelegate.m */,
+				84C10BF11782E08E004220BC /* Supporting Files */,
+			);
+			path = "3G Player";
+			sourceTree = "<group>";
+		};
+		84C10BF11782E08E004220BC /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				84C10BF21782E08E004220BC /* 3G Player-Info.plist */,
+				84C10BF31782E08E004220BC /* InfoPlist.strings */,
+				84C10BF61782E08E004220BC /* main.m */,
+				84C10BF81782E08E004220BC /* 3G Player-Prefix.pch */,
+				84C10BFC1782E08E004220BC /* Default.png */,
+				84C10BFE1782E08E004220BC /* Default@2x.png */,
+				84C10C001782E08E004220BC /* Default-568h@2x.png */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		84C10BE61782E08D004220BC /* 3G Player */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 84C10C041782E08E004220BC /* Build configuration list for PBXNativeTarget "3G Player" */;
+			buildPhases = (
+				84C10BE31782E08D004220BC /* Sources */,
+				84C10BE41782E08D004220BC /* Frameworks */,
+				84C10BE51782E08D004220BC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "3G Player";
+			productName = "3G Player";
+			productReference = 84C10BE71782E08D004220BC /* 3G Player.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		84C10BDF1782E08D004220BC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = themylogin;
+			};
+			buildConfigurationList = 84C10BE21782E08D004220BC /* Build configuration list for PBXProject "3G Player" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 84C10BDE1782E08D004220BC;
+			productRefGroup = 84C10BE81782E08D004220BC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				84C10BE61782E08D004220BC /* 3G Player */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		84C10BE51782E08D004220BC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				84C10BF51782E08E004220BC /* InfoPlist.strings in Resources */,
+				84C10BFD1782E08E004220BC /* Default.png in Resources */,
+				84C10BFF1782E08E004220BC /* Default@2x.png in Resources */,
+				84C10C011782E08E004220BC /* Default-568h@2x.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		84C10BE31782E08D004220BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				84C10BF71782E08E004220BC /* main.m in Sources */,
+				84C10BFB1782E08E004220BC /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		84C10BF31782E08E004220BC /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				84C10BF41782E08E004220BC /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		84C10C021782E08E004220BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		84C10C031782E08E004220BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		84C10C051782E08E004220BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
+				INFOPLIST_FILE = "3G Player/3G Player-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		84C10C061782E08E004220BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
+				INFOPLIST_FILE = "3G Player/3G Player-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		84C10BE21782E08D004220BC /* Build configuration list for PBXProject "3G Player" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84C10C021782E08E004220BC /* Debug */,
+				84C10C031782E08E004220BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		84C10C041782E08E004220BC /* Build configuration list for PBXNativeTarget "3G Player" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84C10C051782E08E004220BC /* Debug */,
+				84C10C061782E08E004220BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 84C10BDF1782E08D004220BC /* Project object */;
+}
