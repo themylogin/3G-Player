@@ -20,6 +20,10 @@
 @property (nonatomic)         int currentIndex;
 @property (nonatomic, retain) AVAudioPlayer* player;
 
+@property (nonatomic)         enum { Disabled, Playlist, Track } repeat;
+
+@property (nonatomic, retain) NSTimer* uiTimer;
+
 @end
 
 @implementation PlaylistController
@@ -40,6 +44,8 @@
         self.currentIndex = -1;
         self.player = nil;
         
+        self.repeat = Disabled;
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerStateChanged) name:@"stateChanged" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingCompleted) name:@"bufferingCompleted" object:musicFileManager];
     }
@@ -49,7 +55,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+    
+    [self updateUI];
+    self.uiTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUI) userInfo:nil repeats:YES];
 }
 
 - (void)didReceiveMemoryWarning
@@ -114,7 +122,62 @@
     [self bufferMostNecessary];
 }
 
-#pragma mark - Gesture recognizer
+- (void)updateUI
+{
+    if (self.player)
+    {
+        if (self.player.playing)
+        {
+            [self.playPauseButton setImage:[UIImage imageNamed:@"pause_active.png"] forState:UIControlStateNormal];
+        }
+        else
+        {
+            [self.playPauseButton setImage:[UIImage imageNamed:@"play_active.png"] forState:UIControlStateNormal];
+        }
+        
+        self.elapsedLabel.text = [NSString stringWithFormat:@"%02d:%02d", (int)self.player.currentTime / 60, (int)self.player.currentTime % 60];
+        self.totalLabel.text = [NSString stringWithFormat:@"%02d:%02d", (int)self.player.duration / 60, (int)self.player.duration % 60];
+        
+        if (!self.positionSlider.tracking)
+        {
+            self.positionSlider.value = self.player.currentTime;
+            self.positionSlider.maximumValue = self.player.duration;
+        }
+    }
+    else
+    {
+        if ([self.playlist count] > 0)
+        {
+            [self.playPauseButton setImage:[UIImage imageNamed:@"play_active.png"] forState:UIControlStateNormal];
+        }
+        else
+        {
+            [self.playPauseButton setImage:[UIImage imageNamed:@"play_inactive.png"] forState:UIControlStateNormal];
+        }
+        
+        self.elapsedLabel.text = @"00:00";
+        self.totalLabel.text = @"00:00";
+    }
+    
+    if (self.repeat == Disabled)
+    {
+        [self.repeatButton setImage:[UIImage imageNamed:@"repeat_disabled.png"] forState:UIControlStateNormal];
+    }
+    if (self.repeat == Playlist)
+    {
+        [self.repeatButton setImage:[UIImage imageNamed:@"repeat_playlist.png"] forState:UIControlStateNormal];
+    }
+    if (self.repeat == Track)
+    {
+        [self.repeatButton setImage:[UIImage imageNamed:@"repeat_track.png"] forState:UIControlStateNormal];
+    }
+}
+
+- (IBAction)handlePositionSliderTouchUpInside:(id)sender
+{
+    self.player.currentTime = self.positionSlider.value;
+    [self updateUI];
+}
 
 - (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer
 {

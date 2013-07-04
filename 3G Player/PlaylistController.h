@@ -13,6 +13,11 @@
 @interface PlaylistController : UIViewController <AVAudioPlayerDelegate>
 
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
+@property (nonatomic, retain) IBOutlet UIButton* playPauseButton;
+@property (nonatomic, retain) IBOutlet UISlider* positionSlider;
+@property (nonatomic, retain) IBOutlet UILabel* elapsedLabel;
+@property (nonatomic, retain) IBOutlet UILabel* totalLabel;
+@property (nonatomic, retain) IBOutlet UIButton* repeatButton;
 
 - (void)addFile:(NSDictionary*)file afterCurrent:(BOOL)afterCurrent;
 - (void)addFiles:(NSArray*)files afterCurrent:(BOOL)afterCurrent;
@@ -20,6 +25,7 @@
 
 - (void)playAtIndex:(int)index;
 
+- (IBAction)handlePositionSliderTouchUpInside:(id)sender;
 - (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer;
 
 @end
