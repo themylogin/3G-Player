@@ -10,12 +10,15 @@
 
 #import "Globals.h"
 
-#import "QuartzCore/QuartzCore.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface PlaylistController ()
 
 @property (nonatomic, retain) NSMutableArray* playlist;
 @property (nonatomic, retain) NSMutableArray* sections;
+
+@property (nonatomic)         int currentIndex;
+@property (nonatomic, retain) AVAudioPlayer* player;
 
 @end
 
@@ -33,6 +36,9 @@
         
         self.playlist = [[NSMutableArray alloc] init];
         self.sections = [[NSMutableArray alloc] init];
+        
+        self.currentIndex = -1;
+        self.player = nil;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerStateChanged) name:@"stateChanged" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingCompleted) name:@"bufferingCompleted" object:musicFileManager];
@@ -74,6 +80,40 @@
     [self _playlistChanged];    
 }
 
+- (void)playAtIndex:(int)index
+{
+    [self playAtIndex:index atPosition:0];
+}
+
+- (void)playAtIndex:(int)index atPosition:(NSTimeInterval)position
+{
+    if (self.player)
+    {
+        [self.player stop];
+        self.player = nil;
+    }
+    
+    self.currentIndex = index;
+    NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
+    
+    NSString* path = [musicFileManager getPath:item];
+    if (path)
+    {
+        NSURL* url = [NSURL fileURLWithPath:path];
+        self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:nil];
+        self.player.delegate = self;
+        if (position)
+        {
+            self.player.currentTime = position;
+        }
+        [self.player play];
+    }
+    
+    [self.tableView reloadData];
+    
+    [self bufferMostNecessary];
+}
+
 #pragma mark - Gesture recognizer
 
 - (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer
@@ -82,6 +122,14 @@
     if (indexPath)
     {
         int index = [self itemIndexForIndexPath:indexPath];
+        if (index < self.currentIndex)
+        {
+            self.currentIndex--;
+        }
+        else if (index == self.currentIndex)
+        {
+            return;
+        }
         [self.playlist removeObjectAtIndex:index];
         [self _playlistChanged];
     }
@@ -126,30 +174,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSDictionary* item = [self itemForIndexPath:indexPath];
-    
-    /*
-    if (indexPath.row < self.directories.count)
-    {
-        NSMutableArray* newCwd = [[NSMutableArray alloc] initWithArray:self.cwd copyItems:YES];
-        [newCwd addObject:[self.directories objectAtIndex:indexPath.row]];
-        
-        LibraryController* libraryController = [[LibraryController alloc] initWithNibName:@"LibraryController" bundle:nil reloadButton:self.reloadButton musicManager:self.musicManager];
-        [libraryController setLibrary:self.library cwd:newCwd];
-        [self.navigationController pushViewController:libraryController animated:YES];
-    }
-    else
-    {
-        musicManager.playlist = [[NSMutableArray alloc] init];
-        for (int i = indexPath.row - directories.count; i < self.files.count; i++)
-        {
-            [musicManager.playlist addObject:[[MusicFile alloc] initWithFilename:[files objectAtIndex:i] locatedIn:cwd]];
-        }
-        MusicFile* file = [musicManager.playlist objectAtIndex:0];
-        [musicManager.playlist removeObjectAtIndex:0];
-        [musicManager playFile:file];
-    }
-     */
+    [self playAtIndex:[self itemIndexForIndexPath:indexPath]];
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -167,10 +192,16 @@
     }
     if (state.state == Buffering)
     {
+        UIColor* fillColor = [UIColor grayColor];
+        if (state.buffering.isError)
+        {
+            fillColor = [UIColor redColor];
+        }
+        
         UIView* view = [[UIView alloc] initWithFrame:cell.contentView.bounds];
         CAGradientLayer* gradient = [CAGradientLayer layer];
         gradient.frame = view.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor whiteColor] CGColor], [[UIColor grayColor] CGColor], nil];
+        gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor whiteColor] CGColor], [fillColor CGColor], nil];
         gradient.locations = [NSArray arrayWithObjects:[NSNumber numberWithFloat:state.buffering.progress], (id)[NSNumber numberWithFloat:state.buffering.progress], nil];
         gradient.startPoint = CGPointMake(0.0, 0.5);
         gradient.endPoint = CGPointMake(1.0, 0.5);
@@ -181,6 +212,35 @@
     if (state.state == Buffered)
     {
     }
+    
+    if ([self itemIndexForIndexPath:indexPath] == self.currentIndex)
+    {
+        cell.textLabel.textColor = [UIColor orangeColor];
+    }
+}
+
+#pragma mark - AVAudioPlayer delegate
+
+- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
+{
+    MusicFileState state = [musicFileManager getState:[self.playlist objectAtIndex:self.currentIndex]];
+    if (state.state == Buffering)
+    {
+        [self tryToResumePlayingNowBufferingFile];
+        return;
+    }
+    
+    self.currentIndex++;
+    if (!(self.currentIndex < [self.playlist count]))
+    {        
+        [self.tableView reloadData];
+        
+        [self bufferMostNecessary];
+        
+        return;
+    }
+    
+    [self playAtIndex:self.currentIndex];
 }
 
 #pragma mark - Internals
@@ -217,7 +277,21 @@
 }
 
 - (void)bufferMostNecessary
-{    
+{
+    if (self.currentIndex != -1)
+    {
+        for (int i = self.currentIndex; i < [self.playlist count]; i++)
+        {
+            NSDictionary* item = [self.playlist objectAtIndex:i];
+            MusicFileState state = [musicFileManager getState:item];
+            if (state.state != Buffered)
+            {
+                [musicFileManager buffer:item];
+                return;
+            }
+        }
+    }
+    
     for (NSDictionary* item in self.playlist)
     {
         MusicFileState state = [musicFileManager getState:item];
@@ -244,11 +318,32 @@
 - (void)onMusicFileManagerStateChanged
 {
     [self.tableView reloadData];
+    
+    [self tryToResumePlayingNowBufferingFile];
 }
 
 - (void)onMusicFileManagerBufferingCompleted
 {
     [self bufferMostNecessary];
+}
+
+- (void)tryToResumePlayingNowBufferingFile
+{
+    if (self.currentIndex == -1)
+    {
+        return;
+    }
+    
+    if (self.player.playing)
+    {
+        return;
+    }
+    
+    MusicFileState state = [musicFileManager getState:[self.playlist objectAtIndex:self.currentIndex]];
+    if (state.state == Buffering)
+    {
+        [self playAtIndex:self.currentIndex atPosition:self.player.duration];
+    }
 }
 
 @end

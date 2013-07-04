@@ -76,6 +76,23 @@
     return state;
 }
 
+- (NSString*)getPath:(NSDictionary*)musicFile
+{
+    NSString* path = [self filePath:musicFile];
+    if ([self.fileManager fileExistsAtPath:path])
+    {
+        return path;
+    }
+    
+    NSString* incompletePath = [self incompleteFilePath:musicFile];
+    if ([self.fileManager fileExistsAtPath:incompletePath])
+    {
+        return incompletePath;
+    }
+    
+    return nil;
+}
+
 - (void)buffer:(NSDictionary*)musicFile
 {    
     if (self.bufferingFile)
@@ -135,7 +152,7 @@
     self.bufferingFileHandle = [NSFileHandle fileHandleForWritingAtPath:incompletePath];
     [self.bufferingFileHandle seekToEndOfFile];
     
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:15.0];
+    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60.0];
     self.bufferingConnection = [NSURLConnection connectionWithRequest:request delegate:self];
 }
 

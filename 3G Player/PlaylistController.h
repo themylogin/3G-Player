@@ -8,13 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PlaylistController : UIViewController
+#import <AVFoundation/AVFoundation.h>
+
+@interface PlaylistController : UIViewController <AVAudioPlayerDelegate>
 
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
 
 - (void)addFile:(NSDictionary*)file afterCurrent:(BOOL)afterCurrent;
 - (void)addFiles:(NSArray*)files afterCurrent:(BOOL)afterCurrent;
 - (void)clear;
+
+- (void)playAtIndex:(int)index;
 
 - (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer;
 

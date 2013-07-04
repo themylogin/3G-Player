@@ -29,6 +29,7 @@ typedef union {
 - (id)init;
 
 - (MusicFileState)getState:(NSDictionary*)musicFile;
+- (NSString*)getPath:(NSDictionary*)musicFile;
 - (void)buffer:(NSDictionary*)musicFile;
 - (void)stopBuffering;
 
