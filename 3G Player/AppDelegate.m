@@ -8,6 +8,8 @@
 
 #import "AppDelegate.h"
 
+#import "Globals.h"
+
 @implementation AppDelegate
 
 - (void)dealloc
@@ -18,9 +20,26 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    libraryDirectory = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingString:@"/Library"];
+    [libraryDirectory retain];
+    
+    playerUrl = @"http://plr.thelogin.ru";
+    [playerUrl retain];
+    
+    musicFileManager = [[MusicFileManager alloc] init];
+    
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
-    // Override point for customization after application launch.
+    
+    self.tabBarController = [[UITabBarController alloc] init];
+    
+    controllers.playlist = [[PlaylistController alloc] init];
+    [self.tabBarController addChildViewController:controllers.playlist];
+    
+    controllers.library = [[LibraryController alloc] init];
+    [self.tabBarController addChildViewController:controllers.library];
+    
     self.window.backgroundColor = [UIColor whiteColor];
+    self.window.rootViewController = self.tabBarController;
     [self.window makeKeyAndVisible];
     return YES;
 }
