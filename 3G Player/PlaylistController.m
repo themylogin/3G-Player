@@ -20,7 +20,7 @@
 @property (nonatomic)         int currentIndex;
 @property (nonatomic, retain) AVAudioPlayer* player;
 
-@property (nonatomic)         enum { Disabled, Playlist, Track } repeat;
+@property (nonatomic)         enum { RepeatDisabled, RepeatPlaylist, RepeatTrack } repeat;
 
 @property (nonatomic, retain) NSTimer* uiTimer;
 
@@ -44,7 +44,7 @@
         self.currentIndex = -1;
         self.player = nil;
         
-        self.repeat = Disabled;
+        self.repeat = RepeatDisabled;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerStateChanged) name:@"stateChanged" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingCompleted) name:@"bufferingCompleted" object:musicFileManager];
@@ -66,17 +66,42 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)addFile:(NSDictionary*)file afterCurrent:(BOOL)afterCurrent
+- (void)addFiles:(NSArray*)files mode:(AddMode)addMode
 {
-    [self _addFileToPlaylist:file];
-    [self _playlistChanged];
-}
-
-- (void)addFiles:(NSArray*)files afterCurrent:(BOOL)afterCurrent
-{
+    int index = [self.playlist count];
+    if (addMode == AddAfterCurrentAlbum)
+    {
+        for (NSDictionary* section in self.sections)
+        {
+            BOOL isCurrentSection = NO;
+            for (NSNumber* nsi in [section objectForKey:@"files"])
+            {
+                int i = [nsi intValue];
+                
+                if (i == self.currentIndex)
+                {
+                    isCurrentSection = YES;
+                }
+                if (isCurrentSection)
+                {
+                    index = i + 1;
+                }
+            }
+            if (isCurrentSection)
+            {
+                break;
+            }
+        }
+    }
+    if (addMode == AddAfterCurrentTrack)
+    {
+        index = self.currentIndex + 1;
+    }
+    
     for (NSDictionary* file in files)
     {
-        [self _addFileToPlaylist:file];
+        [self.playlist insertObject:file atIndex:index];
+        index++;
     }
     
     [self _playlistChanged];
@@ -85,7 +110,16 @@
 - (void)clear
 {
     [self.playlist removeAllObjects];
-    [self _playlistChanged];    
+    [self _playlistChanged];
+    
+    self.currentIndex = -1;
+    if (self.player)
+    {
+        [self.player stop];
+        self.player = nil;
+    }
+    
+    [self updateUI];
 }
 
 - (void)playAtIndex:(int)index
@@ -142,6 +176,7 @@
         {
             self.positionSlider.value = self.player.currentTime;
             self.positionSlider.maximumValue = self.player.duration;
+            self.positionSlider.enabled = true;
         }
     }
     else
@@ -157,25 +192,59 @@
         
         self.elapsedLabel.text = @"00:00";
         self.totalLabel.text = @"00:00";
+        
+        self.positionSlider.value = 0;
+        self.positionSlider.maximumValue = 0;
+        self.positionSlider.enabled = false;
     }
     
-    if (self.repeat == Disabled)
+    if (self.repeat == RepeatDisabled)
     {
         [self.repeatButton setImage:[UIImage imageNamed:@"repeat_disabled.png"] forState:UIControlStateNormal];
     }
-    if (self.repeat == Playlist)
+    if (self.repeat == RepeatPlaylist)
     {
         [self.repeatButton setImage:[UIImage imageNamed:@"repeat_playlist.png"] forState:UIControlStateNormal];
     }
-    if (self.repeat == Track)
+    if (self.repeat == RepeatTrack)
     {
         [self.repeatButton setImage:[UIImage imageNamed:@"repeat_track.png"] forState:UIControlStateNormal];
     }
 }
 
+- (IBAction)handlePlayPauseButtonTouchDown:(id)sender
+{
+    if (self.player)
+    {
+        if (self.player.playing)
+        {
+            [self.player pause];
+        }
+        else
+        {
+            [self.player play];
+        }
+    }
+    else
+    {
+        if ([self.playlist count] > 0)
+        {
+            [self playAtIndex:0];
+        }
+    }
+    
+    [self updateUI];
+}
+
 - (IBAction)handlePositionSliderTouchUpInside:(id)sender
 {
     self.player.currentTime = self.positionSlider.value;
+    [self updateUI];
+}
+
+- (IBAction)handleRepeatButtonTouchDown:(id)sender
+{
+    self.repeat = (self.repeat + 1) % 3;
     [self updateUI];
 }
 
@@ -196,6 +265,26 @@
         [self.playlist removeObjectAtIndex:index];
         [self _playlistChanged];
     }
+}
+
+- (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer
+{
+    if (recognizer.state != UIGestureRecognizerStateEnded)
+    {
+        return;
+    }
+    
+    self.currentIndex = -1;
+    if (self.player)
+    {
+        [self.player stop];
+        self.player = nil;
+    }
+    
+    [self.playlist removeAllObjects];
+    [self _playlistChanged];
+    
+    [self updateUI];
 }
 
 #pragma mark - Table view data source
@@ -249,11 +338,11 @@
     NSDictionary* item = [self itemForIndexPath:indexPath];
     
     MusicFileState state = [musicFileManager getState:item];
-    if (state.state == NotBuffered)
+    if (state.state == MusicFileNotBuffered)
     {
         cell.textLabel.textColor = [UIColor grayColor];
     }
-    if (state.state == Buffering)
+    if (state.state == MusicFileBuffering)
     {
         UIColor* fillColor = [UIColor grayColor];
         if (state.buffering.isError)
@@ -272,7 +361,7 @@
         cell.backgroundView = view;
         [view release];
     }
-    if (state.state == Buffered)
+    if (state.state == MusicFileBuffered)
     {
     }
     
@@ -287,20 +376,31 @@
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
 {
     MusicFileState state = [musicFileManager getState:[self.playlist objectAtIndex:self.currentIndex]];
-    if (state.state == Buffering)
+    if (state.state == MusicFileBuffering)
     {
         [self tryToResumePlayingNowBufferingFile];
         return;
     }
     
-    self.currentIndex++;
-    if (!(self.currentIndex < [self.playlist count]))
-    {        
-        [self.tableView reloadData];
+    if (self.repeat != RepeatTrack)
+    {
+        self.currentIndex++;
+        if (self.repeat == RepeatPlaylist)
+        {
+            self.currentIndex %= [self.playlist count];
+        }
         
-        [self bufferMostNecessary];
+        if (!(self.currentIndex < [self.playlist count]))
+        {
+            self.currentIndex = -1;
+            self.player = nil;
+            
+            [self.tableView reloadData];
         
-        return;
+            [self bufferMostNecessary];
+        
+            return;
+        }
     }
     
     [self playAtIndex:self.currentIndex];
@@ -308,27 +408,47 @@
 
 #pragma mark - Internals
 
-- (void)_addFileToPlaylist:(NSDictionary*)file
-{
-    [self.playlist addObject:file];
-}
-
 - (void)_playlistChanged
 {
     [self.sections removeAllObjects];
-        
-    NSString* currentSection = @"<bad section>";
+
     for (int i = 0; i < [self.playlist count]; i++)
     {
         NSDictionary* file = [self.playlist objectAtIndex:i];
         
-        NSArray* reversed = [[[[file objectForKey:@"path"] componentsSeparatedByString:@"/"] reverseObjectEnumerator] allObjects];
-        NSString* sectionTitle = [[reversed subarrayWithRange:NSMakeRange(1, [reversed count] - 1)] componentsJoinedByString:@" < "];
-        
-        if (![sectionTitle isEqualToString:currentSection])
+        NSMutableString* album = [[NSMutableString alloc] init];
+        if (!([[file objectForKey:@"album"] isEqualToString:@""]))
         {
-            [self.sections addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:sectionTitle, @"title", [[NSMutableArray alloc] init], @"files", nil]];
-            currentSection = sectionTitle;
+            [album appendString:[file objectForKey:@"album"]];
+            if (!([[file objectForKey:@"date"] isEqualToString:@""]))
+            {
+                [album appendString:[NSString stringWithFormat:@" (%@)", [file objectForKey:@"date"]]];
+            }
+        }
+        
+        NSMutableString* title = [album mutableCopy];
+        if (!([[file objectForKey:@"artist"] isEqualToString:@""]))
+        {
+            if (!([title isEqualToString:@""]))
+            {
+                [title appendString:@" by "];
+            }
+            [title appendString:[file objectForKey:@"artist"]];
+        }
+        
+        if (
+            [self.sections count] == 0 ||
+            ![title isEqualToString:[[self.sections lastObject] objectForKey:@"title"]]
+        )
+        {
+            if ([self.sections count] > 0 && ![album isEqualToString:@""] && [album isEqualToString:[[self.sections lastObject] objectForKey:@"album"]])
+            {
+                [[self.sections lastObject] setObject:album forKey:@"title"];
+            }
+            else
+            {
+                [self.sections addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:title, @"title", album, @"album", [[NSMutableArray alloc] init], @"files", nil]];
+            }
         }
         
         [[[self.sections lastObject] objectForKey:@"files"] addObject:[NSNumber numberWithInt:i]];
@@ -347,7 +467,7 @@
         {
             NSDictionary* item = [self.playlist objectAtIndex:i];
             MusicFileState state = [musicFileManager getState:item];
-            if (state.state != Buffered)
+            if (state.state != MusicFileBuffered)
             {
                 [musicFileManager buffer:item];
                 return;
@@ -358,7 +478,7 @@
     for (NSDictionary* item in self.playlist)
     {
         MusicFileState state = [musicFileManager getState:item];
-        if (state.state != Buffered)
+        if (state.state != MusicFileBuffered)
         {
             [musicFileManager buffer:item];
             return;
@@ -403,7 +523,7 @@
     }
     
     MusicFileState state = [musicFileManager getState:[self.playlist objectAtIndex:self.currentIndex]];
-    if (state.state == Buffering)
+    if (state.state == MusicFileBuffering)
     {
         [self playAtIndex:self.currentIndex atPosition:self.player.duration];
     }

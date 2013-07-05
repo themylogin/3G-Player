@@ -18,7 +18,7 @@
 
 @end
 
-static char const* const AFTER_CURRENT = "AFTER_CURRENT";
+static char const* const ADD_MODE = "ADD_MODE";
 static char const* const DIRECTORY = "DIRECTORY";
 static char const* const ITEM = "ITEM";
 
@@ -138,11 +138,11 @@ static char const* const ITEM = "ITEM";
         NSDictionary* item = [self getItemForIndexPath:indexPath];
         if ([self isDirectory:item])
         {
-            [self addDirectoryToPlaylist:[item objectForKey:@"path"] afterCurrent:NO askConfirmation:YES];
+            [self addDirectoryToPlaylist:[item objectForKey:@"path"] mode:AddToTheEnd askConfirmation:YES];
         }
         else
         {
-            [controllers.playlist addFile:item afterCurrent:NO];
+            [controllers.playlist addFiles:[NSArray arrayWithObject:item] mode:AddToTheEnd];
         }
     }
 }
@@ -164,7 +164,8 @@ static char const* const ITEM = "ITEM";
                                                         cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
                                                    destructiveButtonTitle:NSLocalizedString(@"Delete", nil)
                                                         otherButtonTitles:NSLocalizedString(@"Add", nil),
-                                                                          NSLocalizedString(@"Add after current", nil),
+                                                                          NSLocalizedString(@"Add after current album", nil),
+                                                                          NSLocalizedString(@"Add after current track", nil),
                                                                           NSLocalizedString(@"Replace", nil),
                                                                           NSLocalizedString(@"Replace and play", nil),
                                                                           nil];
@@ -179,11 +180,12 @@ static char const* const ITEM = "ITEM";
 - (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     const int DELETE            = 0;
-    const int ADD               = 1;
-    const int ADD_AFTER_CURRENT = 2;
-    const int REPLACE           = 3;
-    const int REPLACE_AND_PLAY  = 4;
-    const int CANCEL            = 5;
+    const int ADD __unused      = 1;
+    const int ADD_AFTER_ALBUM   = 2;
+    const int ADD_AFTER_TRACK   = 3;
+    const int REPLACE           = 4;
+    const int REPLACE_AND_PLAY  = 5;
+    const int CANCEL            = 6;
     
     if (buttonIndex == CANCEL)
     {
@@ -237,19 +239,28 @@ static char const* const ITEM = "ITEM";
         [controllers.playlist clear];
     }
     
-    BOOL afterCurrent = (buttonIndex == ADD_AFTER_CURRENT);
+    AddMode addMode = AddToTheEnd;
+    if (buttonIndex == ADD_AFTER_ALBUM)
+    {
+        addMode = AddAfterCurrentAlbum;
+    }
+    if (buttonIndex == ADD_AFTER_TRACK)
+    {
+        addMode = AddAfterCurrentTrack;
+    }
+    
     if ([self isDirectory:item])
     {
-        [self addDirectoryToPlaylist:[item objectForKey:@"path"] afterCurrent:afterCurrent askConfirmation:YES];
+        [self addDirectoryToPlaylist:[item objectForKey:@"path"] mode:addMode askConfirmation:YES];
     }
     else
     {
-        [controllers.playlist addFile:item afterCurrent:afterCurrent];
+        [controllers.playlist addFiles:[NSArray arrayWithObject:item] mode:addMode];
     }
         
     if (buttonIndex == REPLACE_AND_PLAY)
     {
-        
+        [controllers.playlist playAtIndex:0];
     }
 }
 
@@ -259,7 +270,7 @@ static char const* const ITEM = "ITEM";
 {
     if (buttonIndex == 1)
     {
-        [self addDirectoryToPlaylist:objc_getAssociatedObject(alertView, DIRECTORY) afterCurrent:[objc_getAssociatedObject(alertView, AFTER_CURRENT) boolValue] askConfirmation:NO];
+        [self addDirectoryToPlaylist:objc_getAssociatedObject(alertView, DIRECTORY) mode:[objc_getAssociatedObject(alertView, ADD_MODE) intValue] askConfirmation:NO];
     }
 }
 
@@ -293,13 +304,13 @@ static char const* const ITEM = "ITEM";
     }
 }
 
-- (void) addDirectoryToPlaylist:(NSString*)directory afterCurrent:(BOOL)afterCurrent askConfirmation:(BOOL)ask
+- (void) addDirectoryToPlaylist:(NSString*)directory mode:(AddMode)addMode askConfirmation:(BOOL)ask
 {
     NSMutableArray* filesToAdd = [[NSMutableArray alloc] init];
     
     if ([self addDirectory:directory to:filesToAdd askConfirmation:ask])
     {
-        [controllers.playlist addFiles:filesToAdd afterCurrent:afterCurrent];
+        [controllers.playlist addFiles:filesToAdd mode:addMode];
     }
     else
     {        
@@ -309,7 +320,7 @@ static char const* const ITEM = "ITEM";
                                               cancelButtonTitle:NSLocalizedString(@"No", nil)
                                               otherButtonTitles:NSLocalizedString(@"Yes", nil), nil];
         objc_setAssociatedObject(alert, DIRECTORY, directory, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        objc_setAssociatedObject(alert, AFTER_CURRENT, [NSNumber numberWithBool:afterCurrent], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(alert, ADD_MODE, [NSNumber numberWithInt:addMode], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [alert show];
         [alert release];
     }

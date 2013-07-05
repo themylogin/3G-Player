@@ -46,11 +46,11 @@
     MusicFileState state;
     if ([self.fileManager fileExistsAtPath:[self filePath:musicFile]])
     {
-        state.state = Buffered;
+        state.state = MusicFileBuffered;
     }
     else if (self.bufferingFile && [[self.bufferingFile objectForKey:@"path"] isEqualToString:[musicFile objectForKey:@"path"]])
     {
-        state.state = Buffering;
+        state.state = MusicFileBuffering;
         
         NSString* incompletePath = [self incompleteFilePath:musicFile];
         unsigned long long fileSize = 0;
@@ -71,7 +71,7 @@
     }
     else
     {
-        state.state = NotBuffered;
+        state.state = MusicFileNotBuffered;
     }
     return state;
 }

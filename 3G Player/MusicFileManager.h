@@ -9,9 +9,9 @@
 #import <Foundation/Foundation.h>
 
 typedef enum {
-    NotBuffered,
-    Buffering,
-    Buffered,
+    MusicFileNotBuffered,
+    MusicFileBuffering,
+    MusicFileBuffered,
 } MusicFileStateId;
 
 typedef union {

@@ -10,6 +10,8 @@
 
 #import <AVFoundation/AVFoundation.h>
 
+typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack } AddMode;
+
 @interface PlaylistController : UIViewController <AVAudioPlayerDelegate>
 
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
@@ -19,13 +21,15 @@
 @property (nonatomic, retain) IBOutlet UILabel* totalLabel;
 @property (nonatomic, retain) IBOutlet UIButton* repeatButton;
 
-- (void)addFile:(NSDictionary*)file afterCurrent:(BOOL)afterCurrent;
-- (void)addFiles:(NSArray*)files afterCurrent:(BOOL)afterCurrent;
+- (void)addFiles:(NSArray*)files mode:(AddMode)addMode;
 - (void)clear;
 
 - (void)playAtIndex:(int)index;
 
+- (IBAction)handlePlayPauseButtonTouchDown:(id)sender;
 - (IBAction)handlePositionSliderTouchUpInside:(id)sender;
+- (IBAction)handleRepeatButtonTouchDown:(id)sender;
 - (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer;
+- (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer;
 
 @end
