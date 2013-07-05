@@ -33,6 +33,12 @@
 		84C4CA2F1785E3ED00A95DB9 /* repeat_disabled.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C4CA271785E3ED00A95DB9 /* repeat_disabled.png */; };
 		84C4CA301785E3ED00A95DB9 /* repeat_playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C4CA281785E3ED00A95DB9 /* repeat_playlist.png */; };
 		84C4CA311785E3ED00A95DB9 /* repeat_track.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C4CA291785E3ED00A95DB9 /* repeat_track.png */; };
+		84C4CA3B1786D71E00A95DB9 /* FMCallback.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA341786D71E00A95DB9 /* FMCallback.m */; };
+		84C4CA3C1786D71E00A95DB9 /* FMEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA361786D71E00A95DB9 /* FMEngine.m */; };
+		84C4CA3D1786D71E00A95DB9 /* FMEngineURLConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA381786D71E00A95DB9 /* FMEngineURLConnection.m */; };
+		84C4CA3E1786D71E00A95DB9 /* NSString+FMEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA3A1786D71E00A95DB9 /* NSString+FMEngine.m */; };
+		84C4CA411786D7FB00A95DB9 /* Scrobbler.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA401786D7FB00A95DB9 /* Scrobbler.m */; };
+		84C4CA431786F4EB00A95DB9 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 84C4CA421786F4EA00A95DB9 /* Settings.bundle */; };
 		84C9196C178416D600810B88 /* LFCGzipUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C9196B178416D600810B88 /* LFCGzipUtility.m */; };
 		84C9196E1784173500810B88 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C9196D1784173400810B88 /* libz.dylib */; };
 		84C919C917841B7C00810B88 /* ASIAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C9197217841B7C00810B88 /* ASIAuthenticationDialog.m */; };
@@ -92,6 +98,17 @@
 		84C4CA271785E3ED00A95DB9 /* repeat_disabled.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = repeat_disabled.png; sourceTree = "<group>"; };
 		84C4CA281785E3ED00A95DB9 /* repeat_playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = repeat_playlist.png; sourceTree = "<group>"; };
 		84C4CA291785E3ED00A95DB9 /* repeat_track.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = repeat_track.png; sourceTree = "<group>"; };
+		84C4CA331786D71E00A95DB9 /* FMCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMCallback.h; sourceTree = "<group>"; };
+		84C4CA341786D71E00A95DB9 /* FMCallback.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMCallback.m; sourceTree = "<group>"; };
+		84C4CA351786D71E00A95DB9 /* FMEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMEngine.h; sourceTree = "<group>"; };
+		84C4CA361786D71E00A95DB9 /* FMEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMEngine.m; sourceTree = "<group>"; };
+		84C4CA371786D71E00A95DB9 /* FMEngineURLConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMEngineURLConnection.h; sourceTree = "<group>"; };
+		84C4CA381786D71E00A95DB9 /* FMEngineURLConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMEngineURLConnection.m; sourceTree = "<group>"; };
+		84C4CA391786D71E00A95DB9 /* NSString+FMEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+FMEngine.h"; sourceTree = "<group>"; };
+		84C4CA3A1786D71E00A95DB9 /* NSString+FMEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+FMEngine.m"; sourceTree = "<group>"; };
+		84C4CA3F1786D7FA00A95DB9 /* Scrobbler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scrobbler.h; sourceTree = "<group>"; };
+		84C4CA401786D7FB00A95DB9 /* Scrobbler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Scrobbler.m; sourceTree = "<group>"; };
+		84C4CA421786F4EA00A95DB9 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = SOURCE_ROOT; };
 		84C9196A1784163000810B88 /* LFCGzipUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LFCGzipUtility.h; sourceTree = "<group>"; };
 		84C9196B178416D600810B88 /* LFCGzipUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LFCGzipUtility.m; sourceTree = "<group>"; };
 		84C9196D1784173400810B88 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
@@ -203,6 +220,8 @@
 				84C4CA181785ADA500A95DB9 /* PlaylistController.xib */,
 				84C91A0817856C5500810B88 /* MusicFileManager.h */,
 				84C91A0917856C5500810B88 /* MusicFileManager.m */,
+				84C4CA3F1786D7FA00A95DB9 /* Scrobbler.h */,
+				84C4CA401786D7FB00A95DB9 /* Scrobbler.m */,
 				84C10C071782E20A004220BC /* LibraryController.h */,
 				84C10C081782E20A004220BC /* LibraryController.m */,
 				84C4CA131785ADA500A95DB9 /* LibraryPageController.h */,
@@ -211,6 +230,7 @@
 				84C9196A1784163000810B88 /* LFCGzipUtility.h */,
 				84C9196B178416D600810B88 /* LFCGzipUtility.m */,
 				84C9196F17841B7C00810B88 /* ASIHTTPRequest */,
+				84C4CA321786D71D00A95DB9 /* FMEngine */,
 				84C10C141782E72F004220BC /* JSONKit */,
 				84C919F61784255200810B88 /* ZipArchive */,
 				84C10BF11782E08E004220BC /* Supporting Files */,
@@ -221,6 +241,7 @@
 		84C10BF11782E08E004220BC /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				84C4CA421786F4EA00A95DB9 /* Settings.bundle */,
 				84C4CA221785E3ED00A95DB9 /* icons.png */,
 				84C4CA231785E3ED00A95DB9 /* pause_active.png */,
 				84C4CA241785E3ED00A95DB9 /* pause_inactive.png */,
@@ -247,6 +268,21 @@
 				84C10C161782E72F004220BC /* JSONKit.m */,
 			);
 			path = JSONKit;
+			sourceTree = "<group>";
+		};
+		84C4CA321786D71D00A95DB9 /* FMEngine */ = {
+			isa = PBXGroup;
+			children = (
+				84C4CA331786D71E00A95DB9 /* FMCallback.h */,
+				84C4CA341786D71E00A95DB9 /* FMCallback.m */,
+				84C4CA351786D71E00A95DB9 /* FMEngine.h */,
+				84C4CA361786D71E00A95DB9 /* FMEngine.m */,
+				84C4CA371786D71E00A95DB9 /* FMEngineURLConnection.h */,
+				84C4CA381786D71E00A95DB9 /* FMEngineURLConnection.m */,
+				84C4CA391786D71E00A95DB9 /* NSString+FMEngine.h */,
+				84C4CA3A1786D71E00A95DB9 /* NSString+FMEngine.m */,
+			);
+			path = FMEngine;
 			sourceTree = "<group>";
 		};
 		84C9196F17841B7C00810B88 /* ASIHTTPRequest */ = {
@@ -393,6 +429,7 @@
 				84C4CA2F1785E3ED00A95DB9 /* repeat_disabled.png in Resources */,
 				84C4CA301785E3ED00A95DB9 /* repeat_playlist.png in Resources */,
 				84C4CA311785E3ED00A95DB9 /* repeat_track.png in Resources */,
+				84C4CA431786F4EB00A95DB9 /* Settings.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,6 +463,11 @@
 				84C4CA191785ADA500A95DB9 /* Globals.m in Sources */,
 				84C4CA1A1785ADA500A95DB9 /* LibraryPageController.m in Sources */,
 				84C4CA1C1785ADA500A95DB9 /* PlaylistController.m in Sources */,
+				84C4CA3B1786D71E00A95DB9 /* FMCallback.m in Sources */,
+				84C4CA3C1786D71E00A95DB9 /* FMEngine.m in Sources */,
+				84C4CA3D1786D71E00A95DB9 /* FMEngineURLConnection.m in Sources */,
+				84C4CA3E1786D71E00A95DB9 /* NSString+FMEngine.m in Sources */,
+				84C4CA411786D7FB00A95DB9 /* Scrobbler.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -19,6 +19,7 @@
 
 @property (nonatomic)         int currentIndex;
 @property (nonatomic, retain) AVAudioPlayer* player;
+@property (nonatomic, retain) NSDate* playerStartedAt;
 
 @property (nonatomic)         enum { RepeatDisabled, RepeatPlaylist, RepeatTrack } repeat;
 
@@ -108,16 +109,22 @@
 }
 
 - (void)clear
-{
+{    
+    if (self.player)
+    {
+        if (self.player.playing)
+        {
+            [self scrobbleIfNecessary];
+        }
+        
+        [self.player stop];
+        self.player = nil;
+    }    
+    
     [self.playlist removeAllObjects];
     [self _playlistChanged];
     
     self.currentIndex = -1;
-    if (self.player)
-    {
-        [self.player stop];
-        self.player = nil;
-    }
     
     [self updateUI];
 }
@@ -131,6 +138,11 @@
 {
     if (self.player)
     {
+        if (self.player.playing)
+        {
+            [self scrobbleIfNecessary];
+        }
+        
         [self.player stop];
         self.player = nil;
     }
@@ -149,6 +161,8 @@
             self.player.currentTime = position;
         }
         [self.player play];
+        
+        self.playerStartedAt = [NSDate date];
     }
     
     [self.tableView reloadData];
@@ -274,17 +288,7 @@
         return;
     }
     
-    self.currentIndex = -1;
-    if (self.player)
-    {
-        [self.player stop];
-        self.player = nil;
-    }
-    
-    [self.playlist removeAllObjects];
-    [self _playlistChanged];
-    
-    [self updateUI];
+    [self clear];
 }
 
 #pragma mark - Table view data source
@@ -381,6 +385,8 @@
         [self tryToResumePlayingNowBufferingFile];
         return;
     }
+    
+    [self scrobbleIfNecessary];
     
     if (self.repeat != RepeatTrack)
     {
@@ -526,6 +532,14 @@
     if (state.state == MusicFileBuffering)
     {
         [self playAtIndex:self.currentIndex atPosition:self.player.duration];
+    }
+}
+
+- (void)scrobbleIfNecessary
+{
+    if ([self.playerStartedAt timeIntervalSinceNow] <= -30)
+    {
+        [scrobbler scrobble:[self.playlist objectAtIndex:self.currentIndex] startedAt:self.playerStartedAt];
     }
 }
 

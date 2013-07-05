@@ -11,8 +11,12 @@
 _controllers controllers;
 
 MusicFileManager* musicFileManager;
+Scrobbler* scrobbler;
 
 NSString* libraryDirectory;
 NSString* playerUrl;
+
+NSString* lastfmUsername;
+NSString* lastfmPassword;
 
 UIBarButtonItem* updateLibraryButton;

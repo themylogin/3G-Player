@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>Title</key>
+			<string>player.thelogin.ru</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+			<string>http://player.thelogin.ru</string>
+			<key>Key</key>
+			<string>player_url</string>
+			<key>KeyboardType</key>
+			<string>URL</string>
+			<key>Title</key>
+			<string>URL</string>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>last.fm</string>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+			<string></string>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Login</string>
+			<key>Key</key>
+			<string>lastfm_username</string>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+			<string></string>
+			<key>IsSecure</key>
+			<true/>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Password</string>
+			<key>Key</key>
+			<string>lastfm_password</string>
+		</dict>
+	</array>
+	<key>StringsTable</key>
+	<string>Root</string>
+</dict>
+</plist>

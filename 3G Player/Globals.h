@@ -13,6 +13,7 @@
 #import "LibraryController.h"
 
 #import "MusicFileManager.h"
+#import "Scrobbler.h"
 
 typedef struct {
     LibraryController* library;
@@ -22,9 +23,13 @@ typedef struct {
 extern _controllers controllers;
 
 extern MusicFileManager* musicFileManager;
+extern Scrobbler* scrobbler;
 
 extern NSString* libraryDirectory;
 extern NSString* playerUrl;
+
+extern NSString* lastfmUsername;
+extern NSString* lastfmPassword;
 
 extern UIBarButtonItem* updateLibraryButton;
 
