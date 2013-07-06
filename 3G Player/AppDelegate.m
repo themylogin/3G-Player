@@ -29,6 +29,7 @@
     [self readDefaults];
     
     libraryDirectory = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingString:@"/Library"];
+    [[NSFileManager defaultManager] createDirectoryAtPath:libraryDirectory withIntermediateDirectories:YES attributes:nil error:nil];
     [libraryDirectory retain];
     
     musicFileManager = [[MusicFileManager alloc] init];
