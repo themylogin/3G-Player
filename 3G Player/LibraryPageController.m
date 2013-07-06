@@ -26,7 +26,7 @@ static char const* const ITEM = "ITEM";
 
 - (id)initWithDirectory:(NSString*)directory title:(NSString*)title
 {
-    self = [super init];
+    self = [super initWithNibName:@"LibraryPageController" bundle:nil];
     if (self)
     {
         self.directory = directory;
@@ -122,10 +122,6 @@ static char const* const ITEM = "ITEM";
         [self.navigationController pushViewController:libraryPageController animated:YES];
         [libraryPageController release];
     }
-    // else
-    // {
-    //     [controllers.playlist addFile:item afterCurrent:NO];
-    // }
 }
 
 #pragma mark - Gesture recognizer
@@ -202,27 +198,26 @@ static char const* const ITEM = "ITEM";
             NSDirectoryEnumerator* de = [[NSFileManager defaultManager] enumeratorAtPath:path];
             while (true)
             {
-                NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-            
-                NSString* file = [de nextObject];
-                if (!file)
+                @autoreleasepool
                 {
-                    break;
-                }
-                
-                NSString* filePath = [[path stringByAppendingString:@"/"] stringByAppendingString:file];
-            
-                BOOL isDirectory;
-                if ([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDirectory] && !isDirectory)
-                {
-                    NSString* fileName = [[file pathComponents] lastObject];
-                    if (!([fileName isEqualToString:@"index.json"] || [fileName isEqualToString:@"index.json.checksum"]))
+                    NSString* file = [de nextObject];
+                    if (!file)
                     {
-                        [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+                        break;
+                    }
+                    
+                    NSString* filePath = [[path stringByAppendingString:@"/"] stringByAppendingString:file];
+                    
+                    BOOL isDirectory;
+                    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDirectory] && !isDirectory)
+                    {
+                        NSString* fileName = [[file pathComponents] lastObject];
+                        if (!([fileName isEqualToString:@"index.json"] || [fileName isEqualToString:@"index.json.checksum"]))
+                        {
+                            [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+                        }
                     }
                 }
-            
-                [pool drain];
             }
         }
         else
@@ -330,32 +325,30 @@ static char const* const ITEM = "ITEM";
 
 - (BOOL) addDirectory:(NSString*)directory to:(NSMutableArray*)playlist askConfirmation:(BOOL)ask
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    
-    for (NSDictionary* item in [self loadIndexFor:directory])
+    @autoreleasepool
     {
-        if ([self isDirectory:item])
+        for (NSDictionary* item in [self loadIndexFor:directory])
         {
-            if (![self addDirectory:[item objectForKey:@"path"] to:playlist askConfirmation:ask])
+            if ([self isDirectory:item])
             {
-                [pool drain];
-                return FALSE;
+                if (![self addDirectory:[item objectForKey:@"path"] to:playlist askConfirmation:ask])
+                {
+                    return FALSE;
+                }
+            }
+            else
+            {
+                [playlist addObject:item];
+                if (ask && playlist.count > 128)
+                {
+                    [playlist removeAllObjects];
+                    return FALSE;
+                }
             }
         }
-        else
-        {
-            [playlist addObject:item];
-            if (ask && playlist.count > 128)
-            {
-                [playlist removeAllObjects];
-                [pool drain];
-                return FALSE;
-            }
-        }
+        
+        return TRUE;
     }
-    
-    [pool drain];
-    return TRUE;
 }
 
 - (NSDictionary*)getItemForIndexPath:(NSIndexPath*)indexPath

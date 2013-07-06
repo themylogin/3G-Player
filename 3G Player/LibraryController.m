@@ -53,27 +53,26 @@
         NSDirectoryEnumerator* de = [[NSFileManager defaultManager] enumeratorAtPath:libraryDirectory];
         while (true)
         {
-            NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-            
-            NSString* file = [de nextObject];
-            if (!file)
+            @autoreleasepool
             {
-                break;
-            }
-            
-            if ([[[file pathComponents] lastObject] isEqualToString:@"index.json"])
-            {
-                NSMutableArray* dirComponents = [[file pathComponents] mutableCopy];
-                [dirComponents removeLastObject];
-                NSString* dir = [dirComponents componentsJoinedByString:@"/"];
-                [dirComponents release];
+                NSString* file = [de nextObject];
+                if (!file)
+                {
+                    break;
+                }
+                
+                if ([[[file pathComponents] lastObject] isEqualToString:@"index.json"])
+                {
+                    NSMutableArray* dirComponents = [[file pathComponents] mutableCopy];
+                    [dirComponents removeLastObject];
+                    NSString* dir = [dirComponents componentsJoinedByString:@"/"];
+                    [dirComponents release];
                     
-                NSString* checksum = [NSString stringWithContentsOfFile:[[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:file] stringByAppendingString:@".checksum"] encoding:NSASCIIStringEncoding error:nil];
+                    NSString* checksum = [NSString stringWithContentsOfFile:[[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:file] stringByAppendingString:@".checksum"] encoding:NSASCIIStringEncoding error:nil];
                     
-                [clientDirectories addObject:[NSString stringWithFormat:@"%@ %@", dir, checksum, nil]];
+                    [clientDirectories addObject:[NSString stringWithFormat:@"%@ %@", dir, checksum, nil]];
+                }
             }
-            
-            [pool drain];
         }
         
         NSData* compressedClientDirectories = [LFCGzipUtility gzipData:[[clientDirectories componentsJoinedByString:@"\n"] dataUsingEncoding:NSASCIIStringEncoding]];
