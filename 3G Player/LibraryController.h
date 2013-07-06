@@ -10,4 +10,6 @@
 
 @interface LibraryController : UINavigationController
 
+- (id)initWithRoot;
+
 @end

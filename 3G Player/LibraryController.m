@@ -21,7 +21,7 @@
 
 @implementation LibraryController
 
-- (id)init
+- (id)initWithRoot
 {
     self = [super initWithRootViewController:[[LibraryPageController alloc] initWithDirectory:@"" title:NSLocalizedString(@"Library", @"Library")]];
     if (self)

@@ -42,7 +42,7 @@
     controllers.playlist = [[PlaylistController alloc] init];
     [self.tabBarController addChildViewController:controllers.playlist];
     
-    controllers.library = [[LibraryController alloc] init];
+    controllers.library = [[LibraryController alloc] initWithRoot];
     [self.tabBarController addChildViewController:controllers.library];
     
     self.window.backgroundColor = [UIColor whiteColor];
