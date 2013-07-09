@@ -20,3 +20,4 @@ NSString* lastfmUsername;
 NSString* lastfmPassword;
 
 UIBarButtonItem* updateLibraryButton;
+UIBarButtonItem* updateLibraryProgress;

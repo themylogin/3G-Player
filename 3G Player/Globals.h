@@ -32,5 +32,6 @@ extern NSString* lastfmUsername;
 extern NSString* lastfmPassword;
 
 extern UIBarButtonItem* updateLibraryButton;
+extern UIBarButtonItem* updateLibraryProgress;
 
 #endif

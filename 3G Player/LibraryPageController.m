@@ -66,6 +66,7 @@ static char const* const ITEM = "ITEM";
     [super viewDidLoad];
  
     self.navigationItem.rightBarButtonItem = updateLibraryButton;
+    self.toolbarItems = [NSArray arrayWithObject:updateLibraryProgress];
 }
 
 - (void)didReceiveMemoryWarning
