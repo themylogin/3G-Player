@@ -102,7 +102,8 @@
 
         NSURL* updateUrl = [NSURL URLWithString:[playerUrl stringByAppendingString:@"/update"]];
         ASIHTTPRequest* updateRequest = [ASIHTTPRequest requestWithURL:updateUrl];
-        updateRequest.allowCompressedResponse = NO;
+        [updateRequest setAllowCompressedResponse:NO];
+        [updateRequest setShouldContinueWhenAppEntersBackground:YES];
         [updateRequest setDataReceivedBlock:^(NSData* data){
             NSString* string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
             NSArray* items = [[string stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]] componentsSeparatedByString:@"\n"];            
@@ -134,6 +135,7 @@
         {
             NSURL* libraryUrl = [NSURL URLWithString:[playerUrl stringByAppendingString:@"/library"]];
             ASIFormDataRequest* libraryRequest = [ASIFormDataRequest requestWithURL:libraryUrl];
+            [libraryRequest setShouldContinueWhenAppEntersBackground:YES];
             [libraryRequest setData:compressedClientDirectories withFileName:@"client_directories.txt" andContentType:@"text/plain" forKey:@"library"];
             [libraryRequest setDownloadDestinationPath:libraryFile];
             [libraryRequest setBytesSentBlock:^(unsigned long long size, unsigned long long total) {
