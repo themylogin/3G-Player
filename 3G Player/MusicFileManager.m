@@ -10,6 +10,8 @@
 
 #import "Globals.h"
 
+#import "ASIHTTPRequest.h"
+
 @interface MusicFileManager ()
 
 @property (nonatomic, retain) NSFileManager*        fileManager;
@@ -19,7 +21,7 @@
 @property (nonatomic)         bool              bufferingIsError;
 @property (nonatomic)         uint              bufferingExpectedLength;
 
-@property (nonatomic, retain) NSURLConnection*  bufferingConnection;
+@property (nonatomic, retain) ASIHTTPRequest*   bufferingRequest;
 @property (nonatomic, retain) NSFileHandle*     bufferingFileHandle;
 
 @end
@@ -35,7 +37,7 @@
     self.bufferingIsError = false;
     self.bufferingExpectedLength = 0;
     
-    self.bufferingConnection = nil;
+    self.bufferingRequest = nil;
     self.bufferingFileHandle = nil;
     
     return self;
@@ -103,7 +105,7 @@
         }
         else
         {            
-            [self stopBufferingConnection];
+            [self stopBufferingRequest];
         }
     }
     
@@ -111,7 +113,7 @@
     self.bufferingIsError = false;
     self.bufferingExpectedLength = 0;
     
-    [self startBufferingConnection:musicFile];    
+    [self startBufferingRequest:musicFile];    
     
     [self notifyStateChanged];
 }
@@ -120,7 +122,7 @@
 {
     if (self.bufferingFile)
     {
-        [self stopBufferingConnection];
+        [self stopBufferingRequest];
         
         self.bufferingFile = nil;
         self.bufferingIsError = false;
@@ -130,9 +132,9 @@
     }
 }
 
-- (void)startBufferingConnection:(NSDictionary*)musicFile
+- (void)startBufferingRequest:(NSDictionary*)musicFile
 {
-    [self stopBufferingConnection];
+    [self stopBufferingRequest];
     
     NSString* url = [[playerUrl stringByAppendingString:@"/file?path="] stringByAppendingString:[musicFile objectForKey:@"url"]];
     NSString* incompletePath = [self incompleteFilePath:musicFile];
@@ -152,80 +154,63 @@
     self.bufferingFileHandle = [NSFileHandle fileHandleForWritingAtPath:incompletePath];
     [self.bufferingFileHandle seekToEndOfFile];
     
-    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60.0];
-    self.bufferingConnection = [NSURLConnection connectionWithRequest:request delegate:self];
-}
-
-- (void)stopBufferingConnection
-{
-    if (self.bufferingConnection)
-    {
-        [self.bufferingConnection cancel];
-        self.bufferingConnection = nil;
-    }
-    
-    if (self.bufferingFileHandle)
-    {
-        [self.bufferingFileHandle closeFile];
-        self.bufferingFileHandle = nil;
-    }
-}
-
-#pragma mark - NSURLConnection delegate
-
-- (void)connection:(NSURLConnection*)connection didFailWithError:(NSError *)error
-{
-    self.bufferingIsError = true;    
-    [self performSelector:@selector(startBufferingConnection:) withObject:self.bufferingFile afterDelay:5.0];    
-    
-    [self notifyStateChanged];
-}
-
-- (void)connection:(NSURLConnection*)connection didReceiveResponse:(NSURLResponse *)response
-{
-    NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
-    if ([httpResponse statusCode] != 200)
-    {        
+    self.bufferingRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:url]];
+    [self.bufferingRequest setAllowCompressedResponse:NO];
+    [self.bufferingRequest setShouldContinueWhenAppEntersBackground:YES];
+    [self.bufferingRequest setTimeOutSeconds:60.0];
+    [self.bufferingRequest setFailedBlock:^{
         self.bufferingIsError = true;
         [self performSelector:@selector(startBufferingConnection:) withObject:self.bufferingFile afterDelay:5.0];
-    }
-    else
-    {
+        
+        [self notifyStateChanged];
+    }];
+    [self.bufferingRequest setHeadersReceivedBlock:^(NSDictionary* responseHeaders){
+        if ([self.bufferingRequest responseStatusCode] != 200)
+        {
+            self.bufferingIsError = true;
+            [self performSelector:@selector(startBufferingConnection:) withObject:self.bufferingFile afterDelay:5.0];
+        }
+        else
+        {
+            self.bufferingIsError = false;
+            self.bufferingExpectedLength = [[responseHeaders objectForKey:@"X-Expected-Content-Length"] intValue];
+        }
+        
+        [self notifyStateChanged];
+    }];
+    [self.bufferingRequest setDataReceivedBlock:^(NSData* data){
+        [self.bufferingFileHandle writeData:data];
+        
+        [self notifyStateChanged];
+    }];
+    [self.bufferingRequest setCompletionBlock:^{        
+        [self stopBufferingRequest];
+        
+        [self.fileManager moveItemAtPath:[self incompleteFilePath:self.bufferingFile] toPath:[self filePath:self.bufferingFile] error:nil];
+        
+        self.bufferingFile = nil;
         self.bufferingIsError = false;
-        self.bufferingExpectedLength = [[[httpResponse allHeaderFields] objectForKey:@"X-Expected-Content-Length"] intValue];
-    }
-    
-    [self notifyStateChanged];
+        self.bufferingExpectedLength = 0;
+        
+        [self notifyStateChanged];
+        [self notifyBufferingCompleted];
+    }];
+    [self.bufferingRequest startAsynchronous];
 }
 
-- (void)connection:(NSURLConnection*)connection didReceiveData:(NSData *)data
+- (void)stopBufferingRequest
 {
-    [self.bufferingFileHandle writeData:data];
-    
-    [self notifyStateChanged];
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection*)connection
-{
-    if (self.bufferingConnection)
+    if (self.bufferingRequest)
     {
-        [self.bufferingConnection cancel];
-        self.bufferingConnection = nil;
+        [self.bufferingRequest cancel];
+        self.bufferingRequest = nil;
     }
+    
     if (self.bufferingFileHandle)
     {
         [self.bufferingFileHandle closeFile];
         self.bufferingFileHandle = nil;
     }
-    
-    [self.fileManager moveItemAtPath:[self incompleteFilePath:self.bufferingFile] toPath:[self filePath:self.bufferingFile] error:nil];
-    
-    self.bufferingFile = nil;
-    self.bufferingIsError = false;
-    self.bufferingExpectedLength = 0;
-    
-    [self notifyStateChanged];
-    [self notifyBufferingCompleted];
 }
 
 #pragma mark - Internals
