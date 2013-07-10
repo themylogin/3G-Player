@@ -119,7 +119,9 @@
         
         [self.player stop];
         self.player = nil;
-    }    
+    }
+    
+    [musicFileManager stopBuffering];
     
     [self.playlist removeAllObjects];
     [self _playlistChanged];

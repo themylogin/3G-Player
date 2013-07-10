@@ -159,8 +159,13 @@
     [self.bufferingRequest setShouldContinueWhenAppEntersBackground:YES];
     [self.bufferingRequest setTimeOutSeconds:60.0];
     [self.bufferingRequest setFailedBlock:^{
+        if (!self.bufferingRequest)
+        {
+            return;
+        }
+        
         self.bufferingIsError = true;
-        [self performSelector:@selector(startBufferingConnection:) withObject:self.bufferingFile afterDelay:5.0];
+        [self performSelector:@selector(startBufferingRequest:) withObject:self.bufferingFile afterDelay:5.0];
         
         [self notifyStateChanged];
     }];
@@ -168,7 +173,7 @@
         if ([self.bufferingRequest responseStatusCode] != 200)
         {
             self.bufferingIsError = true;
-            [self performSelector:@selector(startBufferingConnection:) withObject:self.bufferingFile afterDelay:5.0];
+            [self performSelector:@selector(startBufferingRequest:) withObject:self.bufferingFile afterDelay:5.0];
         }
         else
         {
@@ -211,6 +216,45 @@
         [self.bufferingFileHandle closeFile];
         self.bufferingFileHandle = nil;
     }
+}
+
+- (void)deleteFileOrdirectory:(NSDictionary*)fileOrDirectory
+{
+    NSString* path = [[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[fileOrDirectory objectForKey:@"path"]];
+    if ([[fileOrDirectory objectForKey:@"type"] isEqualToString:@"directory"])
+    {
+        NSDirectoryEnumerator* de = [[NSFileManager defaultManager] enumeratorAtPath:path];
+        while (true)
+        {
+            @autoreleasepool
+            {
+                NSString* file = [de nextObject];
+                if (!file)
+                {
+                    break;
+                }
+                
+                NSString* filePath = [[path stringByAppendingString:@"/"] stringByAppendingString:file];
+                
+                BOOL isDirectory;
+                if ([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDirectory] && !isDirectory)
+                {
+                    NSString* fileName = [[file pathComponents] lastObject];
+                    if (!([fileName isEqualToString:@"index.json"] || [fileName isEqualToString:@"index.json.checksum"]))
+                    {
+                        [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+        [[NSFileManager defaultManager] removeItemAtPath:[path stringByAppendingString:@".incomplete"] error:nil];
+    }
+    
+    [self notifyStateChanged];
 }
 
 #pragma mark - Internals

@@ -193,40 +193,7 @@ static char const* const ITEM = "ITEM";
     
     if (buttonIndex == DELETE)
     {
-        NSString* path = [[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[item objectForKey:@"path"]];
-        if ([self isDirectory:item])
-        {        
-            NSDirectoryEnumerator* de = [[NSFileManager defaultManager] enumeratorAtPath:path];
-            while (true)
-            {
-                @autoreleasepool
-                {
-                    NSString* file = [de nextObject];
-                    if (!file)
-                    {
-                        break;
-                    }
-                    
-                    NSString* filePath = [[path stringByAppendingString:@"/"] stringByAppendingString:file];
-                    
-                    BOOL isDirectory;
-                    if ([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDirectory] && !isDirectory)
-                    {
-                        NSString* fileName = [[file pathComponents] lastObject];
-                        if (!([fileName isEqualToString:@"index.json"] || [fileName isEqualToString:@"index.json.checksum"]))
-                        {
-                            [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-                        }
-                    }
-                }
-            }
-        }
-        else
-        {
-            [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-            [[NSFileManager defaultManager] removeItemAtPath:[path stringByAppendingString:@".incomplete"] error:nil];
-        }
-        
+        [musicFileManager deleteFileOrdirectory:item];        
         return;
     }
     
