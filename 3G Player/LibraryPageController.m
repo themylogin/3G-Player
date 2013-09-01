@@ -353,31 +353,25 @@ static char const* const ITEM = "ITEM";
 {
     @autoreleasepool
     {
-        BOOL foundDirs = NO;
-        BOOL foundFiles = NO;
-        BOOL allFilesAreBuffered = YES;
         for (NSDictionary* childItem in [self loadIndexFor:[item objectForKey:@"path"]])
         {
             if ([self isDirectory:childItem])
             {
-                foundDirs = YES;
+                if (![self directoryIsBuffered:childItem])
+                {
+                    return NO;
+                }
             }
             else
             {
-                foundFiles = YES;
                 if (![self fileIsBuffered:childItem])
                 {
-                    allFilesAreBuffered = NO;
+                    return NO;
                 }
             }
         }
         
-        if (foundDirs)
-        {
-            return YES;
-        }
-        
-        return foundFiles ? allFilesAreBuffered : YES;
+        return YES;
     }
 }
 
