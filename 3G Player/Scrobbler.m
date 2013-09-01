@@ -36,6 +36,26 @@
     return self;
 }
 
+- (void)sendNowPlaying:(NSDictionary*)file
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{        
+        [self beAuthorized];
+        if (!self.sessionKey)
+        {
+            return;
+        }
+        
+        FMEngine* fmEngine = [[FMEngine alloc] init];
+        [fmEngine dataForMethod:@"track.updateNowPlaying" withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                          [file objectForKey:@"artist"], @"artist",
+                                                                          [file objectForKey:@"title"], @"track",
+                                                                          self.sessionKey, @"sk",
+                                                                          _LASTFM_API_KEY_, @"api_key",
+                                                                          nil] useSignature:YES httpMethod:POST_TYPE error:nil];
+        [fmEngine release];
+    });
+}
+
 - (void)scrobble:(NSDictionary*)file startedAt:(NSDate*)date
 {
     [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] addObject:[NSDictionary dictionaryWithObjectsAndKeys:[file objectForKey:@"artist"], @"artist", [file objectForKey:@"title"], @"title", date, @"startedAt", nil, nil]];

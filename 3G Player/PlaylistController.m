@@ -165,6 +165,7 @@
         [self.player play];
         
         self.playerStartedAt = [NSDate date];
+        [scrobbler sendNowPlaying:item];
     }
     
     [self.tableView reloadData];
