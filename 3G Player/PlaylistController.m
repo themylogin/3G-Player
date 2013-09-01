@@ -539,7 +539,7 @@
 
 - (void)scrobbleIfNecessary
 {
-    if ([self.playerStartedAt timeIntervalSinceNow] <= -30)
+    if ([[NSDate date] timeIntervalSinceDate:self.playerStartedAt] >= MIN(self.player.duration / 2, 240))
     {
         [scrobbler scrobble:[self.playlist objectAtIndex:self.currentIndex] startedAt:self.playerStartedAt];
     }
