@@ -20,6 +20,7 @@
 @property (nonatomic)         int currentIndex;
 @property (nonatomic, retain) AVAudioPlayer* player;
 @property (nonatomic, retain) NSDate* playerStartedAt;
+@property (nonatomic)         BOOL playerInterruptedWhilePlaying;
 
 @property (nonatomic)         enum { RepeatDisabled, RepeatPlaylist, RepeatTrack } repeat;
 
@@ -413,6 +414,24 @@
     }
     
     [self playAtIndex:self.currentIndex];
+}
+
+- (void)audioPlayerBeginInterruption:(AVAudioPlayer *)player
+{
+    self.playerInterruptedWhilePlaying = player.playing;
+}
+
+- (void)audioPlayerEndInterruption:(AVAudioPlayer *)player
+{
+    if (self.playerInterruptedWhilePlaying)
+    {
+        if (self.player)
+        {
+            [self.player play];
+        }
+        
+        self.playerInterruptedWhilePlaying = NO;
+    }
 }
 
 #pragma mark - Internals
