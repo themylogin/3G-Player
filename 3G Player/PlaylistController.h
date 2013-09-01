@@ -20,6 +20,7 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack } AddMode
 @property (nonatomic, retain) IBOutlet UILabel* elapsedLabel;
 @property (nonatomic, retain) IBOutlet UILabel* totalLabel;
 @property (nonatomic, retain) IBOutlet UIButton* repeatButton;
+@property (nonatomic, retain) IBOutlet UISlider* volumeSlider;
 
 - (void)addFiles:(NSArray*)files mode:(AddMode)addMode;
 - (void)clear;

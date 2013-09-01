@@ -10,6 +10,7 @@
 
 #import "Globals.h"
 
+#import <MediaPlayer/MediaPlayer.h>
 #import <QuartzCore/QuartzCore.h>
 
 @interface PlaylistController ()
@@ -47,6 +48,10 @@
         self.player = nil;
         
         self.repeat = RepeatDisabled;
+        
+        MPVolumeView* volumeView = [[MPVolumeView alloc] initWithFrame:self.volumeSlider.bounds];
+        [self.volumeSlider addSubview:volumeView];
+        [volumeView release];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerStateChanged) name:@"stateChanged" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingCompleted) name:@"bufferingCompleted" object:musicFileManager];
