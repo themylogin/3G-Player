@@ -97,7 +97,7 @@ static char const* const ITEM = "ITEM";
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
         cell.textLabel.adjustsFontSizeToFitWidth = true;
     }
-    
+        
     NSDictionary* item = [self getItemForIndexPath:indexPath];
     if ([self isDirectory:item])
     {
@@ -106,6 +106,14 @@ static char const* const ITEM = "ITEM";
     else
     {
         cell.accessoryType = UITableViewCellAccessoryNone;
+    }
+    if ([self isBuffered:item])
+    {        
+        cell.textLabel.textColor = [UIColor blackColor];
+    }
+    else
+    {        
+        cell.textLabel.textColor = [UIColor grayColor];
     }
     cell.textLabel.text = [item objectForKey:@"name"];
     
@@ -327,6 +335,55 @@ static char const* const ITEM = "ITEM";
 - (BOOL)isDirectory:(NSDictionary*)item
 {
     return [[item objectForKey:@"type"] isEqualToString:@"directory"];
+}
+
+- (BOOL)isBuffered:(NSDictionary*)item
+{
+    if ([self isDirectory:item])
+    {
+        return [self directoryIsBuffered:item];
+    }
+    else
+    {
+        return [self fileIsBuffered:item];
+    }
+}
+
+- (BOOL)directoryIsBuffered:(NSDictionary*)item
+{
+    @autoreleasepool
+    {
+        BOOL foundDirs = NO;
+        BOOL foundFiles = NO;
+        BOOL allFilesAreBuffered = YES;
+        for (NSDictionary* childItem in [self loadIndexFor:[item objectForKey:@"path"]])
+        {
+            if ([self isDirectory:childItem])
+            {
+                foundDirs = YES;
+            }
+            else
+            {
+                foundFiles = YES;
+                if (![self fileIsBuffered:childItem])
+                {
+                    allFilesAreBuffered = NO;
+                }
+            }
+        }
+        
+        if (foundDirs)
+        {
+            return YES;
+        }
+        
+        return foundFiles ? allFilesAreBuffered : YES;
+    }
+}
+
+- (BOOL)fileIsBuffered:(NSDictionary*)item
+{
+    return [musicFileManager getState:item].state == MusicFileBuffered;
 }
 
 @end
