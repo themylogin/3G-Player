@@ -35,6 +35,8 @@ static char const* const ITEM = "ITEM";
         self.fileManager = [NSFileManager defaultManager];
         
         self.index = [self loadIndexFor:self.directory];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerStateChanged) name:@"stateChanged" object:musicFileManager];
     }
     return self;
 }
@@ -378,6 +380,11 @@ static char const* const ITEM = "ITEM";
 - (BOOL)fileIsBuffered:(NSDictionary*)item
 {
     return [musicFileManager getState:item].state == MusicFileBuffered;
+}
+
+- (void)onMusicFileManagerStateChanged
+{
+    [self.tableView reloadData];
 }
 
 @end
