@@ -185,7 +185,7 @@
     [self.bufferingRequest setDataReceivedBlock:^(NSData* data){
         [self.bufferingFileHandle writeData:data];
         
-        [self notifyStateChanged];
+        [self notifyBufferingProgressFor:self.bufferingFile];
     }];
     [self.bufferingRequest setCompletionBlock:^{        
         [self stopBufferingRequest];
@@ -271,6 +271,11 @@
 - (void)notifyStateChanged
 {
     [self.notificationCenter postNotificationName:@"stateChanged" object:self];
+}
+
+- (void)notifyBufferingProgressFor:(NSDictionary*)musicFile
+{
+    [self.notificationCenter postNotificationName:@"bufferingProgress" object:self userInfo:[NSDictionary dictionaryWithObjectsAndKeys:musicFile, @"file", nil]];
 }
 
 - (void)notifyBufferingCompleted

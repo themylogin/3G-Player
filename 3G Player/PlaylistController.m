@@ -54,6 +54,7 @@
         [volumeView release];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerStateChanged) name:@"stateChanged" object:musicFileManager];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingProgress:) name:@"bufferingProgress" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingCompleted) name:@"bufferingCompleted" object:musicFileManager];
     }
     return self;
@@ -357,22 +358,7 @@
     }
     if (state.state == MusicFileBuffering)
     {
-        UIColor* fillColor = [UIColor grayColor];
-        if (state.buffering.isError)
-        {
-            fillColor = [UIColor redColor];
-        }
-        
-        UIView* view = [[UIView alloc] initWithFrame:cell.contentView.bounds];
-        CAGradientLayer* gradient = [CAGradientLayer layer];
-        gradient.frame = view.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor whiteColor] CGColor], [fillColor CGColor], nil];
-        gradient.locations = [NSArray arrayWithObjects:[NSNumber numberWithFloat:state.buffering.progress], (id)[NSNumber numberWithFloat:state.buffering.progress], nil];
-        gradient.startPoint = CGPointMake(0.0, 0.5);
-        gradient.endPoint = CGPointMake(1.0, 0.5);
-        [view.layer insertSublayer:gradient atIndex:0];
-        cell.backgroundView = view;
-        [view release];
+        [self setBufferingCell:cell backgroundViewForState:state];
     }
     if (state.state == MusicFileBuffered)
     {
@@ -382,6 +368,26 @@
     {
         cell.textLabel.textColor = [UIColor orangeColor];
     }
+}
+
+- (void)setBufferingCell:(UITableViewCell*)cell backgroundViewForState:(MusicFileState)state
+{    
+    UIColor* fillColor = [UIColor grayColor];
+    if (state.buffering.isError)
+    {
+        fillColor = [UIColor redColor];
+    }
+    
+    UIView* view = [[UIView alloc] initWithFrame:cell.contentView.bounds];
+    CAGradientLayer* gradient = [CAGradientLayer layer];
+    gradient.frame = view.bounds;
+    gradient.colors = [NSArray arrayWithObjects:(id)[[UIColor whiteColor] CGColor], [fillColor CGColor], nil];
+    gradient.locations = [NSArray arrayWithObjects:[NSNumber numberWithFloat:state.buffering.progress], (id)[NSNumber numberWithFloat:state.buffering.progress], nil];
+    gradient.startPoint = CGPointMake(0.0, 0.5);
+    gradient.endPoint = CGPointMake(1.0, 0.5);
+    [view.layer insertSublayer:gradient atIndex:0];
+    cell.backgroundView = view;
+    [view release];
 }
 
 #pragma mark - AVAudioPlayer delegate
@@ -536,6 +542,26 @@
     [self.tableView reloadData];
     
     [self tryToResumePlayingNowBufferingFile];
+}
+
+- (void)onMusicFileManagerBufferingProgress:(NSNotification*)notification
+{
+    for (int section = 0; section < [self.sections count]; section++)
+    {
+        NSArray* fileIndexes = [[self.sections objectAtIndex:section] objectForKey:@"files"];
+        for (int row = 0; row < [fileIndexes count]; row++)
+        {
+            NSDictionary* playlistItem = [self.playlist objectAtIndex:[[fileIndexes objectAtIndex:row] intValue]];
+            if ([[playlistItem objectForKey:@"path"] isEqualToString:[[[notification userInfo] objectForKey:@"file"] objectForKey:@"path"]])
+            {
+                UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+                if (cell)
+                {
+                    [self setBufferingCell:cell backgroundViewForState:[musicFileManager getState:playlistItem]];
+                }
+            }
+        }
+    }
 }
 
 - (void)onMusicFileManagerBufferingCompleted
