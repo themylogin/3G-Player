@@ -157,7 +157,6 @@
     self.bufferingRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:url]];
     [self.bufferingRequest setAllowCompressedResponse:NO];
     [self.bufferingRequest setShouldContinueWhenAppEntersBackground:YES];
-    [self.bufferingRequest setTimeOutSeconds:60.0];
     [self.bufferingRequest setFailedBlock:^{
         if (!self.bufferingRequest)
         {
