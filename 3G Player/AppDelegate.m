@@ -55,7 +55,7 @@
 
 - (void)readDefaults
 {   
-    playerUrl = @"http://plr.thelogin.ru";
+    playerUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"player_url"];
     [playerUrl retain];
     
     lastfmUsername = [[NSUserDefaults standardUserDefaults] stringForKey:@"lastfm_username"];
