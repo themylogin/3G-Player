@@ -58,7 +58,11 @@
 
 - (void)scrobble:(NSDictionary*)file startedAt:(NSDate*)date
 {
-    [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] addObject:[NSDictionary dictionaryWithObjectsAndKeys:[file objectForKey:@"artist"], @"artist", [file objectForKey:@"title"], @"title", date, @"startedAt", nil, nil]];
+    [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                                                  [file objectForKey:@"artist"], @"artist",
+                                                                                                  [file objectForKey:@"title"], @"title",
+                                                                                                  [NSString stringWithFormat:@"%d", (int)[date timeIntervalSince1970]], @"timestamp",
+                                                                                                  nil]];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     [self flushQueue];
@@ -80,31 +84,33 @@
             {
                 return;
             }
+            
+            NSArray* recentTracks = [self getRecentTracks];
+            if (!recentTracks)
+            {
+                return;
+            }
     
             NSMutableArray* newQueue = [[NSMutableArray alloc] init];
             for (NSDictionary* scrobble in queue)
             {
-                BOOL success = NO;
-                FMEngine* fmEngine = [[FMEngine alloc] init];
-                NSData* reply = [fmEngine dataForMethod:@"track.scrobble" withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                                                          [scrobble objectForKey:@"artist"], @"artist",
-                                                                                          [scrobble objectForKey:@"title"], @"track",
-                                                                                          [NSString stringWithFormat:@"%d", (int)[[scrobble objectForKey:@"startedAt"] timeIntervalSince1970]], @"timestamp",
-                                                                                          self.sessionKey, @"sk",
-                                                                                          _LASTFM_API_KEY_, @"api_key",
-                                                                                          nil] useSignature:YES httpMethod:POST_TYPE error:nil];
-                if (reply)
+                BOOL alreadyScrobbled = NO;
+                for (NSDictionary* track in recentTracks)
                 {
-                    NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
-                    if ([response objectForKey:@"scrobbles"])
+                    if ([[[track objectForKey:@"date"] objectForKey:@"uts"] isEqualToString:[scrobble objectForKey:@"timestamp"]])
                     {
-                        success = YES;
+                        alreadyScrobbled = YES;
+                        break;
                     }
                 }
-                [fmEngine release];
-                
-                if (!success)
+                if (alreadyScrobbled)
                 {
+                    continue;
+                }
+                
+                BOOL scrobbled = [self doScrobble:scrobble];
+                if (!scrobbled)
+                {                    
                     [newQueue addObject:scrobble];
                 }
             }
@@ -138,6 +144,47 @@
         self.sessionKey = [[[[JSONDecoder decoder] objectWithData:reply] objectForKey:@"session"] objectForKey:@"key"];
     }
     [fmEngine release];
+}
+
+- (NSArray*)getRecentTracks
+{
+    FMEngine* fmEngine = [[FMEngine alloc] init];
+    NSData* reply = [fmEngine dataForMethod:@"user.getRecentTracks" withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                                    self.sessionKeyUsername, @"user",
+                                                                                    _LASTFM_API_KEY_, @"api_key",
+                                                                                    nil] useSignature:NO httpMethod:GET_TYPE error:nil];
+    if (reply)
+    {
+        NSDictionary* recentScrobbles = [[JSONDecoder decoder] objectWithData:reply];
+        NSDictionary* recentTracks = [recentScrobbles objectForKey:@"recenttracks"];
+        return [recentTracks objectForKey:@"track"];
+    }
+    else
+    {
+        return nil;
+    }
+}
+
+- (BOOL)doScrobble:(NSDictionary*)scrobble
+{
+    FMEngine* fmEngine = [[FMEngine alloc] init];
+    NSData* reply = [fmEngine dataForMethod:@"track.scrobble" withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                              [scrobble objectForKey:@"artist"], @"artist",
+                                                                              [scrobble objectForKey:@"title"], @"track",
+                                                                              [scrobble objectForKey:@"timestamp"], @"timestamp",
+                                                                              self.sessionKey, @"sk",
+                                                                              _LASTFM_API_KEY_, @"api_key",
+                                                                              nil] useSignature:YES httpMethod:POST_TYPE error:nil];
+    if (reply)
+    {
+        NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
+        if ([response objectForKey:@"scrobbles"])
+        {
+            return YES;
+        }
+    }
+    
+    return NO;
 }
 
 @end
