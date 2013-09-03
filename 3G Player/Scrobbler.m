@@ -67,48 +67,51 @@
 - (void)flushQueue
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        NSMutableArray* queue = [[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"];
-        if (![queue count])
+        @synchronized(self)
         {
-            return;
-        }
-    
-        [self beAuthorized];
-        if (!self.sessionKey)
-        {
-            return;
-        }
-    
-        NSMutableArray* newQueue = [[NSMutableArray alloc] init];
-        for (NSDictionary* scrobble in queue)
-        {
-            BOOL success = NO;
-            FMEngine* fmEngine = [[FMEngine alloc] init];
-            NSData* reply = [fmEngine dataForMethod:@"track.scrobble" withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                                                      [scrobble objectForKey:@"artist"], @"artist",
-                                                                                      [scrobble objectForKey:@"title"], @"track",
-                                                                                      [NSString stringWithFormat:@"%d", (int)[[scrobble objectForKey:@"startedAt"] timeIntervalSince1970]], @"timestamp",
-                                                                                      self.sessionKey, @"sk",
-                                                                                      _LASTFM_API_KEY_, @"api_key",
-                                                                                      nil] useSignature:YES httpMethod:POST_TYPE error:nil];
-            if (reply)
+            NSMutableArray* queue = [[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"];
+            if (![queue count])
             {
-                NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
-                if ([response objectForKey:@"scrobbles"])
+                return;
+            }
+    
+            [self beAuthorized];
+            if (!self.sessionKey)
+            {
+                return;
+            }
+    
+            NSMutableArray* newQueue = [[NSMutableArray alloc] init];
+            for (NSDictionary* scrobble in queue)
+            {
+                BOOL success = NO;
+                FMEngine* fmEngine = [[FMEngine alloc] init];
+                NSData* reply = [fmEngine dataForMethod:@"track.scrobble" withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                                          [scrobble objectForKey:@"artist"], @"artist",
+                                                                                          [scrobble objectForKey:@"title"], @"track",
+                                                                                          [NSString stringWithFormat:@"%d", (int)[[scrobble objectForKey:@"startedAt"] timeIntervalSince1970]], @"timestamp",
+                                                                                          self.sessionKey, @"sk",
+                                                                                          _LASTFM_API_KEY_, @"api_key",
+                                                                                          nil] useSignature:YES httpMethod:POST_TYPE error:nil];
+                if (reply)
                 {
-                    success = YES;
+                    NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
+                    if ([response objectForKey:@"scrobbles"])
+                    {
+                        success = YES;
+                    }
+                }
+                [fmEngine release];
+                
+                if (!success)
+                {
+                    [newQueue addObject:scrobble];
                 }
             }
-            [fmEngine release];
-            
-            if (!success)
-            {
-                [newQueue addObject:scrobble];
-            }
-        }
 
-        [[NSUserDefaults standardUserDefaults] setValue:newQueue forKey:@"scrobblerQueue"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+            [[NSUserDefaults standardUserDefaults] setValue:newQueue forKey:@"scrobblerQueue"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
     });
 }
 
