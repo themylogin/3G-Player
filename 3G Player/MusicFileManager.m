@@ -137,6 +137,7 @@
     [self stopBufferingRequest];
     
     NSString* url = [[playerUrl stringByAppendingString:@"/file?path="] stringByAppendingString:[musicFile objectForKey:@"url"]];
+    NSString* sizeUrl = [[playerUrl stringByAppendingString:@"/file_size?path="] stringByAppendingString:[musicFile objectForKey:@"url"]];
     NSString* incompletePath = [self incompleteFilePath:musicFile];
     if ([self.fileManager fileExistsAtPath:incompletePath])
     {
@@ -158,15 +159,7 @@
     [self.bufferingRequest setAllowCompressedResponse:NO];
     [self.bufferingRequest setShouldContinueWhenAppEntersBackground:YES];
     [self.bufferingRequest setFailedBlock:^{
-        if (!self.bufferingRequest)
-        {
-            return;
-        }
-        
-        self.bufferingIsError = true;
-        [self performSelector:@selector(startBufferingRequest:) withObject:self.bufferingFile afterDelay:5.0];
-        
-        [self notifyStateChanged];
+        [self onBufferingRequestError];
     }];
     [self.bufferingRequest setHeadersReceivedBlock:^(NSDictionary* responseHeaders){
         if ([self.bufferingRequest responseStatusCode] != 200)
@@ -187,10 +180,23 @@
         
         [self notifyBufferingProgressFor:self.bufferingFile];
     }];
-    [self.bufferingRequest setCompletionBlock:^{        
+    [self.bufferingRequest setCompletionBlock:^{
+        unsigned long long fileSize = [[self.fileManager attributesOfItemAtPath:incompletePath error:nil] fileSize];
+        
+        ASIHTTPRequest* sizeRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:sizeUrl]];
+        [sizeRequest setAllowCompressedResponse:NO];
+        [sizeRequest setShouldContinueWhenAppEntersBackground:YES];
+        [sizeRequest startSynchronous];
+        if (sizeRequest.error || [sizeRequest responseStatusCode] != 200 ||
+            ![[NSString stringWithFormat:@"%llu", fileSize] isEqualToString:[sizeRequest responseString]])
+        {
+            [self onBufferingRequestError];
+            return;
+        }
+        
         [self stopBufferingRequest];
         
-        [self.fileManager moveItemAtPath:[self incompleteFilePath:self.bufferingFile] toPath:[self filePath:self.bufferingFile] error:nil];
+        [self.fileManager moveItemAtPath:incompletePath toPath:[self filePath:self.bufferingFile] error:nil];
         
         self.bufferingFile = nil;
         self.bufferingIsError = false;
@@ -200,6 +206,19 @@
         [self notifyBufferingCompleted];
     }];
     [self.bufferingRequest startAsynchronous];
+}
+
+- (void)onBufferingRequestError
+{
+    if (!self.bufferingRequest)
+    {
+        return;
+    }
+    
+    self.bufferingIsError = true;
+    [self performSelector:@selector(startBufferingRequest:) withObject:self.bufferingFile afterDelay:5.0];
+    
+    [self notifyStateChanged];
 }
 
 - (void)stopBufferingRequest
