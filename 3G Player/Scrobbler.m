@@ -58,12 +58,15 @@
 
 - (void)scrobble:(NSDictionary*)file startedAt:(NSDate*)date
 {
-    [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                                                                  [file objectForKey:@"artist"], @"artist",
-                                                                                                  [file objectForKey:@"title"], @"title",
-                                                                                                  [NSString stringWithFormat:@"%d", (int)[date timeIntervalSince1970]], @"timestamp",
-                                                                                                  nil]];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    @synchronized([NSUserDefaults standardUserDefaults])
+    {
+        [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] addObject:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                                                      [file objectForKey:@"artist"], @"artist",
+                                                                                                      [file objectForKey:@"title"], @"title",
+                                                                                                      [NSString stringWithFormat:@"%d", (int)[date timeIntervalSince1970]], @"timestamp",
+                                                                                                      nil]];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
     
     [self flushQueue];
 }
@@ -73,10 +76,17 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         @synchronized(self)
         {
-            NSMutableArray* queue = [[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"];
-            if (![queue count])
+            NSMutableArray* queue;
+            @synchronized([NSUserDefaults standardUserDefaults])
             {
-                return;
+                queue = [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] copy];
+                if (![queue count])
+                {
+                    return;
+                }
+                
+                [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] removeAllObjects];
+                [[NSUserDefaults standardUserDefaults] synchronize];
             }
     
             [self beAuthorized];
@@ -91,7 +101,6 @@
                 return;
             }
     
-            NSMutableArray* newQueue = [[NSMutableArray alloc] init];
             for (NSDictionary* scrobble in queue)
             {
                 BOOL alreadyScrobbled = NO;
@@ -110,13 +119,15 @@
                 
                 BOOL scrobbled = [self doScrobble:scrobble];
                 if (!scrobbled)
-                {                    
-                    [newQueue addObject:scrobble];
+                {
+                    @synchronized([NSUserDefaults standardUserDefaults])
+                    {
+                        [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] addObject:scrobble];
+                        [[NSUserDefaults standardUserDefaults] synchronize];
+                    }
+                    
                 }
             }
-
-            [[NSUserDefaults standardUserDefaults] setValue:newQueue forKey:@"scrobblerQueue"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
         }
     });
 }
