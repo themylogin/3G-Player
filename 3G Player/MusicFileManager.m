@@ -164,8 +164,7 @@
     [self.bufferingRequest setHeadersReceivedBlock:^(NSDictionary* responseHeaders){
         if ([self.bufferingRequest responseStatusCode] != 200)
         {
-            self.bufferingIsError = true;
-            [self performSelector:@selector(startBufferingRequest:) withObject:self.bufferingFile afterDelay:5.0];
+            [self onBufferingRequestError];
         }
         else
         {
@@ -214,6 +213,8 @@
     {
         return;
     }
+    
+    [self stopBufferingRequest];
     
     self.bufferingIsError = true;
     [self performSelector:@selector(startBufferingRequest:) withObject:self.bufferingFile afterDelay:5.0];
