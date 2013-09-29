@@ -51,10 +51,6 @@
         
         self.repeat = RepeatDisabled;
         
-        MPVolumeView* volumeView = [[MPVolumeView alloc] initWithFrame:self.volumeSlider.bounds];
-        [self.volumeSlider addSubview:volumeView];
-        [volumeView release];
-        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerStateChanged) name:@"stateChanged" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingProgress:) name:@"bufferingProgress" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingCompleted) name:@"bufferingCompleted" object:musicFileManager];
@@ -67,6 +63,10 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    MPVolumeView* volumeView = [[MPVolumeView alloc] initWithFrame:self.volumeView.bounds];
+    [self.volumeView addSubview:volumeView];
+    [volumeView release];
     
     [self periodic];
     self.periodicTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(periodic) userInfo:nil repeats:YES];
