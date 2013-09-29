@@ -33,6 +33,12 @@
         
     self.flushTimer = [NSTimer scheduledTimerWithTimeInterval:60.0 target:self selector:@selector(flushQueue) userInfo:nil repeats:YES];
     
+    if ([[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] == nil)
+    {
+        [[NSUserDefaults standardUserDefaults] setObject:[NSMutableArray array] forKey:@"scrobblerQueue"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    
     return self;
 }
 
