@@ -13,6 +13,9 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import <QuartzCore/QuartzCore.h>
 
+#import "CocoaAsyncSocket/GCDAsyncSocket.h"
+#import "JSONKit.h"
+
 @interface PlaylistController ()
 
 @property (nonatomic, retain) NSMutableArray* playlist;
@@ -70,6 +73,9 @@
     
     [self periodic];
     self.periodicTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(periodic) userInfo:nil repeats:YES];
+    
+    GCDAsyncSocket* socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    [socket acceptOnPort:20139 error:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -476,6 +482,53 @@
         
         self.playerInterruptedWhilePlaying = NO;
     }
+}
+
+#pragma mark - GCDAsyncSocket delegate
+
+- (void)socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket
+{    
+	[newSocket readDataToData:[GCDAsyncSocket CRLFData] withTimeout:10 tag:0];
+}
+
+- (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
+{
+    NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
+    NSString *command = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];
+    
+    if ([command isEqualToString:@"become_superseeded"])
+    {
+        NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+        if (self.player && self.player.playing)
+        {            
+            NSMutableArray* list = [[NSMutableArray alloc] initWithCapacity:self.playlist.count];
+            for (int i = 0; i < self.playlist.count; i++)
+            {
+                [list setObject:[[self.playlist objectAtIndex:i] objectForKey:@"url"] atIndexedSubscript:i];
+            }
+            [result setObject:list forKey:@"playlist"];
+            
+            NSMutableDictionary* current = [[NSMutableDictionary alloc] init];
+            [current setObject:[NSNumber numberWithInt:(self.currentIndex)] forKey:@"index"];
+            [current setObject:[NSNumber numberWithDouble:(self.player.currentTime)] forKey:@"position"];
+            [result setObject:current forKey:@"current"];
+        }
+        
+        [sock writeData:[result JSONData] withTimeout:10 tag:0];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.player pause];
+        });
+    }
+    else
+    {
+        [sock disconnect];
+    }
+}
+
+- (void)socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
+{
+	[sock disconnect];
 }
 
 #pragma mark - Internals
