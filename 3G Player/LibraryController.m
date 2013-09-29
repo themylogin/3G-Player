@@ -144,6 +144,7 @@
             [libraryRequest setBytesReceivedBlock:^(unsigned long long size, unsigned long long total) {
                 self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Receiving library: (%.0f%%)", (float)size / total * 100, nil];
             }];
+            [libraryRequest setTimeOutSeconds:120];
             [libraryRequest startSynchronous];
             if ([libraryRequest error] || [libraryRequest responseStatusCode] != 200)
             {

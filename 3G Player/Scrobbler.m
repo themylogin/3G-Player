@@ -85,12 +85,13 @@
             NSMutableArray* queue;
             @synchronized([NSUserDefaults standardUserDefaults])
             {
-                queue = [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] copy];
-                if (![queue count])
+                NSMutableArray* scrobblerQueue = [[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"];
+                if ([scrobblerQueue count] == 0)
                 {
                     return;
-                }
-                
+                }                    
+                    
+                queue = [NSMutableArray arrayWithArray:scrobblerQueue];
                 [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] removeAllObjects];
                 [[NSUserDefaults standardUserDefaults] synchronize];
             }
