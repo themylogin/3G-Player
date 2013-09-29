@@ -25,7 +25,9 @@
 
 @property (nonatomic)         enum { RepeatDisabled, RepeatPlaylist, RepeatTrack } repeat;
 
-@property (nonatomic, retain) NSTimer* uiTimer;
+@property (nonatomic, retain) NSTimer* periodicTimer;
+
+@property (nonatomic)         BOOL pausedByLowVolume;
 
 @end
 
@@ -56,6 +58,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerStateChanged) name:@"stateChanged" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingProgress:) name:@"bufferingProgress" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingCompleted) name:@"bufferingCompleted" object:musicFileManager];
+        
+        self.pausedByLowVolume = FALSE;
     }
     return self;
 }
@@ -64,8 +68,8 @@
 {
     [super viewDidLoad];
     
-    [self updateUI];
-    self.uiTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateUI) userInfo:nil repeats:YES];
+    [self periodic];
+    self.periodicTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(periodic) userInfo:nil repeats:YES];
 }
 
 - (void)didReceiveMemoryWarning
@@ -178,6 +182,35 @@
     [self.tableView reloadData];
     
     [self bufferMostNecessary];
+}
+
+- (void)periodic
+{
+    if (self.player)
+    {
+        Float32 volume;
+        UInt32 dataSize = sizeof(Float32);
+        AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareOutputVolume, &dataSize, &volume);
+        
+        if (self.player.playing)
+        {
+            if (volume < 0.25)
+            {
+                self.pausedByLowVolume = TRUE;
+                [self.player pause];
+            }
+        }
+        else
+        {
+            if (self.pausedByLowVolume && volume >= 0.25)
+            {
+                self.pausedByLowVolume = FALSE;
+                [self.player play];
+            }
+        }
+    }
+    
+    [self updateUI];
 }
 
 - (void)updateUI

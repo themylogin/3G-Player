@@ -28,6 +28,7 @@
 		84C10C011782E08E004220BC /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C10C001782E08E004220BC /* Default-568h@2x.png */; };
 		84C10C091782E20A004220BC /* LibraryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C10C081782E20A004220BC /* LibraryController.m */; };
 		84C10C171782E72F004220BC /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C10C161782E72F004220BC /* JSONKit.m */; };
+		84C29E7D17F8562600D259F3 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C29E7C17F8562600D259F3 /* AudioToolbox.framework */; };
 		84C4CA191785ADA500A95DB9 /* Globals.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA121785ADA500A95DB9 /* Globals.m */; };
 		84C4CA1A1785ADA500A95DB9 /* LibraryPageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA141785ADA500A95DB9 /* LibraryPageController.m */; };
 		84C4CA1B1785ADA500A95DB9 /* LibraryPageController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84C4CA151785ADA500A95DB9 /* LibraryPageController.xib */; };
@@ -100,6 +101,8 @@
 		84C10C081782E20A004220BC /* LibraryController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LibraryController.m; sourceTree = "<group>"; };
 		84C10C151782E72F004220BC /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
 		84C10C161782E72F004220BC /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
+		84C29E7817F855EE00D259F3 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		84C29E7C17F8562600D259F3 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		84C4CA111785ADA500A95DB9 /* Globals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Globals.h; sourceTree = "<group>"; };
 		84C4CA121785ADA500A95DB9 /* Globals.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Globals.m; sourceTree = "<group>"; };
 		84C4CA131785ADA500A95DB9 /* LibraryPageController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibraryPageController.h; sourceTree = "<group>"; };
@@ -178,6 +181,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84C29E7D17F8562600D259F3 /* AudioToolbox.framework in Frameworks */,
 				84C4CA211785B36E00A95DB9 /* AVFoundation.framework in Frameworks */,
 				84C4CA1F1785B1BC00A95DB9 /* MediaPlayer.framework in Frameworks */,
 				84C91A0C178581EF00810B88 /* QuartzCore.framework in Frameworks */,
@@ -197,7 +201,6 @@
 		84C10BDE1782E08D004220BC = {
 			isa = PBXGroup;
 			children = (
-				84C4CA201785B36E00A95DB9 /* AVFoundation.framework */,
 				84C10BF01782E08E004220BC /* 3G Player */,
 				84C10BE91782E08D004220BC /* Frameworks */,
 				84C10BE81782E08D004220BC /* Products */,
@@ -215,6 +218,9 @@
 		84C10BE91782E08D004220BC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				84C29E7C17F8562600D259F3 /* AudioToolbox.framework */,
+				84C29E7817F855EE00D259F3 /* CoreAudio.framework */,
+				84C4CA201785B36E00A95DB9 /* AVFoundation.framework */,
 				84C4CA1E1785B1BC00A95DB9 /* MediaPlayer.framework */,
 				84C91A0B178581EF00810B88 /* QuartzCore.framework */,
 				84C919F417841BE100810B88 /* MobileCoreServices.framework */,
