@@ -74,7 +74,7 @@
     [self periodic];
     self.periodicTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(periodic) userInfo:nil repeats:YES];
     
-    GCDAsyncSocket* socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    GCDAsyncSocket* socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_queue_create("socketQueue", NULL)];
     [socket acceptOnPort:20139 error:nil];
 }
 
@@ -514,7 +514,7 @@
             [result setObject:current forKey:@"current"];
         }
         
-        [sock writeData:[result JSONData] withTimeout:10 tag:0];
+        [sock writeData:[[result JSONData] copy] withTimeout:10 tag:0];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.player pause];

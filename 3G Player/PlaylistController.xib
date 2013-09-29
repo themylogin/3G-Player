@@ -46,7 +46,6 @@
 						<array class="NSMutableArray" key="NSSubviews"/>
 						<string key="NSFrameSize">{320, 358}</string>
 						<reference key="NSSuperview" ref="191373211"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="822103543"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<object class="NSColor" key="IBUIBackgroundColor" id="330824588">
@@ -72,7 +71,6 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{20, 18}, {26, 26}}</string>
 								<reference key="NSSuperview" ref="822103543"/>
-								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="591882299"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIOpaque">NO</bool>
@@ -109,7 +107,6 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{52, 20}, {182, 23}}</string>
 								<reference key="NSSuperview" ref="822103543"/>
-								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="707260793"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIOpaque">NO</bool>
@@ -122,7 +119,6 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{240, 18}, {26, 13}}</string>
 								<reference key="NSSuperview" ref="822103543"/>
-								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="357358856"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIOpaque">NO</bool>
@@ -156,7 +152,6 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{240, 31}, {26, 13}}</string>
 								<reference key="NSSuperview" ref="822103543"/>
-								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="530157883"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIOpaque">NO</bool>
@@ -181,7 +176,6 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{274, 18}, {26, 26}}</string>
 								<reference key="NSSuperview" ref="822103543"/>
-								<reference key="NSWindow"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<bool key="IBUIOpaque">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
@@ -214,7 +208,6 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{0, 74}, {320, 20}}</string>
 								<reference key="NSSuperview" ref="822103543"/>
-								<reference key="NSWindow"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<object class="NSColor" key="IBUIBackgroundColor">
 									<int key="NSColorSpace">3</int>
@@ -228,7 +221,6 @@
 						</array>
 						<string key="NSFrame">{{0, 366}, {320, 94}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="654781373"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<object class="NSColor" key="IBUIBackgroundColor">
@@ -240,7 +232,6 @@
 				</array>
 				<string key="NSFrame">{{0, 20}, {320, 460}}</string>
 				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="829521766"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">1</int>
@@ -547,86 +538,7 @@
 			<nil key="sourceID"/>
 			<int key="maxID">216</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes">
-			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
-				<object class="IBPartialClassDescription">
-					<string key="className">PlaylistController</string>
-					<string key="superclassName">UIViewController</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="handlePinch:">UIPinchGestureRecognizer</string>
-						<string key="handlePlayPauseButtonTouchDown:">id</string>
-						<string key="handlePositionSliderTouchUpInside:">id</string>
-						<string key="handleRepeatButtonTouchDown:">id</string>
-						<string key="handleSwipe:">UISwipeGestureRecognizer</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="handlePinch:">
-							<string key="name">handlePinch:</string>
-							<string key="candidateClassName">UIPinchGestureRecognizer</string>
-						</object>
-						<object class="IBActionInfo" key="handlePlayPauseButtonTouchDown:">
-							<string key="name">handlePlayPauseButtonTouchDown:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="handlePositionSliderTouchUpInside:">
-							<string key="name">handlePositionSliderTouchUpInside:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="handleRepeatButtonTouchDown:">
-							<string key="name">handleRepeatButtonTouchDown:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="handleSwipe:">
-							<string key="name">handleSwipe:</string>
-							<string key="candidateClassName">UISwipeGestureRecognizer</string>
-						</object>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="outlets">
-						<string key="elapsedLabel">UILabel</string>
-						<string key="playPauseButton">UIButton</string>
-						<string key="positionSlider">UISlider</string>
-						<string key="repeatButton">UIButton</string>
-						<string key="tableView">UITableView</string>
-						<string key="totalLabel">UILabel</string>
-						<string key="volumeView">UIView</string>
-					</dictionary>
-					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<object class="IBToOneOutletInfo" key="elapsedLabel">
-							<string key="name">elapsedLabel</string>
-							<string key="candidateClassName">UILabel</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="playPauseButton">
-							<string key="name">playPauseButton</string>
-							<string key="candidateClassName">UIButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="positionSlider">
-							<string key="name">positionSlider</string>
-							<string key="candidateClassName">UISlider</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="repeatButton">
-							<string key="name">repeatButton</string>
-							<string key="candidateClassName">UIButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="tableView">
-							<string key="name">tableView</string>
-							<string key="candidateClassName">UITableView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="totalLabel">
-							<string key="name">totalLabel</string>
-							<string key="candidateClassName">UILabel</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="volumeView">
-							<string key="name">volumeView</string>
-							<string key="candidateClassName">UIView</string>
-						</object>
-					</dictionary>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/PlaylistController.h</string>
-					</object>
-				</object>
-			</array>
-		</object>
+		<object class="IBClassDescriber" key="IBDocument.Classes"/>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaTouchFramework</string>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
