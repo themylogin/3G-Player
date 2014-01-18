@@ -12,7 +12,6 @@
 #import "LibraryPageController.h"
 
 #import "ASIFormDataRequest.h"
-#import "LFCGzipUtility.h"
 #import "ZipArchive.h"
 
 @interface LibraryController ()
