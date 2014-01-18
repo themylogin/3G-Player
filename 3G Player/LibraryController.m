@@ -60,83 +60,84 @@
 
 - (void)updateLibrary
 {
+    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Update Library", nil)
+                                                    message:NSLocalizedString(@"Should server update its library first?", nil)
+                                                   delegate:self
+                                          cancelButtonTitle:NSLocalizedString(@"No", nil)
+                                          otherButtonTitles:NSLocalizedString(@"Yes", nil), nil];
+    [alert show];
+    [alert release];
+}
+
+- (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    [self doUpdateLibrary:(buttonIndex == 1)];
+}
+
+- (void)doUpdateLibrary:(BOOL)serverShouldUpdate
+{
     updateLibraryButton.enabled = NO;
     self.toolbarHidden = NO;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        NSMutableArray* clientDirectories = [[NSMutableArray alloc] init];
-        NSDirectoryEnumerator* de = [[NSFileManager defaultManager] enumeratorAtPath:libraryDirectory];
-        while (true)
+        BOOL shouldUpdate = TRUE;
+        
+        if (serverShouldUpdate)
         {
-            @autoreleasepool
+            NSURL* updateUrl = [NSURL URLWithString:[playerUrl stringByAppendingString:@"/update"]];
+            ASIHTTPRequest* updateRequest = [ASIHTTPRequest requestWithURL:updateUrl];
+            [updateRequest setAllowCompressedResponse:NO];
+            [updateRequest setShouldContinueWhenAppEntersBackground:YES];
+            [updateRequest setDataReceivedBlock:^(NSData* data){
+                NSString* string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                NSArray* items = [[string stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]] componentsSeparatedByString:@"\n"];            
+                self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Updating: %@", [items lastObject], nil];
+            }];
+            [updateRequest startSynchronous];        
+            if ([updateRequest error] || [updateRequest responseStatusCode] != 200)
             {
-                NSString* file = [de nextObject];
-                if (!file)
+                shouldUpdate = FALSE;
+                
+                NSString* errorDescription;
+                if ([updateRequest error])
                 {
-                    break;
+                    errorDescription = [[updateRequest error] localizedDescription];
+                }
+                else
+                {
+                    errorDescription = [updateRequest responseStatusMessage];
                 }
                 
-                if ([[[file pathComponents] lastObject] isEqualToString:@"index.json"])
-                {
-                    NSMutableArray* dirComponents = [[file pathComponents] mutableCopy];
-                    [dirComponents removeLastObject];
-                    NSString* dir = [dirComponents componentsJoinedByString:@"/"];
-                    [dirComponents release];
-                    
-                    NSString* checksum = [NSString stringWithContentsOfFile:[[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:file] stringByAppendingString:@".checksum"] encoding:NSASCIIStringEncoding error:nil];
-                    
-                    [clientDirectories addObject:[NSString stringWithFormat:@"%@ %@", dir, checksum, nil]];
-                    
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Preparing: %@", dir];
-                    });
-                }
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Server library update error", nil)
+                                                                    message:errorDescription
+                                                                   delegate:nil
+                                                          cancelButtonTitle:NSLocalizedString(@"OK", nil)
+                                                          otherButtonTitles:nil];
+                    [alert show];
+                });
             }
         }
         
-        NSData* compressedClientDirectories = [LFCGzipUtility gzipData:[[clientDirectories componentsJoinedByString:@"\n"] dataUsingEncoding:NSASCIIStringEncoding]];
-        [clientDirectories release];
-        
-        NSString* libraryFile = [libraryDirectory stringByAppendingString:@"/library.zip"];
-        [[NSFileManager defaultManager] removeItemAtPath:libraryFile error:nil];
-
-        NSURL* updateUrl = [NSURL URLWithString:[playerUrl stringByAppendingString:@"/update"]];
-        ASIHTTPRequest* updateRequest = [ASIHTTPRequest requestWithURL:updateUrl];
-        [updateRequest setAllowCompressedResponse:NO];
-        [updateRequest setShouldContinueWhenAppEntersBackground:YES];
-        [updateRequest setDataReceivedBlock:^(NSData* data){
-            NSString* string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            NSArray* items = [[string stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]] componentsSeparatedByString:@"\n"];            
-            self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Updating: %@", [items lastObject], nil];
-        }];
-        [updateRequest startSynchronous];        
-        if ([updateRequest error] || [updateRequest responseStatusCode] != 200)
+        if (shouldUpdate)
         {
-            NSString* errorDescription;
-            if ([updateRequest error])
+            NSString* libraryFile = [libraryDirectory stringByAppendingString:@"/library.zip"];
+            [[NSFileManager defaultManager] removeItemAtPath:libraryFile error:nil];
+            
+            NSString* revision;
+            NSString* revisionFile = [libraryDirectory stringByAppendingString:@"/revision.txt"];
+            if ([[NSFileManager defaultManager] isReadableFileAtPath:revisionFile])
             {
-                errorDescription = [[updateRequest error] localizedDescription];
+                revision = [NSString stringWithContentsOfFile:revisionFile encoding:NSUTF8StringEncoding error:nil];
             }
             else
             {
-                errorDescription = [updateRequest responseStatusMessage];
+                revision = @"";
             }
             
-            dispatch_async(dispatch_get_main_queue(), ^{
-                UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Library update error", nil)
-                                                                message:errorDescription
-                                                               delegate:nil
-                                                      cancelButtonTitle:NSLocalizedString(@"OK", nil)
-                                                      otherButtonTitles:nil];
-                [alert show];
-            });
-        }
-        else
-        {
-            NSURL* libraryUrl = [NSURL URLWithString:[playerUrl stringByAppendingString:@"/library"]];
+            NSURL* libraryUrl = [NSURL URLWithString:[playerUrl stringByAppendingString:[NSString stringWithFormat:@"/library?revision=%@", revision, nil]]];
             ASIFormDataRequest* libraryRequest = [ASIFormDataRequest requestWithURL:libraryUrl];
             [libraryRequest setShouldContinueWhenAppEntersBackground:YES];
-            [libraryRequest setData:compressedClientDirectories withFileName:@"client_directories.txt" andContentType:@"text/plain" forKey:@"library"];
             [libraryRequest setDownloadDestinationPath:libraryFile];
             [libraryRequest setBytesSentBlock:^(unsigned long long size, unsigned long long total) {
                 self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Sending library request: (%.0f%%)", (float)size / total * 100, nil];
