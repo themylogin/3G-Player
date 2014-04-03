@@ -98,6 +98,14 @@
     }
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    [self becomeFirstResponder];
+}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -460,30 +468,7 @@
         return;
     }
     
-    [self scrobbleIfNecessary];
-    
-    if (self.repeat != RepeatTrack)
-    {
-        self.currentIndex++;
-        if (self.repeat == RepeatPlaylist)
-        {
-            self.currentIndex %= [self.playlist count];
-        }
-        
-        if (!(self.currentIndex < [self.playlist count]))
-        {
-            self.currentIndex = -1;
-            self.player = nil;
-            
-            [self.tableView reloadData];
-        
-            [self bufferMostNecessary];
-        
-            return;
-        }
-    }
-    
-    [self playAtIndex:self.currentIndex];
+    [self playNextTrack:TRUE];
 }
 
 - (void)audioPlayerBeginInterruption:(AVAudioPlayer *)player
@@ -501,6 +486,41 @@
         }
         
         self.playerInterruptedWhilePlaying = NO;
+    }
+}
+
+#pragma mark - Remote Control Buttons delegate
+
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+- (void)remoteControlReceivedWithEvent:(UIEvent*)receivedEvent
+{
+    if (receivedEvent.type == UIEventTypeRemoteControl)
+    {
+        switch (receivedEvent.subtype)
+        {
+            case UIEventSubtypeRemoteControlPlay:
+                [self.player play];
+                break;
+                
+            case UIEventSubtypeRemoteControlPause:
+                [self.player pause];
+                break;
+                
+            case UIEventSubtypeRemoteControlPreviousTrack:
+                [self playPrevTrack:FALSE];
+                break;
+                
+            case UIEventSubtypeRemoteControlNextTrack:
+                [self playNextTrack:FALSE];
+                break;
+                
+            default:
+                break;
+        }
     }
 }
 
@@ -698,6 +718,72 @@
     {
         [self playAtIndex:self.currentIndex atPosition:self.player.duration];
     }
+}
+
+- (void)playNextTrack:(BOOL)respectRepeatTrack
+{
+    [self scrobbleIfNecessary];
+    
+    if (respectRepeatTrack && self.repeat == RepeatTrack)
+    {
+    }
+    else
+    {
+        self.currentIndex++;
+        if (self.currentIndex >= [self.playlist count])
+        {
+            if (self.repeat == RepeatPlaylist)
+            {
+                self.currentIndex = 0;
+            }
+            else
+            {
+                self.currentIndex = -1;
+                self.player = nil;
+            
+                [self.tableView reloadData];
+                
+                [self bufferMostNecessary];
+            
+                return;
+            }
+        }
+    }
+    
+    [self playAtIndex:self.currentIndex];
+}
+
+- (void)playPrevTrack:(BOOL)respectRepeatTrack
+{
+    [self scrobbleIfNecessary];
+    
+    if (respectRepeatTrack && self.repeat == RepeatTrack)
+    {
+    }
+    else
+    {
+        self.currentIndex--;
+        if (self.currentIndex < 0)
+        {
+            if (self.repeat == RepeatPlaylist)
+            {
+                self.currentIndex = [self.playlist count] - 1;
+            }
+            else
+            {
+                self.currentIndex = -1;
+                self.player = nil;
+                
+                [self.tableView reloadData];
+                
+                [self bufferMostNecessary];
+                
+                return;
+            }
+        }
+    }
+    
+    [self playAtIndex:self.currentIndex];
 }
 
 - (void)scrobbleIfNecessary
