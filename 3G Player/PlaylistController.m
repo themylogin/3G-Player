@@ -189,7 +189,7 @@
     if (path)
     {
         NSURL* url = [NSURL fileURLWithPath:path];
-        self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:nil];
+        self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:url fileTypeHint:AVFileTypeMPEGLayer3 error:nil];
         self.player.delegate = self;
         if (position)
         {
