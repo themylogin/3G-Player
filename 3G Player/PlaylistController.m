@@ -60,6 +60,11 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingProgress:) name:@"bufferingProgress" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingCompleted) name:@"bufferingCompleted" object:musicFileManager];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(onVolumeChanged)
+                                                     name:@"AVSystemController_SystemVolumeDidChangeNotification"
+                                                   object:nil];
+        
         self.pausedByLowVolume = FALSE;
         
         self.bufferingProgressReportedAt = nil;
@@ -220,30 +225,6 @@
 
 - (void)periodic
 {
-    if (self.player)
-    {
-        Float32 volume;
-        UInt32 dataSize = sizeof(Float32);
-        AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareOutputVolume, &dataSize, &volume);
-        
-        if (self.player.playing)
-        {
-            if (volume < 0.25)
-            {
-                self.pausedByLowVolume = TRUE;
-                [self.player pause];
-            }
-        }
-        else
-        {
-            if (self.pausedByLowVolume && volume >= 0.25)
-            {
-                self.pausedByLowVolume = FALSE;
-                [self.player play];
-            }
-        }
-    }
-    
     [self updateUI];
 }
 
@@ -520,6 +501,33 @@
                 
             default:
                 break;
+        }
+    }
+}
+
+- (void)onVolumeChanged
+{
+    if (self.player)
+    {
+        Float32 volume;
+        UInt32 dataSize = sizeof(Float32);
+        AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareOutputVolume, &dataSize, &volume);
+        
+        if (self.player.playing)
+        {
+            if (volume < 0.05)
+            {
+                self.pausedByLowVolume = TRUE;
+                [self.player pause];
+            }
+        }
+        else
+        {
+            if (self.pausedByLowVolume && volume >= 0.05)
+            {
+                self.pausedByLowVolume = FALSE;
+                [self.player play];
+            }
         }
     }
 }
