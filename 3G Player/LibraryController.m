@@ -33,7 +33,7 @@
         self.updateLibraryProgressLabel.backgroundColor = [UIColor clearColor];
         self.updateLibraryProgressLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:12];
         self.updateLibraryProgressLabel.textColor = [UIColor whiteColor];
-        self.updateLibraryProgressLabel.text = @"DNO";
+        self.updateLibraryProgressLabel.text = @"";
         updateLibraryProgress = [[UIBarButtonItem alloc] initWithCustomView:self.updateLibraryProgressLabel];
         updateLibraryProgress.enabled = NO;
         
@@ -62,20 +62,21 @@
     UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Update Library", nil)
                                                     message:NSLocalizedString(@"Should server update its library first?", nil)
                                                    delegate:self
-                                          cancelButtonTitle:NSLocalizedString(@"No", nil)
-                                          otherButtonTitles:NSLocalizedString(@"Yes", nil), nil];
+                                          cancelButtonTitle:NSLocalizedString(@"Yes", nil)
+                                          otherButtonTitles:NSLocalizedString(@"No", nil), nil];
     [alert show];
     [alert release];
 }
 
 - (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-    [self doUpdateLibrary:(buttonIndex == 1)];
+    [self doUpdateLibrary:(buttonIndex == 0)];
 }
 
 - (void)doUpdateLibrary:(BOOL)serverShouldUpdate
 {
     updateLibraryButton.enabled = NO;
+    self.updateLibraryProgressLabel.text = @"Updating";
     self.toolbarHidden = NO;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
@@ -92,6 +93,7 @@
                 NSArray* items = [[string stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]] componentsSeparatedByString:@"\n"];            
                 self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Updating: %@", [items lastObject], nil];
             }];
+            [updateRequest setTimeOutSeconds:120];
             [updateRequest startSynchronous];        
             if ([updateRequest error] || [updateRequest responseStatusCode] != 200)
             {
