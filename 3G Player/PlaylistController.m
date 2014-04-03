@@ -32,6 +32,8 @@
 
 @property (nonatomic)         BOOL pausedByLowVolume;
 
+@property (nonatomic, retain) NSDate* bufferingProgressReportedAt;
+
 @end
 
 @implementation PlaylistController
@@ -59,6 +61,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingCompleted) name:@"bufferingCompleted" object:musicFileManager];
         
         self.pausedByLowVolume = FALSE;
+        
+        self.bufferingProgressReportedAt = nil;
     }
     return self;
 }
@@ -78,7 +82,7 @@
     [socket acceptOnPort:20139 error:nil];
 }
 
-- (void) viewDidLayoutSubviews {
+- (void)viewDidLayoutSubviews {
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
     {
         self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
@@ -648,6 +652,12 @@
 
 - (void)onMusicFileManagerBufferingProgress:(NSNotification*)notification
 {
+    if (self.bufferingProgressReportedAt && [[NSDate date] timeIntervalSinceDate:self.bufferingProgressReportedAt] < 2.0)
+    {
+        return;
+    }
+    self.bufferingProgressReportedAt = [NSDate date];
+        
     for (int section = 0; section < [self.sections count]; section++)
     {
         NSArray* fileIndexes = [[self.sections objectAtIndex:section] objectForKey:@"files"];
