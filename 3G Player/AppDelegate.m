@@ -8,9 +8,14 @@
 
 #import "AppDelegate.h"
 
+#import "CocoaAsyncSocket/GCDAsyncSocket.h"
+
 #import "Globals.h"
 
 @implementation AppDelegate
+
+GCDAsyncSocket* serverSocket;
+dispatch_queue_t serverSocketQueue;
 
 - (void)dealloc
 {
@@ -47,6 +52,9 @@
     controllers.library = [[LibraryController alloc] initWithRoot];
     [self.tabBarController addChildViewController:controllers.library];
     
+    serverSocketQueue = dispatch_queue_create("serverSocketQueue", NULL);
+    [self initServerSocket];
+    
     self.window.backgroundColor = [UIColor whiteColor];
     self.window.rootViewController = self.tabBarController;
     [self.window makeKeyAndVisible];
@@ -73,13 +81,15 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
-    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+    [serverSocket setDelegate:nil];
+    [serverSocket disconnect];
+    [serverSocket dealloc];
+    serverSocket = nil;
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+    [self initServerSocket];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
@@ -90,6 +100,12 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+- (void)initServerSocket
+{
+    serverSocket = [[GCDAsyncSocket alloc] initWithDelegate:controllers.playlist delegateQueue:serverSocketQueue];
+    [serverSocket acceptOnPort:20139 error:nil];
 }
 
 // Why am I supposed to do this?

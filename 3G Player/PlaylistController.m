@@ -74,9 +74,6 @@
     
     [self periodic];
     self.periodicTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(periodic) userInfo:nil repeats:YES];
-    
-    GCDAsyncSocket* socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_queue_create("socketQueue", NULL)];
-    [socket acceptOnPort:20139 error:nil];
 }
 
 - (void)viewDidLayoutSubviews {
