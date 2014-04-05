@@ -45,6 +45,7 @@
     if (self)
     {
         self.tabBarItem.title = NSLocalizedString(@"Playlist", NIL);
+        self.tabBarItem.image = [UIImage imageNamed:@"tabbar_playlist.png"];
         
         self.playlist = [[NSMutableArray alloc] init];
         self.sections = [[NSMutableArray alloc] init];
