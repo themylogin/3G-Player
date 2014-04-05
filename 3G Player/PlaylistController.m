@@ -30,8 +30,6 @@
 
 @property (nonatomic, retain) NSTimer* periodicTimer;
 
-@property (nonatomic)         BOOL pausedByLowVolume;
-
 @property (nonatomic, retain) NSDate* bufferingProgressReportedAt;
 
 @end
@@ -59,13 +57,6 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerStateChanged) name:@"stateChanged" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingProgress:) name:@"bufferingProgress" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingCompleted) name:@"bufferingCompleted" object:musicFileManager];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(onVolumeChanged)
-                                                     name:@"AVSystemController_SystemVolumeDidChangeNotification"
-                                                   object:nil];
-        
-        self.pausedByLowVolume = FALSE;
         
         self.bufferingProgressReportedAt = nil;
     }
@@ -501,33 +492,6 @@
                 
             default:
                 break;
-        }
-    }
-}
-
-- (void)onVolumeChanged
-{
-    if (self.player)
-    {
-        Float32 volume;
-        UInt32 dataSize = sizeof(Float32);
-        AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareOutputVolume, &dataSize, &volume);
-        
-        if (self.player.playing)
-        {
-            if (volume < 0.05)
-            {
-                self.pausedByLowVolume = TRUE;
-                [self.player pause];
-            }
-        }
-        else
-        {
-            if (self.pausedByLowVolume && volume >= 0.05)
-            {
-                self.pausedByLowVolume = FALSE;
-                [self.player play];
-            }
         }
     }
 }
