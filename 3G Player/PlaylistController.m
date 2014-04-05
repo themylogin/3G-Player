@@ -446,12 +446,13 @@
     self.playerInterruptedWhilePlaying = player.playing;
 }
 
-- (void)audioPlayerEndInterruption:(AVAudioPlayer *)player
+- (void)audioPlayerEndInterruption:(AVAudioPlayer *)player withOptions:(NSUInteger)flags
 {
     if (self.playerInterruptedWhilePlaying)
     {
         if (self.player)
         {
+            [self.player prepareToPlay];
             [self.player play];
         }
         
