@@ -59,6 +59,11 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingProgress:) name:@"bufferingProgress" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingCompleted) name:@"bufferingCompleted" object:musicFileManager];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(onAudioRouteChange:)
+                                                     name:AVAudioSessionRouteChangeNotification
+                                                   object:[AVAudioSession sharedInstance]];
+        
         self.bufferingProgressReportedAt = nil;
     }
     return self;
@@ -457,6 +462,15 @@
         }
         
         self.playerInterruptedWhilePlaying = NO;
+    }
+}
+
+- (void)onAudioRouteChange:(NSNotification*)notification
+{
+    NSInteger reason = [[[notification userInfo] objectForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
+    if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable)
+    {
+        [self.player pause];
     }
 }
 
