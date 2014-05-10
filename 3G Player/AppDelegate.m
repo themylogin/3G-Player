@@ -45,8 +45,8 @@ dispatch_queue_t serverSocketQueue;
     
     self.tabBarController = [[UITabBarController alloc] init];
     
-    controllers.playlist = [[PlaylistController alloc] init];
-    [self.tabBarController addChildViewController:controllers.playlist];
+    controllers.current = [[CurrentController alloc] init];
+    [self.tabBarController addChildViewController:controllers.current];
     
     controllers.library = [[LibraryController alloc] initWithRoot];
     [self.tabBarController addChildViewController:controllers.library];
@@ -103,7 +103,7 @@ dispatch_queue_t serverSocketQueue;
 
 - (void)initServerSocket
 {
-    serverSocket = [[GCDAsyncSocket alloc] initWithDelegate:controllers.playlist delegateQueue:serverSocketQueue];
+    serverSocket = [[GCDAsyncSocket alloc] initWithDelegate:controllers.current delegateQueue:serverSocketQueue];
     [serverSocket acceptOnPort:20139 error:nil];
 }
 

@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 themylogin. All rights reserved.
 //
 
-#import "PlaylistController.h"
+#import "CurrentController.h"
 
 #import "Globals.h"
 
@@ -16,7 +16,7 @@
 #import "CocoaAsyncSocket/GCDAsyncSocket.h"
 #import "JSONKit.h"
 
-@interface PlaylistController ()
+@interface CurrentController ()
 
 @property (nonatomic, retain) NSMutableArray* playlist;
 @property (nonatomic, retain) NSMutableArray* sections;
@@ -34,7 +34,7 @@
 
 @end
 
-@implementation PlaylistController
+@implementation CurrentController
 
 @synthesize playlist;
 @synthesize sections;
@@ -44,8 +44,8 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self)
     {
-        self.tabBarItem.title = NSLocalizedString(@"Playlist", NIL);
-        self.tabBarItem.image = [UIImage imageNamed:@"tabbar_playlist.png"];
+        self.tabBarItem.title = NSLocalizedString(@"Current", NIL);
+        self.tabBarItem.image = [UIImage imageNamed:@"tabbar_current.png"];
         
         self.playlist = [[NSMutableArray alloc] init];
         self.sections = [[NSMutableArray alloc] init];

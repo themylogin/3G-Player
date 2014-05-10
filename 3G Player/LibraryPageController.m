@@ -149,7 +149,7 @@ static char const* const ITEM = "ITEM";
         }
         else
         {
-            [controllers.playlist addFiles:[NSArray arrayWithObject:item] mode:AddToTheEnd];
+            [controllers.current addFiles:[NSArray arrayWithObject:item] mode:AddToTheEnd];
         }
     }
 }
@@ -209,7 +209,7 @@ static char const* const ITEM = "ITEM";
     
     if (buttonIndex == REPLACE || buttonIndex == REPLACE_AND_PLAY)
     {
-        [controllers.playlist clear];
+        [controllers.current clear];
     }
     
     AddMode addMode = AddToTheEnd;
@@ -228,12 +228,12 @@ static char const* const ITEM = "ITEM";
     }
     else
     {
-        [controllers.playlist addFiles:[NSArray arrayWithObject:item] mode:addMode];
+        [controllers.current addFiles:[NSArray arrayWithObject:item] mode:addMode];
     }
         
     if (buttonIndex == REPLACE_AND_PLAY)
     {
-        [controllers.playlist playAtIndex:0];
+        [controllers.current playAtIndex:0];
     }
 }
 
@@ -283,7 +283,7 @@ static char const* const ITEM = "ITEM";
     
     if ([self addDirectory:directory to:filesToAdd askConfirmation:ask])
     {
-        [controllers.playlist addFiles:filesToAdd mode:addMode];
+        [controllers.current addFiles:filesToAdd mode:addMode];
     }
     else
     {        

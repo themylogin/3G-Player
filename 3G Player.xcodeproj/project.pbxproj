@@ -36,8 +36,8 @@
 		84C4CA191785ADA500A95DB9 /* Globals.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA121785ADA500A95DB9 /* Globals.m */; };
 		84C4CA1A1785ADA500A95DB9 /* LibraryPageController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA141785ADA500A95DB9 /* LibraryPageController.m */; };
 		84C4CA1B1785ADA500A95DB9 /* LibraryPageController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84C4CA151785ADA500A95DB9 /* LibraryPageController.xib */; };
-		84C4CA1C1785ADA500A95DB9 /* PlaylistController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA171785ADA500A95DB9 /* PlaylistController.m */; };
-		84C4CA1D1785ADA500A95DB9 /* PlaylistController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84C4CA181785ADA500A95DB9 /* PlaylistController.xib */; };
+		84C4CA1C1785ADA500A95DB9 /* CurrentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA171785ADA500A95DB9 /* CurrentController.m */; };
+		84C4CA1D1785ADA500A95DB9 /* CurrentController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84C4CA181785ADA500A95DB9 /* CurrentController.xib */; };
 		84C4CA1F1785B1BC00A95DB9 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C4CA1E1785B1BC00A95DB9 /* MediaPlayer.framework */; };
 		84C4CA211785B36E00A95DB9 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C4CA201785B36E00A95DB9 /* AVFoundation.framework */; };
 		84C4CA2A1785E3ED00A95DB9 /* icons.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C4CA221785E3ED00A95DB9 /* icons.png */; };
@@ -54,7 +54,7 @@
 		84C4CA3E1786D71E00A95DB9 /* NSString+FMEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA3A1786D71E00A95DB9 /* NSString+FMEngine.m */; };
 		84C4CA411786D7FB00A95DB9 /* Scrobbler.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C4CA401786D7FB00A95DB9 /* Scrobbler.m */; };
 		84C4CA431786F4EB00A95DB9 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 84C4CA421786F4EA00A95DB9 /* Settings.bundle */; };
-		84C836AB18F0779F00033739 /* tabbar_playlist@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C836A918F0779F00033739 /* tabbar_playlist@2x.png */; };
+		84C836AB18F0779F00033739 /* tabbar_current@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C836A918F0779F00033739 /* tabbar_current@2x.png */; };
 		84C836AC18F0779F00033739 /* tabbar_library@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C836AA18F0779F00033739 /* tabbar_library@2x.png */; };
 		84C919C917841B7C00810B88 /* ASIAuthenticationDialog.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C9197217841B7C00810B88 /* ASIAuthenticationDialog.m */; };
 		84C919CA17841B7C00810B88 /* ASIDataCompressor.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C9197517841B7C00810B88 /* ASIDataCompressor.m */; };
@@ -118,9 +118,9 @@
 		84C4CA131785ADA500A95DB9 /* LibraryPageController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LibraryPageController.h; sourceTree = "<group>"; };
 		84C4CA141785ADA500A95DB9 /* LibraryPageController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LibraryPageController.m; sourceTree = "<group>"; };
 		84C4CA151785ADA500A95DB9 /* LibraryPageController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LibraryPageController.xib; sourceTree = "<group>"; };
-		84C4CA161785ADA500A95DB9 /* PlaylistController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaylistController.h; sourceTree = "<group>"; };
-		84C4CA171785ADA500A95DB9 /* PlaylistController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlaylistController.m; sourceTree = "<group>"; };
-		84C4CA181785ADA500A95DB9 /* PlaylistController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PlaylistController.xib; sourceTree = "<group>"; };
+		84C4CA161785ADA500A95DB9 /* CurrentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CurrentController.h; sourceTree = "<group>"; };
+		84C4CA171785ADA500A95DB9 /* CurrentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CurrentController.m; sourceTree = "<group>"; };
+		84C4CA181785ADA500A95DB9 /* CurrentController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CurrentController.xib; sourceTree = "<group>"; };
 		84C4CA1E1785B1BC00A95DB9 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		84C4CA201785B36E00A95DB9 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		84C4CA221785E3ED00A95DB9 /* icons.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icons.png; sourceTree = "<group>"; };
@@ -142,7 +142,7 @@
 		84C4CA3F1786D7FA00A95DB9 /* Scrobbler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scrobbler.h; sourceTree = "<group>"; };
 		84C4CA401786D7FB00A95DB9 /* Scrobbler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Scrobbler.m; sourceTree = "<group>"; };
 		84C4CA421786F4EA00A95DB9 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = SOURCE_ROOT; };
-		84C836A918F0779F00033739 /* tabbar_playlist@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tabbar_playlist@2x.png"; sourceTree = "<group>"; };
+		84C836A918F0779F00033739 /* tabbar_current@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tabbar_current@2x.png"; sourceTree = "<group>"; };
 		84C836AA18F0779F00033739 /* tabbar_library@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tabbar_library@2x.png"; sourceTree = "<group>"; };
 		84C9197117841B7C00810B88 /* ASIAuthenticationDialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASIAuthenticationDialog.h; sourceTree = "<group>"; };
 		84C9197217841B7C00810B88 /* ASIAuthenticationDialog.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASIAuthenticationDialog.m; sourceTree = "<group>"; };
@@ -252,9 +252,9 @@
 				84C4CA121785ADA500A95DB9 /* Globals.m */,
 				84C10BF91782E08E004220BC /* AppDelegate.h */,
 				84C10BFA1782E08E004220BC /* AppDelegate.m */,
-				84C4CA161785ADA500A95DB9 /* PlaylistController.h */,
-				84C4CA171785ADA500A95DB9 /* PlaylistController.m */,
-				84C4CA181785ADA500A95DB9 /* PlaylistController.xib */,
+				84C4CA161785ADA500A95DB9 /* CurrentController.h */,
+				84C4CA171785ADA500A95DB9 /* CurrentController.m */,
+				84C4CA181785ADA500A95DB9 /* CurrentController.xib */,
 				84C91A0817856C5500810B88 /* MusicFileManager.h */,
 				84C91A0917856C5500810B88 /* MusicFileManager.m */,
 				84C4CA3F1786D7FA00A95DB9 /* Scrobbler.h */,
@@ -277,7 +277,7 @@
 		84C10BF11782E08E004220BC /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				84C836A918F0779F00033739 /* tabbar_playlist@2x.png */,
+				84C836A918F0779F00033739 /* tabbar_current@2x.png */,
 				84C836AA18F0779F00033739 /* tabbar_library@2x.png */,
 				84943CBA17CBB33A00A1CD17 /* Icon.png */,
 				84943CBB17CBB33A00A1CD17 /* Icon@2x.png */,
@@ -479,7 +479,7 @@
 				84C10BFF1782E08E004220BC /* Default@2x.png in Resources */,
 				84C10C011782E08E004220BC /* Default-568h@2x.png in Resources */,
 				84C4CA1B1785ADA500A95DB9 /* LibraryPageController.xib in Resources */,
-				84C4CA1D1785ADA500A95DB9 /* PlaylistController.xib in Resources */,
+				84C4CA1D1785ADA500A95DB9 /* CurrentController.xib in Resources */,
 				84C4CA2A1785E3ED00A95DB9 /* icons.png in Resources */,
 				84C4CA2B1785E3ED00A95DB9 /* pause_active.png in Resources */,
 				84C4CA2C1785E3ED00A95DB9 /* pause_inactive.png in Resources */,
@@ -491,7 +491,7 @@
 				84C4CA431786F4EB00A95DB9 /* Settings.bundle in Resources */,
 				84943CBC17CBB33A00A1CD17 /* Icon.png in Resources */,
 				84943CBD17CBB33A00A1CD17 /* Icon@2x.png in Resources */,
-				84C836AB18F0779F00033739 /* tabbar_playlist@2x.png in Resources */,
+				84C836AB18F0779F00033739 /* tabbar_current@2x.png in Resources */,
 				84B5D20717CBB730007FB471 /* Icon-72.png in Resources */,
 				84B5D20817CBB730007FB471 /* Icon-72@2x.png in Resources */,
 				84B5D20917CBB730007FB471 /* Icon-Small-50.png in Resources */,
@@ -532,7 +532,7 @@
 				84C91A0A17856C5500810B88 /* MusicFileManager.m in Sources */,
 				84C4CA191785ADA500A95DB9 /* Globals.m in Sources */,
 				84C4CA1A1785ADA500A95DB9 /* LibraryPageController.m in Sources */,
-				84C4CA1C1785ADA500A95DB9 /* PlaylistController.m in Sources */,
+				84C4CA1C1785ADA500A95DB9 /* CurrentController.m in Sources */,
 				84C4CA3B1786D71E00A95DB9 /* FMCallback.m in Sources */,
 				84C4CA3C1786D71E00A95DB9 /* FMEngine.m in Sources */,
 				84C4CA3D1786D71E00A95DB9 /* FMEngineURLConnection.m in Sources */,

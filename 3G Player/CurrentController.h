@@ -12,7 +12,7 @@
 
 typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack } AddMode;
 
-@interface PlaylistController : UIViewController <AVAudioPlayerDelegate>
+@interface CurrentController : UIViewController <AVAudioPlayerDelegate>
 
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
 @property (nonatomic, retain) IBOutlet UIButton* playPauseButton;

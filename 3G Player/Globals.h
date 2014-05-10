@@ -9,15 +9,15 @@
 #ifndef _G_Player_Controllers_h
 #define _G_Player_Controllers_h
 
-#import "PlaylistController.h"
+#import "CurrentController.h"
 #import "LibraryController.h"
 
 #import "MusicFileManager.h"
 #import "Scrobbler.h"
 
 typedef struct {
+    CurrentController* current;
     LibraryController* library;
-    PlaylistController* playlist;
 } _controllers;
 
 extern _controllers controllers;
