@@ -262,6 +262,7 @@
                     if (!([fileName isEqualToString:@"index.json"] || [fileName isEqualToString:@"index.json.checksum"]))
                     {
                         [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+                        [[NSFileManager defaultManager] removeItemAtPath:[filePath stringByAppendingString:@".incomplete"] error:nil];
                     }
                 }
             }
