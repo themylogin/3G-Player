@@ -226,7 +226,7 @@
 {
     if (self.bufferingRequest)
     {
-        [self.bufferingRequest cancel];
+        [self.bufferingRequest clearDelegatesAndCancel];
         self.bufferingRequest = nil;
     }
     
