@@ -22,7 +22,6 @@
 @property (nonatomic, retain) NSMutableArray* sections;
 
 @property (nonatomic)         int currentIndex;
-@property (nonatomic, retain) AVAudioPlayer* player;
 @property (nonatomic, retain) NSDate* playerStartedAt;
 @property (nonatomic)         BOOL playerInterruptedWhilePlaying;
 
@@ -100,9 +99,6 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-    [self becomeFirstResponder];
 }
 
 - (void)didReceiveMemoryWarning
@@ -471,41 +467,6 @@
     if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable)
     {
         [self.player pause];
-    }
-}
-
-#pragma mark - Remote Control Buttons delegate
-
-- (BOOL)canBecomeFirstResponder
-{
-    return YES;
-}
-
-- (void)remoteControlReceivedWithEvent:(UIEvent*)receivedEvent
-{
-    if (receivedEvent.type == UIEventTypeRemoteControl)
-    {
-        switch (receivedEvent.subtype)
-        {
-            case UIEventSubtypeRemoteControlPlay:
-                [self.player play];
-                break;
-                
-            case UIEventSubtypeRemoteControlPause:
-                [self.player pause];
-                break;
-                
-            case UIEventSubtypeRemoteControlPreviousTrack:
-                [self playPrevTrack:FALSE];
-                break;
-                
-            case UIEventSubtypeRemoteControlNextTrack:
-                [self playNextTrack:FALSE];
-                break;
-                
-            default:
-                break;
-        }
     }
 }
 

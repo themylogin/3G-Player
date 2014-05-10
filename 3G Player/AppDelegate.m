@@ -51,6 +51,9 @@ dispatch_queue_t serverSocketQueue;
     controllers.library = [[LibraryController alloc] initWithRoot];
     [self.tabBarController addChildViewController:controllers.library];
     
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    [self becomeFirstResponder];
+    
     serverSocketQueue = dispatch_queue_create("serverSocketQueue", NULL);
     [self initServerSocket];
     
@@ -105,6 +108,41 @@ dispatch_queue_t serverSocketQueue;
 {
     serverSocket = [[GCDAsyncSocket alloc] initWithDelegate:controllers.current delegateQueue:serverSocketQueue];
     [serverSocket acceptOnPort:20139 error:nil];
+}
+
+#pragma mark - Remote Control Buttons delegate
+
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+- (void)remoteControlReceivedWithEvent:(UIEvent*)receivedEvent
+{
+    if (receivedEvent.type == UIEventTypeRemoteControl)
+    {
+        switch (receivedEvent.subtype)
+        {
+            case UIEventSubtypeRemoteControlPlay:
+                [controllers.current.player play];
+                break;
+                
+            case UIEventSubtypeRemoteControlPause:
+                [controllers.current.player pause];
+                break;
+                
+            case UIEventSubtypeRemoteControlPreviousTrack:
+                [controllers.current playPrevTrack:FALSE];
+                break;
+                
+            case UIEventSubtypeRemoteControlNextTrack:
+                [controllers.current playNextTrack:FALSE];
+                break;
+                
+            default:
+                break;
+        }
+    }
 }
 
 // Why am I supposed to do this?
