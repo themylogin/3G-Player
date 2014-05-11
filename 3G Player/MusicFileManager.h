@@ -36,5 +36,7 @@ typedef union {
 - (void)deleteFileOrdirectory:(NSDictionary*)fileOrDirectory;
 
 - (void)notifyFileUsage:(NSDictionary*)musicFile;
+- (NSArray*)listOldDirectories;
+
 
 @end

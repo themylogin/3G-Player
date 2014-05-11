@@ -366,6 +366,7 @@
 - (void)writeHistoryFile:(NSMutableDictionary*)history
 {
     [[history JSONData] writeToFile:self.historyFile atomically:YES];
+    [self.notificationCenter postNotificationName:@"oldDirectoriesUpdated" object:self userInfo:nil];
 }
 
 - (void)notifyFileUsage:(NSDictionary*)musicFile
@@ -375,16 +376,21 @@
     [self writeHistoryFile:history];
 }
 
+- (NSArray*)listOldDirectories
+{
+    return [[self readHistoryFile] keysSortedByValueUsingComparator:^NSComparisonResult(id obj1, id obj2){
+        return [obj1 compare:obj2];
+    }];
+}
+
 - (void)removeOldFiles
 {
     while (![self hasFreeSpace])
     {
-        NSArray* orderedKeys = [[self readHistoryFile] keysSortedByValueUsingComparator:^NSComparisonResult(id obj1, id obj2){
-            return [obj1 compare:obj2];
-        }];
-        if ([orderedKeys count] > 0)
+        NSArray* oldDirectories = [self listOldDirectories];
+        if ([oldDirectories count] > 0)
         {
-            NSString* directoryToRemove = [[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[orderedKeys objectAtIndex:0]];
+            NSString* directoryToRemove = [[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[oldDirectories objectAtIndex:0]];
             
             NSArray* files = [self.fileManager contentsOfDirectoryAtPath:directoryToRemove error:nil];
             for (int i = 0; i < [files count]; i++)
@@ -399,7 +405,7 @@
             }
             
             NSMutableDictionary* history = [self readHistoryFile];
-            [history removeObjectForKey:[orderedKeys objectAtIndex:0]];
+            [history removeObjectForKey:[oldDirectories objectAtIndex:0]];
             [self writeHistoryFile:history];
         }
         else

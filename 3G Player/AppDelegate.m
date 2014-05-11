@@ -51,6 +51,9 @@ dispatch_queue_t serverSocketQueue;
     controllers.library = [[LibraryController alloc] initWithRoot];
     [self.tabBarController addChildViewController:controllers.library];
     
+    controllers.info = [[InfoController alloc] init];
+    [self.tabBarController addChildViewController:controllers.info];
+    
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
     [self becomeFirstResponder];
     

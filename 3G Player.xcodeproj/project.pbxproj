@@ -79,6 +79,8 @@
 		84DEA2D6191FC2A1000F9832 /* tabbar_info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84DEA2D2191FC2A1000F9832 /* tabbar_info@2x.png */; };
 		84DEA2D7191FC2A1000F9832 /* tabbar_library.png in Resources */ = {isa = PBXBuildFile; fileRef = 84DEA2D3191FC2A1000F9832 /* tabbar_library.png */; };
 		84DEA2D8191FC2A1000F9832 /* tabbar_current.png in Resources */ = {isa = PBXBuildFile; fileRef = 84DEA2D4191FC2A1000F9832 /* tabbar_current.png */; };
+		84DEA2DC191FC314000F9832 /* InfoController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DEA2DA191FC314000F9832 /* InfoController.m */; };
+		84DEA2DD191FC314000F9832 /* InfoController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84DEA2DB191FC314000F9832 /* InfoController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -191,6 +193,9 @@
 		84DEA2D2191FC2A1000F9832 /* tabbar_info@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tabbar_info@2x.png"; sourceTree = "<group>"; };
 		84DEA2D3191FC2A1000F9832 /* tabbar_library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tabbar_library.png; sourceTree = "<group>"; };
 		84DEA2D4191FC2A1000F9832 /* tabbar_current.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tabbar_current.png; sourceTree = "<group>"; };
+		84DEA2D9191FC314000F9832 /* InfoController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InfoController.h; sourceTree = "<group>"; };
+		84DEA2DA191FC314000F9832 /* InfoController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InfoController.m; sourceTree = "<group>"; };
+		84DEA2DB191FC314000F9832 /* InfoController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -263,6 +268,9 @@
 				84C4CA161785ADA500A95DB9 /* CurrentController.h */,
 				84C4CA171785ADA500A95DB9 /* CurrentController.m */,
 				84C4CA181785ADA500A95DB9 /* CurrentController.xib */,
+				84DEA2D9191FC314000F9832 /* InfoController.h */,
+				84DEA2DA191FC314000F9832 /* InfoController.m */,
+				84DEA2DB191FC314000F9832 /* InfoController.xib */,
 				84C91A0817856C5500810B88 /* MusicFileManager.h */,
 				84C91A0917856C5500810B88 /* MusicFileManager.m */,
 				84C4CA3F1786D7FA00A95DB9 /* Scrobbler.h */,
@@ -505,6 +513,7 @@
 				84943CBC17CBB33A00A1CD17 /* Icon.png in Resources */,
 				84943CBD17CBB33A00A1CD17 /* Icon@2x.png in Resources */,
 				84DEA2D8191FC2A1000F9832 /* tabbar_current.png in Resources */,
+				84DEA2DD191FC314000F9832 /* InfoController.xib in Resources */,
 				84C836AB18F0779F00033739 /* tabbar_current@2x.png in Resources */,
 				84B5D20717CBB730007FB471 /* Icon-72.png in Resources */,
 				84B5D20817CBB730007FB471 /* Icon-72@2x.png in Resources */,
@@ -532,6 +541,7 @@
 				84C10C091782E20A004220BC /* LibraryController.m in Sources */,
 				84C10C171782E72F004220BC /* JSONKit.m in Sources */,
 				84C919C917841B7C00810B88 /* ASIAuthenticationDialog.m in Sources */,
+				84DEA2DC191FC314000F9832 /* InfoController.m in Sources */,
 				84C919CA17841B7C00810B88 /* ASIDataCompressor.m in Sources */,
 				84C919CB17841B7C00810B88 /* ASIDataDecompressor.m in Sources */,
 				84C919CC17841B7C00810B88 /* ASIDownloadCache.m in Sources */,
