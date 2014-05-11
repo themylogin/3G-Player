@@ -18,6 +18,7 @@
 
 @end
 
+static char const* const ALERTVIEW = "ALERTVIEW";
 static char const* const ADD_MODE = "ADD_MODE";
 static char const* const DIRECTORY = "DIRECTORY";
 static char const* const ITEM = "ITEM";
@@ -203,7 +204,15 @@ static char const* const ITEM = "ITEM";
     
     if (buttonIndex == DELETE)
     {
-        [musicFileManager deleteFileOrdirectory:item];        
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Question", nil)
+                                                        message:[NSString stringWithFormat:NSLocalizedString(@"Delete «%@»?", nil), [item objectForKey:@"name"]]
+                                                       delegate:self
+                                              cancelButtonTitle:NSLocalizedString(@"No", nil)
+                                              otherButtonTitles:NSLocalizedString(@"Yes", nil), nil];
+        objc_setAssociatedObject(alert, ALERTVIEW, @"DELETE", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(alert, ITEM, item, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [alert show];
+        [alert release];
         return;
     }
     
@@ -241,9 +250,19 @@ static char const* const ITEM = "ITEM";
 
 - (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex == 1)
+    NSString* view = objc_getAssociatedObject(alertView, ALERTVIEW);
+    
+    if ([view isEqualToString:@"ADD"])
     {
-        [self addDirectoryToPlaylist:objc_getAssociatedObject(alertView, DIRECTORY) mode:[objc_getAssociatedObject(alertView, ADD_MODE) intValue] askConfirmation:NO];
+        if (buttonIndex == 1)
+        {
+            [self addDirectoryToPlaylist:objc_getAssociatedObject(alertView, DIRECTORY) mode:[objc_getAssociatedObject(alertView, ADD_MODE) intValue] askConfirmation:NO];
+        }
+    }
+    
+    if ([view isEqualToString:@"DELETE"])
+    {
+        [musicFileManager deleteFileOrdirectory:objc_getAssociatedObject(alertView, ITEM)];
     }
 }
 
@@ -292,6 +311,7 @@ static char const* const ITEM = "ITEM";
                                                        delegate:self
                                               cancelButtonTitle:NSLocalizedString(@"No", nil)
                                               otherButtonTitles:NSLocalizedString(@"Yes", nil), nil];
+        objc_setAssociatedObject(alert, ALERTVIEW, @"ADD", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(alert, DIRECTORY, directory, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(alert, ADD_MODE, [NSNumber numberWithInt:addMode], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [alert show];
