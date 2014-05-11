@@ -204,6 +204,8 @@
         }
         [self.player play];
         
+        [musicFileManager notifyFileUsage:item];
+        
         self.playerStartedAt = [NSDate date];
         [scrobbler sendNowPlaying:item];
     }
