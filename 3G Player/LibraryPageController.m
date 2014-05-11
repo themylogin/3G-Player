@@ -105,14 +105,27 @@ static char const* const ITEM = "ITEM";
     if ([self isDirectory:item])
     {
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        if ([self isBlacklisted:item])
+        {
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        }
+        else
+        {
+            cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+        }
     }
     else
     {
         cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
     }
     if ([self isBuffered:item])
     {        
         cell.textLabel.textColor = [UIColor blackColor];
+    }
+    else if ([self isBlacklisted:item])
+    {
+        cell.textLabel.textColor = [UIColor colorWithRed:0.85 green:0.85 blue:0.85 alpha:1.0];
     }
     else
     {        
@@ -130,6 +143,11 @@ static char const* const ITEM = "ITEM";
     NSDictionary* item = [self getItemForIndexPath:indexPath];
     if ([self isDirectory:item])
     {
+        if ([self isBlacklisted:item])
+        {
+            return;
+        }
+        
         LibraryPageController* libraryPageController = [[LibraryPageController alloc] initWithDirectory:[item objectForKey:@"path"] title:[item objectForKey:@"name"]];
         [self.navigationController pushViewController:libraryPageController animated:YES];
         [libraryPageController release];
@@ -167,11 +185,26 @@ static char const* const ITEM = "ITEM";
     {        
         NSDictionary* item = [self getItemForIndexPath:indexPath];
         
+        if ([self isBlacklisted:item])
+        {
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Question", nil)
+                                                            message:[NSString stringWithFormat:NSLocalizedString(@"Remove «%@» from blacklist?", nil), [item objectForKey:@"name"]]
+                                                           delegate:self
+                                                  cancelButtonTitle:NSLocalizedString(@"No", nil)
+                                                  otherButtonTitles:NSLocalizedString(@"Yes", nil), nil];
+            objc_setAssociatedObject(alert, ALERTVIEW, @"REMOVE_FROM_BLACKLIST", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            objc_setAssociatedObject(alert, ITEM, item, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            [alert show];
+            [alert release];
+            return;
+        }
+        
         UIActionSheet* actionSheet = [[UIActionSheet alloc] initWithTitle:[item objectForKey:@"name"]
                                                                  delegate:self
                                                         cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
                                                    destructiveButtonTitle:NSLocalizedString(@"Delete", nil)
-                                                        otherButtonTitles:NSLocalizedString(@"Add", nil),
+                                                        otherButtonTitles:NSLocalizedString(@"Blacklist", nil),
+                                                                          NSLocalizedString(@"Add", nil),
                                                                           NSLocalizedString(@"Add after current album", nil),
                                                                           NSLocalizedString(@"Add after current track", nil),
                                                                           NSLocalizedString(@"Replace", nil),
@@ -188,12 +221,13 @@ static char const* const ITEM = "ITEM";
 - (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     const int DELETE            = 0;
-    const int ADD __unused      = 1;
-    const int ADD_AFTER_ALBUM   = 2;
-    const int ADD_AFTER_TRACK   = 3;
-    const int REPLACE           = 4;
-    const int REPLACE_AND_PLAY  = 5;
-    const int CANCEL            = 6;
+    const int BLACKLIST         = 1;
+    const int ADD __unused      = 2;
+    const int ADD_AFTER_ALBUM   = 3;
+    const int ADD_AFTER_TRACK   = 4;
+    const int REPLACE           = 5;
+    const int REPLACE_AND_PLAY  = 6;
+    const int CANCEL            = 7;
     
     if (buttonIndex == CANCEL)
     {
@@ -213,6 +247,13 @@ static char const* const ITEM = "ITEM";
         objc_setAssociatedObject(alert, ITEM, item, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [alert show];
         [alert release];
+        return;
+    }
+    
+    if (buttonIndex == BLACKLIST)
+    {
+        [self.fileManager createFileAtPath:[self blacklistFilePath:item] contents:nil attributes:nil];
+        [self.tableView reloadData];
         return;
     }
     
@@ -262,7 +303,19 @@ static char const* const ITEM = "ITEM";
     
     if ([view isEqualToString:@"DELETE"])
     {
-        [musicFileManager deleteFileOrdirectory:objc_getAssociatedObject(alertView, ITEM)];
+        if (buttonIndex == 1)
+        {
+            [musicFileManager deleteFileOrdirectory:objc_getAssociatedObject(alertView, ITEM)];
+        }
+    }
+    
+    if ([view isEqualToString:@"REMOVE_FROM_BLACKLIST"])
+    {
+        if (buttonIndex == 1)
+        {
+            [self.fileManager removeItemAtPath:[self blacklistFilePath:objc_getAssociatedObject(alertView, ITEM)] error:nil];
+            [self.tableView reloadData];
+        }
     }
 }
 
@@ -329,6 +382,11 @@ static char const* const ITEM = "ITEM";
         {
             if ([self isDirectory:item])
             {
+                if ([self isBlacklisted:item])
+                {
+                    continue;
+                }
+                
                 if (![self addDirectory:[item objectForKey:@"path"] to:playlist askConfirmation:ask])
                 {
                     return FALSE;
@@ -359,6 +417,16 @@ static char const* const ITEM = "ITEM";
     return [[item objectForKey:@"type"] isEqualToString:@"directory"];
 }
 
+- (NSString*)blacklistFilePath:(NSDictionary*)item
+{
+    return [[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[item objectForKey:@"path"]] stringByAppendingString:@"/blacklisted"];
+}
+
+- (BOOL)isBlacklisted:(NSDictionary*)item
+{
+    return [self.fileManager fileExistsAtPath:[self blacklistFilePath:item] isDirectory:nil];
+}
+
 - (BOOL)isBuffered:(NSDictionary*)item
 {
     if ([self isDirectory:item])
@@ -379,6 +447,11 @@ static char const* const ITEM = "ITEM";
         {
             if ([self isDirectory:childItem])
             {
+                if ([self isBlacklisted:childItem])
+                {
+                    continue;
+                }
+                
                 if (![self directoryIsBuffered:childItem])
                 {
                     return NO;
