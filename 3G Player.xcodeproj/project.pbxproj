@@ -471,6 +471,11 @@
 			attributes = {
 				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = themylogin;
+				TargetAttributes = {
+					84C10BE61782E08D004220BC = {
+						DevelopmentTeam = P8ZZXCNN95;
+					};
+				};
 			};
 			buildConfigurationList = 84C10BE21782E08D004220BC /* Build configuration list for PBXProject "3G Player" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -642,11 +647,14 @@
 		84C10C051782E08E004220BC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
 				INFOPLIST_FILE = "3G Player/3G Player-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -654,11 +662,14 @@
 		84C10C061782E08E004220BC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
 				INFOPLIST_FILE = "3G Player/3G Player-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
