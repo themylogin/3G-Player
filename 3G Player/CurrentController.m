@@ -23,7 +23,6 @@
 
 @property (nonatomic)         int currentIndex;
 @property (nonatomic, retain) NSDate* playerStartedAt;
-@property (nonatomic)         BOOL playerInterruptedWhilePlaying;
 
 @property (nonatomic)         enum { RepeatDisabled, RepeatPlaylist, RepeatTrack } repeat;
 
@@ -447,21 +446,12 @@
 
 - (void)audioPlayerBeginInterruption:(AVAudioPlayer *)player
 {
-    self.playerInterruptedWhilePlaying = player.playing;
-}
+    [self.player pause];}
 
 - (void)audioPlayerEndInterruption:(AVAudioPlayer *)player withOptions:(NSUInteger)flags
 {
-    if (self.playerInterruptedWhilePlaying)
-    {
-        if (self.player)
-        {
-            [self.player prepareToPlay];
-            [self.player play];
-        }
-        
-        self.playerInterruptedWhilePlaying = NO;
-    }
+    [self.player prepareToPlay];
+    [self.player play];
 }
 
 - (void)onAudioRouteChange:(NSNotification*)notification
