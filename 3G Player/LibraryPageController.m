@@ -218,6 +218,37 @@ static char const* const ITEM = "ITEM";
     }
 }
 
+- (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer
+{
+    if (recognizer.state == UIGestureRecognizerStateRecognized && recognizer.rotation > M_PI_2)
+    {
+        bool everythingIsBlacklisted = YES;
+        for (NSDictionary* item in self.index)
+        {
+            if (![self isBlacklisted:item])
+            {
+                everythingIsBlacklisted = NO;
+                break;
+            }
+        }
+        
+        if (everythingIsBlacklisted)
+        {
+            for (NSDictionary* item in self.index)
+            {
+                [self unblacklistItem:item];
+            }
+        }
+        else
+        {
+            for (NSDictionary* item in self.index)
+            {
+                [self blacklistItem:item];
+            }
+        }
+    }
+}
+
 #pragma mark - Action sheet delegate
 
 - (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
@@ -254,8 +285,7 @@ static char const* const ITEM = "ITEM";
     
     if (buttonIndex == BLACKLIST)
     {
-        [self.fileManager createFileAtPath:[self blacklistFilePath:item] contents:nil attributes:nil];
-        [self.tableView reloadData];
+        [self blacklistItem:item];
         return;
     }
     
@@ -315,8 +345,7 @@ static char const* const ITEM = "ITEM";
     {
         if (buttonIndex == 1)
         {
-            [self.fileManager removeItemAtPath:[self blacklistFilePath:objc_getAssociatedObject(alertView, ITEM)] error:nil];
-            [self.tableView reloadData];
+            [self unblacklistItem:objc_getAssociatedObject(alertView, ITEM)];
         }
     }
 }
@@ -351,7 +380,7 @@ static char const* const ITEM = "ITEM";
     }
 }
 
-- (void) addDirectoryToPlaylist:(NSString*)directory mode:(AddMode)addMode askConfirmation:(BOOL)ask
+- (void)addDirectoryToPlaylist:(NSString*)directory mode:(AddMode)addMode askConfirmation:(BOOL)ask
 {
     NSMutableArray* filesToAdd = [[NSMutableArray alloc] init];
     
@@ -376,7 +405,7 @@ static char const* const ITEM = "ITEM";
     [filesToAdd release];
 }
 
-- (BOOL) addDirectory:(NSString*)directory to:(NSMutableArray*)playlist askConfirmation:(BOOL)ask
+- (BOOL)addDirectory:(NSString*)directory to:(NSMutableArray*)playlist askConfirmation:(BOOL)ask
 {
     @autoreleasepool
     {
@@ -434,6 +463,18 @@ static char const* const ITEM = "ITEM";
 - (BOOL)isBlacklisted:(NSDictionary*)item
 {
     return [self.fileManager fileExistsAtPath:[self blacklistFilePath:item] isDirectory:nil];
+}
+
+- (void)blacklistItem:(NSDictionary*)item
+{
+    [self.fileManager createFileAtPath:[self blacklistFilePath:item] contents:nil attributes:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"stateChanged" object:musicFileManager];
+}
+
+- (void)unblacklistItem:(NSDictionary*)item
+{
+    [self.fileManager removeItemAtPath:[self blacklistFilePath:item] error:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"stateChanged" object:musicFileManager];
 }
 
 - (BOOL)isBuffered:(NSDictionary*)item

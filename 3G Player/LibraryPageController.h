@@ -21,5 +21,6 @@
 
 - (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer*)recognizer;
+- (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer;
 
 @end
