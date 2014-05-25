@@ -202,14 +202,16 @@ static char const* const ITEM = "ITEM";
         UIActionSheet* actionSheet = [[UIActionSheet alloc] initWithTitle:[item objectForKey:@"name"]
                                                                  delegate:self
                                                         cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
-                                                   destructiveButtonTitle:NSLocalizedString(@"Delete", nil)
-                                                        otherButtonTitles:NSLocalizedString(@"Blacklist", nil),
+                                                   destructiveButtonTitle:nil
+                                                        otherButtonTitles:NSLocalizedString(@"Replace", nil),
+                                                                          NSLocalizedString(@"Replace and play", nil),
                                                                           NSLocalizedString(@"Add", nil),
                                                                           NSLocalizedString(@"Add after current album", nil),
                                                                           NSLocalizedString(@"Add after current track", nil),
-                                                                          NSLocalizedString(@"Replace", nil),
-                                                                          NSLocalizedString(@"Replace and play", nil),
+                                                                          NSLocalizedString(@"Blacklist", nil),
+                                                                          NSLocalizedString(@"Delete", nil),
                                                                           nil];
+        actionSheet.destructiveButtonIndex = 6;
         objc_setAssociatedObject(actionSheet, ITEM, item, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [actionSheet showInView:[self.view window]];
         [actionSheet release];        
@@ -220,13 +222,13 @@ static char const* const ITEM = "ITEM";
 
 - (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    const int DELETE            = 0;
-    const int BLACKLIST         = 1;
+    const int REPLACE           = 0;
+    const int REPLACE_AND_PLAY  = 1;
     const int ADD __unused      = 2;
     const int ADD_AFTER_ALBUM   = 3;
     const int ADD_AFTER_TRACK   = 4;
-    const int REPLACE           = 5;
-    const int REPLACE_AND_PLAY  = 6;
+    const int BLACKLIST         = 5;
+    const int DELETE            = 6;
     const int CANCEL            = 7;
     
     if (buttonIndex == CANCEL)
