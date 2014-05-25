@@ -382,13 +382,13 @@ static char const* const ITEM = "ITEM";
     {
         for (NSDictionary* item in [self loadIndexFor:directory])
         {
+            if ([self isBlacklisted:item])
+            {
+                continue;
+            }
+            
             if ([self isDirectory:item])
             {
-                if ([self isBlacklisted:item])
-                {
-                    continue;
-                }
-                
                 if (![self addDirectory:[item objectForKey:@"path"] to:playlist askConfirmation:ask])
                 {
                     return FALSE;
@@ -421,7 +421,14 @@ static char const* const ITEM = "ITEM";
 
 - (NSString*)blacklistFilePath:(NSDictionary*)item
 {
-    return [[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[item objectForKey:@"path"]] stringByAppendingString:@"/blacklisted"];
+    if ([self isDirectory:item])
+    {
+        return [[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[item objectForKey:@"path"]] stringByAppendingString:@"/blacklisted"];
+    }
+    else
+    {
+        return [[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[item objectForKey:@"path"]] stringByAppendingString:@".blacklisted"];
+    }
 }
 
 - (BOOL)isBlacklisted:(NSDictionary*)item
@@ -447,13 +454,13 @@ static char const* const ITEM = "ITEM";
     {
         for (NSDictionary* childItem in [self loadIndexFor:[item objectForKey:@"path"]])
         {
-            if ([self isDirectory:childItem])
+            if ([self isBlacklisted:childItem])
             {
-                if ([self isBlacklisted:childItem])
-                {
-                    continue;
-                }
-                
+                continue;
+            }
+            
+            if ([self isDirectory:childItem])
+            {                
                 if (![self directoryIsBuffered:childItem])
                 {
                     return NO;

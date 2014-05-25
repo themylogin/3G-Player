@@ -349,7 +349,7 @@
     return !([fileName isEqualToString:@"index.json"] ||
              [fileName isEqualToString:@"index.json.checksum"] ||
              [fileName isEqualToString:@"revision.txt"] ||
-             [fileName isEqualToString:@"blacklisted"]);
+             [fileName hasSuffix:@"blacklisted"]);
 }
 
 - (NSString*)musicHistoryKey:(NSString*) path
