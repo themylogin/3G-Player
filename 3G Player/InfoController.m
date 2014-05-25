@@ -10,6 +10,8 @@
 
 #import "Globals.h"
 
+#import "JSONKit.h"
+
 @interface InfoController ()
 
 @end
@@ -46,8 +48,23 @@
     NSArray* old = [musicFileManager listOldDirectories];
     NSArray* candidates = [old subarrayWithRange:NSMakeRange(0, MIN([old count], 5))];
     
+    NSMutableArray* readableCandidates = [NSMutableArray array];
+    for (int i = 0; i < [candidates count]; i++)
+    {
+        NSString* candidate = [candidates objectAtIndex:i];
+        NSArray* parts = [candidate componentsSeparatedByString:@"/"];
+        NSMutableArray* readableCandidate = [NSMutableArray array];
+        for (int j = 0; j < [parts count]; j++)
+        {
+            NSString* indexJsonPath = [[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[[parts subarrayWithRange:NSMakeRange(0, j)] componentsJoinedByString:@"/"]] stringByAppendingString:@"/index.json"];
+            NSDictionary* index = [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfFile:indexJsonPath]];
+            [readableCandidate addObject:[[index objectForKey:[parts objectAtIndex:j]] objectForKey:@"name"]];
+        }
+        [readableCandidates addObject:[readableCandidate componentsJoinedByString:@"/"]];
+    }
+    
     self.candidatesForDeletion.numberOfLines = 0;
-    self.candidatesForDeletion.text = [candidates componentsJoinedByString:@"\n"];
+    self.candidatesForDeletion.text = [readableCandidates componentsJoinedByString:@"\n"];
     
     CGRect currentFrame = self.candidatesForDeletion.frame;
     CGSize max = CGSizeMake(self.candidatesForDeletion.frame.size.width, 1024);
