@@ -22,6 +22,7 @@ static char const* const ALERTVIEW = "ALERTVIEW";
 static char const* const ADD_MODE = "ADD_MODE";
 static char const* const DIRECTORY = "DIRECTORY";
 static char const* const ITEM = "ITEM";
+static char const* const PLAY_AFTER = "PLAY_AFTER";
 
 @implementation LibraryPageController
 
@@ -164,7 +165,7 @@ static char const* const ITEM = "ITEM";
         NSDictionary* item = [self getItemForIndexPath:indexPath];
         if ([self isDirectory:item])
         {
-            [self addDirectoryToPlaylist:[item objectForKey:@"path"] mode:AddToTheEnd askConfirmation:YES];
+            [self addDirectoryToPlaylist:[item objectForKey:@"path"] mode:AddToTheEnd askConfirmation:YES playAfter:FALSE];
         }
         else
         {
@@ -306,16 +307,15 @@ static char const* const ITEM = "ITEM";
     
     if ([self isDirectory:item])
     {
-        [self addDirectoryToPlaylist:[item objectForKey:@"path"] mode:addMode askConfirmation:YES];
+        [self addDirectoryToPlaylist:[item objectForKey:@"path"] mode:addMode askConfirmation:YES playAfter:buttonIndex == REPLACE_AND_PLAY];
     }
     else
     {
         [controllers.current addFiles:[NSArray arrayWithObject:item] mode:addMode];
-    }
-        
-    if (buttonIndex == REPLACE_AND_PLAY)
-    {
-        [controllers.current playAtIndex:0];
+        if (buttonIndex == REPLACE_AND_PLAY)
+        {
+            [controllers.current playAtIndex:0];
+        }
     }
 }
 
@@ -329,7 +329,7 @@ static char const* const ITEM = "ITEM";
     {
         if (buttonIndex == 1)
         {
-            [self addDirectoryToPlaylist:objc_getAssociatedObject(alertView, DIRECTORY) mode:[objc_getAssociatedObject(alertView, ADD_MODE) intValue] askConfirmation:NO];
+            [self addDirectoryToPlaylist:objc_getAssociatedObject(alertView, DIRECTORY) mode:[objc_getAssociatedObject(alertView, ADD_MODE) intValue] askConfirmation:NO playAfter:[objc_getAssociatedObject(alertView, PLAY_AFTER) boolValue]];
         }
     }
     
@@ -380,13 +380,18 @@ static char const* const ITEM = "ITEM";
     }
 }
 
-- (void)addDirectoryToPlaylist:(NSString*)directory mode:(AddMode)addMode askConfirmation:(BOOL)ask
+- (void)addDirectoryToPlaylist:(NSString*)directory mode:(AddMode)addMode askConfirmation:(BOOL)ask playAfter:(BOOL)play
 {
     NSMutableArray* filesToAdd = [[NSMutableArray alloc] init];
     
     if ([self addDirectory:directory to:filesToAdd askConfirmation:ask])
     {
         [controllers.current addFiles:filesToAdd mode:addMode];
+        
+        if (play)
+        {
+            [controllers.current playAtIndex:0];
+        }
     }
     else
     {        
@@ -398,6 +403,7 @@ static char const* const ITEM = "ITEM";
         objc_setAssociatedObject(alert, ALERTVIEW, @"ADD", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(alert, DIRECTORY, directory, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(alert, ADD_MODE, [NSNumber numberWithInt:addMode], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(alert, PLAY_AFTER, [NSNumber numberWithBool:play], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [alert show];
         [alert release];
     }
