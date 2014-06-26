@@ -225,9 +225,18 @@
         [sizeRequest setAllowCompressedResponse:NO];
         [sizeRequest setShouldContinueWhenAppEntersBackground:YES];
         [sizeRequest startSynchronous];
-        if (sizeRequest.error || [sizeRequest responseStatusCode] != 200 ||
-            ![[NSString stringWithFormat:@"%llu", fileSize] isEqualToString:[sizeRequest responseString]])
+        if (sizeRequest.error || [sizeRequest responseStatusCode] != 200)
         {
+            [self onBufferingRequestError];
+            return;
+        }
+        int responseSize = [[sizeRequest responseString] intValue];
+        if (fileSize != responseSize)
+        {
+            if (fileSize > responseSize)
+            {
+                [self.bufferingFileHandle truncateFileAtOffset:0];
+            }
             [self onBufferingRequestError];
             return;
         }
