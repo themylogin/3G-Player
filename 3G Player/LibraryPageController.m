@@ -16,6 +16,15 @@
 
 @interface LibraryPageController ()
 
+
+@property (nonatomic, retain) NSString* directory;
+
+@property (nonatomic, retain) NSFileManager* fileManager;
+
+@property (nonatomic, retain) NSArray* index;
+@property (nonatomic, retain) NSMutableArray* indexLetters;
+@property (nonatomic, retain) NSMutableDictionary* indexRowsForLetters;
+
 @end
 
 static char const* const ALERTVIEW = "ALERTVIEW";
@@ -37,6 +46,22 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
         self.fileManager = [NSFileManager defaultManager];
         
         self.index = [self loadIndexFor:self.directory];
+        
+        self.indexLetters = [NSMutableArray array];
+        self.indexRowsForLetters = [NSMutableDictionary dictionary];
+        for (int i = 0; i < [self.index count]; i++)
+        {
+            NSDictionary* item = [self.index objectAtIndex:i];
+            if ([self isDirectory:item])
+            {
+                NSString* letter = [[[item objectForKey:@"name"] substringToIndex:1] uppercaseString];
+                if (![self.indexRowsForLetters objectForKey:letter])
+                {
+                    [self.indexLetters addObject:letter];
+                    [self.indexRowsForLetters setObject:[NSNumber numberWithInt:i] forKey:letter];
+                }
+            }
+        }
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerStateChanged) name:@"stateChanged" object:musicFileManager];
     }
@@ -86,9 +111,20 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     return 1;
 }
 
+- (NSArray*)sectionIndexTitlesForTableView:(UITableView *)tableView
+{
+    return self.indexLetters;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return [self.index count];
+}
+
+- (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index
+{
+    [tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:[[self.indexRowsForLetters objectForKey:title] integerValue] inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+    return index;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath

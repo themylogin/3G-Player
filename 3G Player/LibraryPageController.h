@@ -10,12 +10,6 @@
 
 @interface LibraryPageController : UITableViewController <UIActionSheetDelegate>
 
-@property (nonatomic, retain) NSString* directory;
-
-@property (nonatomic, retain) NSFileManager* fileManager;
-
-@property (nonatomic, retain) NSArray* index;
-
 - (id)initWithDirectory:(NSString*)directory title:(NSString*)title;
 - (BOOL)update;
 
