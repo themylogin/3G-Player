@@ -278,6 +278,7 @@
 
 - (void)deleteFileOrdirectory:(NSDictionary*)fileOrDirectory
 {
+    NSString* removeHistoryWithPrefix = nil;
     NSString* path = [[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[fileOrDirectory objectForKey:@"path"]];
     if ([[fileOrDirectory objectForKey:@"type"] isEqualToString:@"directory"])
     {
@@ -305,11 +306,60 @@
                 }
             }
         }
+        
+        removeHistoryWithPrefix = [fileOrDirectory objectForKey:@"path"];
     }
     else
     {
         [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
         [[NSFileManager defaultManager] removeItemAtPath:[path stringByAppendingString:@".incomplete"] error:nil];
+        
+        BOOL hasAliveSiblingsOrChildren = NO;
+        NSString* pathParent = [path stringByDeletingLastPathComponent];
+        NSDirectoryEnumerator* de = [[NSFileManager defaultManager] enumeratorAtPath:pathParent];
+        while (true)
+        {
+            @autoreleasepool
+            {
+                NSString* file = [de nextObject];
+                if (!file)
+                {
+                    break;
+                }
+                
+                NSString* filePath = [[pathParent stringByAppendingString:@"/"] stringByAppendingString:file];
+                
+                BOOL isDirectory;
+                if ([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDirectory] && !isDirectory)
+                {
+                    NSString* fileName = [[file pathComponents] lastObject];
+                    if ([self isMusicFile:fileName])
+                    {
+                        hasAliveSiblingsOrChildren = YES;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!hasAliveSiblingsOrChildren)
+        {
+            removeHistoryWithPrefix = [[fileOrDirectory objectForKey:@"path"] stringByDeletingLastPathComponent];
+        }
+    }
+    
+    if (removeHistoryWithPrefix)
+    {
+        NSMutableDictionary* history = [self readHistoryFile];
+        NSMutableArray* historyKeysToDelete = [NSMutableArray array];
+        for (NSString* key in [history keyEnumerator])
+        {
+            if ([key hasPrefix:removeHistoryWithPrefix])
+            {
+                [historyKeysToDelete addObject:key];
+            }
+        }
+        [history removeObjectsForKeys:historyKeysToDelete];
+        [self writeHistoryFile:history];
     }
     
     [self notifyStateChanged];
@@ -352,7 +402,7 @@
              [fileName hasSuffix:@"blacklisted"]);
 }
 
-- (NSString*)musicHistoryKey:(NSString*) path
+- (NSString*)musicHistoryKey:(NSString*)path
 {
     NSMutableArray* pathComponents = [[path pathComponents] mutableCopy];
     [pathComponents removeLastObject];
