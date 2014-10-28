@@ -58,7 +58,24 @@
         {
             NSString* indexJsonPath = [[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[[parts subarrayWithRange:NSMakeRange(0, j)] componentsJoinedByString:@"/"]] stringByAppendingString:@"/index.json"];
             NSDictionary* index = [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfFile:indexJsonPath]];
-            [readableCandidate addObject:[[index objectForKey:[parts objectAtIndex:j]] objectForKey:@"name"]];
+            NSDictionary* readableCandidatePart = nil;
+            NSString* readableCandidatePartPath = [[parts subarrayWithRange:NSMakeRange(0, j + 1)] componentsJoinedByString:@"/"];
+            for (NSString* key in index)
+            {
+                NSDictionary* probableReadableCandidatePart = [index objectForKey:key];
+                if ([[probableReadableCandidatePart objectForKey:@"path"] isEqualToString:readableCandidatePartPath])
+                {
+                    readableCandidatePart = probableReadableCandidatePart;
+                }
+            }
+            if (readableCandidatePart)
+            {
+                [readableCandidate addObject:[readableCandidatePart objectForKey:@"name"]];
+            }
+            else
+            {
+                [readableCandidate addObject:@"..."];
+            }
         }
         [readableCandidates addObject:[readableCandidate componentsJoinedByString:@"/"]];
     }
