@@ -407,6 +407,11 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
                     {
                         return (NSComparisonResult)NSOrderedDescending;
                     }
+                    if ([[a objectForKey:@"type"] isEqualToString:@"file"] && [[b objectForKey:@"type"] isEqualToString:@"file"] &&
+                        ![[a objectForKey:@"disc"] isEqual:[b objectForKey:@"disc"]])
+                    {
+                        return [[a objectForKey:@"disc"] compare:[b objectForKey:@"disc"]];
+                    }
                     return [[a objectForKey:@"name"] compare:[b objectForKey:@"name"] options:NSCaseInsensitiveSearch];
                 }];
     }
