@@ -82,6 +82,18 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         @synchronized(self)
         {
+            [self beAuthorized];
+            if (!self.sessionKey)
+            {
+                return;
+            }
+            
+            NSArray* recentTracks = [self getRecentTracks];
+            if (!recentTracks)
+            {
+                return;
+            }
+            
             NSMutableArray* queue;
             @synchronized([NSUserDefaults standardUserDefaults])
             {
@@ -94,18 +106,6 @@
                 queue = [NSMutableArray arrayWithArray:scrobblerQueue];
                 [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] removeAllObjects];
                 [[NSUserDefaults standardUserDefaults] synchronize];
-            }
-    
-            [self beAuthorized];
-            if (!self.sessionKey)
-            {
-                return;
-            }
-            
-            NSArray* recentTracks = [self getRecentTracks];
-            if (!recentTracks)
-            {
-                return;
             }
     
             for (NSDictionary* scrobble in queue)
