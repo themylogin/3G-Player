@@ -30,6 +30,7 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack } AddMode
 - (void)playAtIndex:(long)index;
 - (void)playNextTrack:(BOOL)respectRepeatTrack;
 - (void)playPrevTrack:(BOOL)respectRepeatTrack;
+- (void)pause;
 
 - (IBAction)handlePlayPauseButtonTouchDown:(id)sender;
 - (IBAction)handlePositionSliderTouchUpInside:(id)sender;

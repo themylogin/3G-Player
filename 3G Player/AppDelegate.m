@@ -131,7 +131,7 @@ dispatch_queue_t serverSocketQueue;
                 break;
                 
             case UIEventSubtypeRemoteControlPause:
-                [controllers.current.player pause];
+                [controllers.current pause];
                 break;
                 
             case UIEventSubtypeRemoteControlPreviousTrack:

@@ -63,6 +63,19 @@
                                                    object:[AVAudioSession sharedInstance]];
         
         self.bufferingProgressReportedAt = nil;
+        
+        NSDictionary* current = [[NSUserDefaults standardUserDefaults] objectForKey:@"current"];
+        if (current)
+        {
+            [self.playlist addObjectsFromArray:[current objectForKey:@"playlist"]];
+            [self _playlistChanged];
+            
+            self.repeat = [[current objectForKey:@"repeat"] intValue];
+            [self updateUI];
+            
+            [self initAtIndex:[[current objectForKey:@"index"] longValue]
+                   atPosition:[[current objectForKey:@"position"] doubleValue]];
+        }
     }
     return self;
 }
@@ -178,6 +191,12 @@
 
 - (void)playAtIndex:(long)index atPosition:(NSTimeInterval)position
 {
+    [self initAtIndex:index atPosition:position];
+    [self.player play];
+}
+
+- (void)initAtIndex:(long)index atPosition:(NSTimeInterval)position
+{
     if (self.player)
     {
         if (self.player.playing)
@@ -202,7 +221,6 @@
         {
             self.player.currentTime = position;
         }
-        [self.player play];
         
         [musicFileManager notifyFileUsage:item];
         
@@ -213,6 +231,12 @@
     [self.tableView reloadData];
     
     [self bufferMostNecessary];
+}
+
+- (void)pause
+{
+    [self saveState];
+    [self.player pause];
 }
 
 - (void)periodic
@@ -282,7 +306,7 @@
     {
         if (self.player.playing)
         {
-            [self.player pause];
+            [self pause];
         }
         else
         {
@@ -442,11 +466,12 @@
     }
     
     [self playNextTrack:TRUE];
+    [self saveState];
 }
 
 - (void)audioPlayerBeginInterruption:(AVAudioPlayer *)player
 {
-    [self.player pause];
+    [self pause];
 }
 
 - (void)audioPlayerEndInterruption:(AVAudioPlayer *)player withOptions:(NSUInteger)flags
@@ -460,7 +485,7 @@
     NSInteger reason = [[[notification userInfo] objectForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
     if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable)
     {
-        [self.player pause];
+        [self pause];
     }
 }
 
@@ -497,7 +522,7 @@
         [sock writeData:[[result JSONData] copy] withTimeout:10 tag:0];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.player pause];
+            [self pause];
         });
     }
     else
@@ -562,6 +587,21 @@
     [self.tableView reloadData];
     
     [self bufferMostNecessary];
+}
+
+- (void)saveState
+{
+    @synchronized([NSUserDefaults standardUserDefaults])
+    {
+        NSDictionary* current = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 self.playlist, @"playlist",
+                                 [NSNumber numberWithLong:self.currentIndex], @"index",
+                                 [NSNumber numberWithDouble:self.player.currentTime], @"position",
+                                 [NSNumber numberWithInt:self.repeat], @"repeat",
+                                 nil];
+        [[NSUserDefaults standardUserDefaults] setObject:current forKey:@"current"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
 }
 
 - (void)bufferMostNecessary
