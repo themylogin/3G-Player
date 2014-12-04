@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 themylogin. All rights reserved.
 //
 
-#import "PlaylistController.h"
+#import "CurrentController.h"
 
 #import "Globals.h"
 
@@ -16,15 +16,13 @@
 #import "CocoaAsyncSocket/GCDAsyncSocket.h"
 #import "JSONKit.h"
 
-@interface PlaylistController ()
+@interface CurrentController ()
 
 @property (nonatomic, retain) NSMutableArray* playlist;
 @property (nonatomic, retain) NSMutableArray* sections;
 
 @property (nonatomic)         int currentIndex;
-@property (nonatomic, retain) AVAudioPlayer* player;
 @property (nonatomic, retain) NSDate* playerStartedAt;
-@property (nonatomic)         BOOL playerInterruptedWhilePlaying;
 
 @property (nonatomic)         enum { RepeatDisabled, RepeatPlaylist, RepeatTrack } repeat;
 
@@ -34,7 +32,7 @@
 
 @end
 
-@implementation PlaylistController
+@implementation CurrentController
 
 @synthesize playlist;
 @synthesize sections;
@@ -44,8 +42,8 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self)
     {
-        self.tabBarItem.title = NSLocalizedString(@"Playlist", NIL);
-        self.tabBarItem.image = [UIImage imageNamed:@"tabbar_playlist.png"];
+        self.tabBarItem.title = NSLocalizedString(@"Current", NIL);
+        self.tabBarItem.image = [UIImage imageNamed:@"tabbar_current.png"];
         
         self.playlist = [[NSMutableArray alloc] init];
         self.sections = [[NSMutableArray alloc] init];
@@ -81,7 +79,8 @@
     self.periodicTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(periodic) userInfo:nil repeats:YES];
 }
 
-- (void)viewDidLayoutSubviews {
+- (void)viewDidLayoutSubviews
+{
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
     {
         self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
@@ -100,9 +99,6 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-    [self becomeFirstResponder];
 }
 
 - (void)didReceiveMemoryWarning
@@ -207,6 +203,8 @@
             self.player.currentTime = position;
         }
         [self.player play];
+        
+        [musicFileManager notifyFileUsage:item];
         
         self.playerStartedAt = [NSDate date];
         [scrobbler sendNowPlaying:item];
@@ -448,21 +446,12 @@
 
 - (void)audioPlayerBeginInterruption:(AVAudioPlayer *)player
 {
-    self.playerInterruptedWhilePlaying = player.playing;
-}
+    [self.player pause];}
 
 - (void)audioPlayerEndInterruption:(AVAudioPlayer *)player withOptions:(NSUInteger)flags
 {
-    if (self.playerInterruptedWhilePlaying)
-    {
-        if (self.player)
-        {
-            [self.player prepareToPlay];
-            [self.player play];
-        }
-        
-        self.playerInterruptedWhilePlaying = NO;
-    }
+    [self.player prepareToPlay];
+    [self.player play];
 }
 
 - (void)onAudioRouteChange:(NSNotification*)notification
@@ -471,41 +460,6 @@
     if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable)
     {
         [self.player pause];
-    }
-}
-
-#pragma mark - Remote Control Buttons delegate
-
-- (BOOL)canBecomeFirstResponder
-{
-    return YES;
-}
-
-- (void)remoteControlReceivedWithEvent:(UIEvent*)receivedEvent
-{
-    if (receivedEvent.type == UIEventTypeRemoteControl)
-    {
-        switch (receivedEvent.subtype)
-        {
-            case UIEventSubtypeRemoteControlPlay:
-                [self.player play];
-                break;
-                
-            case UIEventSubtypeRemoteControlPause:
-                [self.player pause];
-                break;
-                
-            case UIEventSubtypeRemoteControlPreviousTrack:
-                [self playPrevTrack:FALSE];
-                break;
-                
-            case UIEventSubtypeRemoteControlNextTrack:
-                [self playNextTrack:FALSE];
-                break;
-                
-            default:
-                break;
-        }
     }
 }
 

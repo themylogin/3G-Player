@@ -45,11 +45,17 @@ dispatch_queue_t serverSocketQueue;
     
     self.tabBarController = [[UITabBarController alloc] init];
     
-    controllers.playlist = [[PlaylistController alloc] init];
-    [self.tabBarController addChildViewController:controllers.playlist];
+    controllers.current = [[CurrentController alloc] init];
+    [self.tabBarController addChildViewController:controllers.current];
     
     controllers.library = [[LibraryController alloc] initWithRoot];
     [self.tabBarController addChildViewController:controllers.library];
+    
+    controllers.info = [[InfoController alloc] init];
+    [self.tabBarController addChildViewController:controllers.info];
+    
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    [self becomeFirstResponder];
     
     serverSocketQueue = dispatch_queue_create("serverSocketQueue", NULL);
     [self initServerSocket];
@@ -103,8 +109,43 @@ dispatch_queue_t serverSocketQueue;
 
 - (void)initServerSocket
 {
-    serverSocket = [[GCDAsyncSocket alloc] initWithDelegate:controllers.playlist delegateQueue:serverSocketQueue];
+    serverSocket = [[GCDAsyncSocket alloc] initWithDelegate:controllers.current delegateQueue:serverSocketQueue];
     [serverSocket acceptOnPort:20139 error:nil];
+}
+
+#pragma mark - Remote Control Buttons delegate
+
+- (BOOL)canBecomeFirstResponder
+{
+    return YES;
+}
+
+- (void)remoteControlReceivedWithEvent:(UIEvent*)receivedEvent
+{
+    if (receivedEvent.type == UIEventTypeRemoteControl)
+    {
+        switch (receivedEvent.subtype)
+        {
+            case UIEventSubtypeRemoteControlPlay:
+                [controllers.current.player play];
+                break;
+                
+            case UIEventSubtypeRemoteControlPause:
+                [controllers.current.player pause];
+                break;
+                
+            case UIEventSubtypeRemoteControlPreviousTrack:
+                [controllers.current playPrevTrack:FALSE];
+                break;
+                
+            case UIEventSubtypeRemoteControlNextTrack:
+                [controllers.current playNextTrack:FALSE];
+                break;
+                
+            default:
+                break;
+        }
+    }
 }
 
 // Why am I supposed to do this?

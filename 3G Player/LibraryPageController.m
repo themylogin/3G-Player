@@ -16,11 +16,22 @@
 
 @interface LibraryPageController ()
 
+
+@property (nonatomic, retain) NSString* directory;
+
+@property (nonatomic, retain) NSFileManager* fileManager;
+
+@property (nonatomic, retain) NSArray* index;
+@property (nonatomic, retain) NSMutableArray* indexLetters;
+@property (nonatomic, retain) NSMutableDictionary* indexRowsForLetters;
+
 @end
 
+static char const* const ALERTVIEW = "ALERTVIEW";
 static char const* const ADD_MODE = "ADD_MODE";
 static char const* const DIRECTORY = "DIRECTORY";
 static char const* const ITEM = "ITEM";
+static char const* const PLAY_AFTER = "PLAY_AFTER";
 
 @implementation LibraryPageController
 
@@ -35,6 +46,22 @@ static char const* const ITEM = "ITEM";
         self.fileManager = [NSFileManager defaultManager];
         
         self.index = [self loadIndexFor:self.directory];
+        
+        self.indexLetters = [NSMutableArray array];
+        self.indexRowsForLetters = [NSMutableDictionary dictionary];
+        for (int i = 0; i < [self.index count]; i++)
+        {
+            NSDictionary* item = [self.index objectAtIndex:i];
+            if ([self isDirectory:item])
+            {
+                NSString* letter = [[[item objectForKey:@"name"] substringToIndex:1] uppercaseString];
+                if (![self.indexRowsForLetters objectForKey:letter])
+                {
+                    [self.indexLetters addObject:letter];
+                    [self.indexRowsForLetters setObject:[NSNumber numberWithInt:i] forKey:letter];
+                }
+            }
+        }
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerStateChanged) name:@"stateChanged" object:musicFileManager];
     }
@@ -84,9 +111,20 @@ static char const* const ITEM = "ITEM";
     return 1;
 }
 
+- (NSArray*)sectionIndexTitlesForTableView:(UITableView *)tableView
+{
+    return self.indexLetters;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return [self.index count];
+}
+
+- (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index
+{
+    [tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:[[self.indexRowsForLetters objectForKey:title] integerValue] inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+    return index;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -104,14 +142,27 @@ static char const* const ITEM = "ITEM";
     if ([self isDirectory:item])
     {
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        if ([self isBlacklisted:item])
+        {
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        }
+        else
+        {
+            cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+        }
     }
     else
     {
         cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
     }
     if ([self isBuffered:item])
     {        
         cell.textLabel.textColor = [UIColor blackColor];
+    }
+    else if ([self isBlacklisted:item])
+    {
+        cell.textLabel.textColor = [UIColor colorWithRed:0.85 green:0.85 blue:0.85 alpha:1.0];
     }
     else
     {        
@@ -129,6 +180,11 @@ static char const* const ITEM = "ITEM";
     NSDictionary* item = [self getItemForIndexPath:indexPath];
     if ([self isDirectory:item])
     {
+        if ([self isBlacklisted:item])
+        {
+            return;
+        }
+        
         LibraryPageController* libraryPageController = [[LibraryPageController alloc] initWithDirectory:[item objectForKey:@"path"] title:[item objectForKey:@"name"]];
         [self.navigationController pushViewController:libraryPageController animated:YES];
         [libraryPageController release];
@@ -145,11 +201,11 @@ static char const* const ITEM = "ITEM";
         NSDictionary* item = [self getItemForIndexPath:indexPath];
         if ([self isDirectory:item])
         {
-            [self addDirectoryToPlaylist:[item objectForKey:@"path"] mode:AddToTheEnd askConfirmation:YES];
+            [self addDirectoryToPlaylist:[item objectForKey:@"path"] mode:AddToTheEnd askConfirmation:YES playAfter:FALSE];
         }
         else
         {
-            [controllers.playlist addFiles:[NSArray arrayWithObject:item] mode:AddToTheEnd];
+            [controllers.current addFiles:[NSArray arrayWithObject:item] mode:AddToTheEnd];
         }
     }
 }
@@ -166,19 +222,67 @@ static char const* const ITEM = "ITEM";
     {        
         NSDictionary* item = [self getItemForIndexPath:indexPath];
         
+        if ([self isBlacklisted:item])
+        {
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Question", nil)
+                                                            message:[NSString stringWithFormat:NSLocalizedString(@"Remove «%@» from blacklist?", nil), [item objectForKey:@"name"]]
+                                                           delegate:self
+                                                  cancelButtonTitle:NSLocalizedString(@"No", nil)
+                                                  otherButtonTitles:NSLocalizedString(@"Yes", nil), nil];
+            objc_setAssociatedObject(alert, ALERTVIEW, @"REMOVE_FROM_BLACKLIST", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            objc_setAssociatedObject(alert, ITEM, item, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            [alert show];
+            [alert release];
+            return;
+        }
+        
         UIActionSheet* actionSheet = [[UIActionSheet alloc] initWithTitle:[item objectForKey:@"name"]
                                                                  delegate:self
                                                         cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
-                                                   destructiveButtonTitle:NSLocalizedString(@"Delete", nil)
-                                                        otherButtonTitles:NSLocalizedString(@"Add", nil),
+                                                   destructiveButtonTitle:nil
+                                                        otherButtonTitles:NSLocalizedString(@"Replace", nil),
+                                                                          NSLocalizedString(@"Replace and play", nil),
+                                                                          NSLocalizedString(@"Add", nil),
                                                                           NSLocalizedString(@"Add after current album", nil),
                                                                           NSLocalizedString(@"Add after current track", nil),
-                                                                          NSLocalizedString(@"Replace", nil),
-                                                                          NSLocalizedString(@"Replace and play", nil),
+                                                                          NSLocalizedString(@"Blacklist", nil),
+                                                                          NSLocalizedString(@"Delete", nil),
                                                                           nil];
+        actionSheet.destructiveButtonIndex = 6;
         objc_setAssociatedObject(actionSheet, ITEM, item, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [actionSheet showInView:[self.view window]];
         [actionSheet release];        
+    }
+}
+
+- (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer
+{
+    if (recognizer.state == UIGestureRecognizerStateRecognized && recognizer.rotation > M_PI_2)
+    {
+        bool everythingIsBlacklisted = YES;
+        for (NSDictionary* item in self.index)
+        {
+            if (![self isBlacklisted:item])
+            {
+                everythingIsBlacklisted = NO;
+                break;
+            }
+        }
+        
+        if (everythingIsBlacklisted)
+        {
+            for (NSDictionary* item in self.index)
+            {
+                [self unblacklistItem:item];
+            }
+        }
+        else
+        {
+            for (NSDictionary* item in self.index)
+            {
+                [self blacklistItem:item];
+            }
+        }
     }
 }
 
@@ -186,13 +290,14 @@ static char const* const ITEM = "ITEM";
 
 - (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    const int DELETE            = 0;
-    const int ADD __unused      = 1;
-    const int ADD_AFTER_ALBUM   = 2;
-    const int ADD_AFTER_TRACK   = 3;
-    const int REPLACE           = 4;
-    const int REPLACE_AND_PLAY  = 5;
-    const int CANCEL            = 6;
+    const int REPLACE           = 0;
+    const int REPLACE_AND_PLAY  = 1;
+    const int ADD __unused      = 2;
+    const int ADD_AFTER_ALBUM   = 3;
+    const int ADD_AFTER_TRACK   = 4;
+    const int BLACKLIST         = 5;
+    const int DELETE            = 6;
+    const int CANCEL            = 7;
     
     if (buttonIndex == CANCEL)
     {
@@ -203,13 +308,27 @@ static char const* const ITEM = "ITEM";
     
     if (buttonIndex == DELETE)
     {
-        [musicFileManager deleteFileOrdirectory:item];        
+        UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Question", nil)
+                                                        message:[NSString stringWithFormat:NSLocalizedString(@"Delete «%@»?", nil), [item objectForKey:@"name"]]
+                                                       delegate:self
+                                              cancelButtonTitle:NSLocalizedString(@"No", nil)
+                                              otherButtonTitles:NSLocalizedString(@"Yes", nil), nil];
+        objc_setAssociatedObject(alert, ALERTVIEW, @"DELETE", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(alert, ITEM, item, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        [alert show];
+        [alert release];
+        return;
+    }
+    
+    if (buttonIndex == BLACKLIST)
+    {
+        [self blacklistItem:item];
         return;
     }
     
     if (buttonIndex == REPLACE || buttonIndex == REPLACE_AND_PLAY)
     {
-        [controllers.playlist clear];
+        [controllers.current clear];
     }
     
     AddMode addMode = AddToTheEnd;
@@ -224,16 +343,15 @@ static char const* const ITEM = "ITEM";
     
     if ([self isDirectory:item])
     {
-        [self addDirectoryToPlaylist:[item objectForKey:@"path"] mode:addMode askConfirmation:YES];
+        [self addDirectoryToPlaylist:[item objectForKey:@"path"] mode:addMode askConfirmation:YES playAfter:buttonIndex == REPLACE_AND_PLAY];
     }
     else
     {
-        [controllers.playlist addFiles:[NSArray arrayWithObject:item] mode:addMode];
-    }
-        
-    if (buttonIndex == REPLACE_AND_PLAY)
-    {
-        [controllers.playlist playAtIndex:0];
+        [controllers.current addFiles:[NSArray arrayWithObject:item] mode:addMode];
+        if (buttonIndex == REPLACE_AND_PLAY)
+        {
+            [controllers.current playAtIndex:0];
+        }
     }
 }
 
@@ -241,9 +359,30 @@ static char const* const ITEM = "ITEM";
 
 - (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex == 1)
+    NSString* view = objc_getAssociatedObject(alertView, ALERTVIEW);
+    
+    if ([view isEqualToString:@"ADD"])
     {
-        [self addDirectoryToPlaylist:objc_getAssociatedObject(alertView, DIRECTORY) mode:[objc_getAssociatedObject(alertView, ADD_MODE) intValue] askConfirmation:NO];
+        if (buttonIndex == 1)
+        {
+            [self addDirectoryToPlaylist:objc_getAssociatedObject(alertView, DIRECTORY) mode:[objc_getAssociatedObject(alertView, ADD_MODE) intValue] askConfirmation:NO playAfter:[objc_getAssociatedObject(alertView, PLAY_AFTER) boolValue]];
+        }
+    }
+    
+    if ([view isEqualToString:@"DELETE"])
+    {
+        if (buttonIndex == 1)
+        {
+            [musicFileManager deleteFileOrdirectory:objc_getAssociatedObject(alertView, ITEM)];
+        }
+    }
+    
+    if ([view isEqualToString:@"REMOVE_FROM_BLACKLIST"])
+    {
+        if (buttonIndex == 1)
+        {
+            [self unblacklistItem:objc_getAssociatedObject(alertView, ITEM)];
+        }
     }
 }
 
@@ -268,6 +407,11 @@ static char const* const ITEM = "ITEM";
                     {
                         return (NSComparisonResult)NSOrderedDescending;
                     }
+                    if ([[a objectForKey:@"type"] isEqualToString:@"file"] && [[b objectForKey:@"type"] isEqualToString:@"file"] &&
+                        ![[a objectForKey:@"disc"] isEqual:[b objectForKey:@"disc"]])
+                    {
+                        return [[a objectForKey:@"disc"] compare:[b objectForKey:@"disc"]];
+                    }
                     return [[a objectForKey:@"name"] compare:[b objectForKey:@"name"] options:NSCaseInsensitiveSearch];
                 }];
     }
@@ -277,13 +421,18 @@ static char const* const ITEM = "ITEM";
     }
 }
 
-- (void) addDirectoryToPlaylist:(NSString*)directory mode:(AddMode)addMode askConfirmation:(BOOL)ask
+- (void)addDirectoryToPlaylist:(NSString*)directory mode:(AddMode)addMode askConfirmation:(BOOL)ask playAfter:(BOOL)play
 {
     NSMutableArray* filesToAdd = [[NSMutableArray alloc] init];
     
     if ([self addDirectory:directory to:filesToAdd askConfirmation:ask])
     {
-        [controllers.playlist addFiles:filesToAdd mode:addMode];
+        [controllers.current addFiles:filesToAdd mode:addMode];
+        
+        if (play)
+        {
+            [controllers.current playAtIndex:0];
+        }
     }
     else
     {        
@@ -292,8 +441,10 @@ static char const* const ITEM = "ITEM";
                                                        delegate:self
                                               cancelButtonTitle:NSLocalizedString(@"No", nil)
                                               otherButtonTitles:NSLocalizedString(@"Yes", nil), nil];
+        objc_setAssociatedObject(alert, ALERTVIEW, @"ADD", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(alert, DIRECTORY, directory, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         objc_setAssociatedObject(alert, ADD_MODE, [NSNumber numberWithInt:addMode], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        objc_setAssociatedObject(alert, PLAY_AFTER, [NSNumber numberWithBool:play], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         [alert show];
         [alert release];
     }
@@ -301,12 +452,17 @@ static char const* const ITEM = "ITEM";
     [filesToAdd release];
 }
 
-- (BOOL) addDirectory:(NSString*)directory to:(NSMutableArray*)playlist askConfirmation:(BOOL)ask
+- (BOOL)addDirectory:(NSString*)directory to:(NSMutableArray*)playlist askConfirmation:(BOOL)ask
 {
     @autoreleasepool
     {
         for (NSDictionary* item in [self loadIndexFor:directory])
         {
+            if ([self isBlacklisted:item])
+            {
+                continue;
+            }
+            
             if ([self isDirectory:item])
             {
                 if (![self addDirectory:[item objectForKey:@"path"] to:playlist askConfirmation:ask])
@@ -339,6 +495,35 @@ static char const* const ITEM = "ITEM";
     return [[item objectForKey:@"type"] isEqualToString:@"directory"];
 }
 
+- (NSString*)blacklistFilePath:(NSDictionary*)item
+{
+    if ([self isDirectory:item])
+    {
+        return [[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[item objectForKey:@"path"]] stringByAppendingString:@"/blacklisted"];
+    }
+    else
+    {
+        return [[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[item objectForKey:@"path"]] stringByAppendingString:@".blacklisted"];
+    }
+}
+
+- (BOOL)isBlacklisted:(NSDictionary*)item
+{
+    return [self.fileManager fileExistsAtPath:[self blacklistFilePath:item] isDirectory:nil];
+}
+
+- (void)blacklistItem:(NSDictionary*)item
+{
+    [self.fileManager createFileAtPath:[self blacklistFilePath:item] contents:nil attributes:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"stateChanged" object:musicFileManager];
+}
+
+- (void)unblacklistItem:(NSDictionary*)item
+{
+    [self.fileManager removeItemAtPath:[self blacklistFilePath:item] error:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"stateChanged" object:musicFileManager];
+}
+
 - (BOOL)isBuffered:(NSDictionary*)item
 {
     if ([self isDirectory:item])
@@ -357,8 +542,13 @@ static char const* const ITEM = "ITEM";
     {
         for (NSDictionary* childItem in [self loadIndexFor:[item objectForKey:@"path"]])
         {
-            if ([self isDirectory:childItem])
+            if ([self isBlacklisted:childItem])
             {
+                continue;
+            }
+            
+            if ([self isDirectory:childItem])
+            {                
                 if (![self directoryIsBuffered:childItem])
                 {
                     return NO;
