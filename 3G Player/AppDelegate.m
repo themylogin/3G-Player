@@ -38,6 +38,8 @@ dispatch_queue_t serverSocketQueue;
     [[NSFileManager defaultManager] createDirectoryAtPath:libraryDirectory withIntermediateDirectories:YES attributes:nil error:nil];
     [libraryDirectory retain];
     
+    musicTableService = [[MusicTableService alloc] init];
+    
     musicFileManager = [[MusicFileManager alloc] init];
     scrobbler = [[Scrobbler alloc] init];
     
@@ -50,6 +52,9 @@ dispatch_queue_t serverSocketQueue;
     
     controllers.library = [[LibraryController alloc] initWithRoot];
     [self.tabBarController addChildViewController:controllers.library];
+    
+    controllers.recents = [[RecentsController alloc] init];
+    [self.tabBarController addChildViewController:controllers.recents];
     
     controllers.info = [[InfoController alloc] init];
     [self.tabBarController addChildViewController:controllers.info];

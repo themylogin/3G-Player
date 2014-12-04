@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface LibraryPageController : UITableViewController <UIActionSheetDelegate>
+@interface LibraryPageController : UITableViewController
 
 - (id)initWithDirectory:(NSString*)directory title:(NSString*)title;
 - (BOOL)update;

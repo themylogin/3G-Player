@@ -10,6 +10,8 @@
 
 _controllers controllers;
 
+MusicTableService* musicTableService;
+
 MusicFileManager* musicFileManager;
 Scrobbler* scrobbler;
 

@@ -11,7 +11,10 @@
 
 #import "CurrentController.h"
 #import "LibraryController.h"
+#import "RecentsController.h"
 #import "InfoController.h"
+
+#import "MusicTableService.h"
 
 #import "MusicFileManager.h"
 #import "Scrobbler.h"
@@ -19,10 +22,13 @@
 typedef struct {
     CurrentController* current;
     LibraryController* library;
+    RecentsController* recents;
     InfoController* info;
 } _controllers;
 
 extern _controllers controllers;
+
+extern MusicTableService* musicTableService;
 
 extern MusicFileManager* musicFileManager;
 extern Scrobbler* scrobbler;

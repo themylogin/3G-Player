@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		84075B661A3086A3001E395C /* RecentsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84075B641A3086A3001E395C /* RecentsController.m */; };
+		84075B671A3086A3001E395C /* RecentsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84075B651A3086A3001E395C /* RecentsController.xib */; };
+		84075B6A1A3094AF001E395C /* MusicTableService.m in Sources */ = {isa = PBXBuildFile; fileRef = 84075B691A3094AF001E395C /* MusicTableService.m */; };
 		84943CBC17CBB33A00A1CD17 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 84943CBA17CBB33A00A1CD17 /* Icon.png */; };
 		84943CBD17CBB33A00A1CD17 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84943CBB17CBB33A00A1CD17 /* Icon@2x.png */; };
 		84B5D20717CBB730007FB471 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 84B5D20017CBB730007FB471 /* Icon-72.png */; };
@@ -84,6 +87,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		84075B631A3086A3001E395C /* RecentsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecentsController.h; sourceTree = "<group>"; };
+		84075B641A3086A3001E395C /* RecentsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecentsController.m; sourceTree = "<group>"; };
+		84075B651A3086A3001E395C /* RecentsController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecentsController.xib; sourceTree = "<group>"; };
+		84075B681A3094AF001E395C /* MusicTableService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicTableService.h; sourceTree = "<group>"; };
+		84075B691A3094AF001E395C /* MusicTableService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicTableService.m; sourceTree = "<group>"; };
 		84943CBA17CBB33A00A1CD17 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		84943CBB17CBB33A00A1CD17 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
 		84B5D20017CBB730007FB471 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = "<group>"; };
@@ -277,9 +285,14 @@
 				84C4CA401786D7FB00A95DB9 /* Scrobbler.m */,
 				84C10C071782E20A004220BC /* LibraryController.h */,
 				84C10C081782E20A004220BC /* LibraryController.m */,
+				84075B681A3094AF001E395C /* MusicTableService.h */,
+				84075B691A3094AF001E395C /* MusicTableService.m */,
 				84C4CA131785ADA500A95DB9 /* LibraryPageController.h */,
 				84C4CA141785ADA500A95DB9 /* LibraryPageController.m */,
 				84C4CA151785ADA500A95DB9 /* LibraryPageController.xib */,
+				84075B631A3086A3001E395C /* RecentsController.h */,
+				84075B641A3086A3001E395C /* RecentsController.m */,
+				84075B651A3086A3001E395C /* RecentsController.xib */,
 				84C9196F17841B7C00810B88 /* ASIHTTPRequest */,
 				84C29E7E17F85A1A00D259F3 /* CocoaAsyncSocket */,
 				84C4CA321786D71D00A95DB9 /* FMEngine */,
@@ -519,6 +532,7 @@
 				84943CBD17CBB33A00A1CD17 /* Icon@2x.png in Resources */,
 				84DEA2D8191FC2A1000F9832 /* tabbar_current.png in Resources */,
 				84DEA2DD191FC314000F9832 /* InfoController.xib in Resources */,
+				84075B671A3086A3001E395C /* RecentsController.xib in Resources */,
 				84C836AB18F0779F00033739 /* tabbar_current@2x.png in Resources */,
 				84B5D20717CBB730007FB471 /* Icon-72.png in Resources */,
 				84B5D20817CBB730007FB471 /* Icon-72@2x.png in Resources */,
@@ -549,6 +563,7 @@
 				84DEA2DC191FC314000F9832 /* InfoController.m in Sources */,
 				84C919CA17841B7C00810B88 /* ASIDataCompressor.m in Sources */,
 				84C919CB17841B7C00810B88 /* ASIDataDecompressor.m in Sources */,
+				84075B6A1A3094AF001E395C /* MusicTableService.m in Sources */,
 				84C919CC17841B7C00810B88 /* ASIDownloadCache.m in Sources */,
 				84C919CD17841B7C00810B88 /* ASIFormDataRequest.m in Sources */,
 				84C919CE17841B7C00810B88 /* ASIHTTPRequest.m in Sources */,
@@ -563,6 +578,7 @@
 				84C91A0A17856C5500810B88 /* MusicFileManager.m in Sources */,
 				84C4CA191785ADA500A95DB9 /* Globals.m in Sources */,
 				84C4CA1A1785ADA500A95DB9 /* LibraryPageController.m in Sources */,
+				84075B661A3086A3001E395C /* RecentsController.m in Sources */,
 				84C4CA1C1785ADA500A95DB9 /* CurrentController.m in Sources */,
 				84C4CA3B1786D71E00A95DB9 /* FMCallback.m in Sources */,
 				84C4CA3C1786D71E00A95DB9 /* FMEngine.m in Sources */,

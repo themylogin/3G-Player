@@ -12,6 +12,7 @@
 #import "LibraryPageController.h"
 
 #import "ASIFormDataRequest.h"
+#import "JSONKit.h"
 #import "ZipArchive.h"
 
 @interface LibraryController ()

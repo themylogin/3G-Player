@@ -426,7 +426,7 @@
 - (void)writeHistoryFile:(NSMutableDictionary*)history
 {
     [[history JSONData] writeToFile:self.historyFile atomically:YES];
-    [self.notificationCenter postNotificationName:@"oldDirectoriesUpdated" object:self userInfo:nil];
+    [self.notificationCenter postNotificationName:@"historyUpdated" object:self userInfo:nil];
 }
 
 - (void)notifyFileUsage:(NSDictionary*)musicFile
@@ -489,6 +489,40 @@
     }
     
     return YES;
+}
+
+- (NSArray*)pathForDirectory:(NSString*)directory
+{
+    NSArray* parts = [directory componentsSeparatedByString:@"/"];
+    NSMutableArray* path = [NSMutableArray array];
+    for (int j = 0; j < [parts count]; j++)
+    {
+        NSString* indexJsonPath = [[[libraryDirectory stringByAppendingString:@"/"]
+                                    stringByAppendingString:[[parts subarrayWithRange:NSMakeRange(0, j)]
+                                                             componentsJoinedByString:@"/"]]
+                                   stringByAppendingString:@"/index.json"];
+        NSDictionary* index = [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfFile:indexJsonPath]];
+        NSDictionary* pathPart = nil;
+        NSString* pathPartPath = [[parts subarrayWithRange:NSMakeRange(0, j + 1)]
+                                  componentsJoinedByString:@"/"];
+        for (NSString* key in index)
+        {
+            NSDictionary* probablePathPart = [index objectForKey:key];
+            if ([[probablePathPart objectForKey:@"path"] isEqualToString:pathPartPath])
+            {
+                pathPart = probablePathPart;
+            }
+        }
+        if (pathPart)
+        {
+            [path addObject:[pathPart objectForKey:@"name"]];
+        }
+        else
+        {
+            return nil;
+        }
+    }
+    return parts;
 }
 
 @end

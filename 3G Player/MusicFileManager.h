@@ -37,6 +37,6 @@ typedef union {
 
 - (void)notifyFileUsage:(NSDictionary*)musicFile;
 - (NSArray*)listOldDirectories;
-
+- (NSArray*)pathForDirectory:(NSString*)directory;
 
 @end
