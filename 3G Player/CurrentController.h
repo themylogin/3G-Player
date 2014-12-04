@@ -27,7 +27,7 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack } AddMode
 - (void)addFiles:(NSArray*)files mode:(AddMode)addMode;
 - (void)clear;
 
-- (void)playAtIndex:(int)index;
+- (void)playAtIndex:(long)index;
 - (void)playNextTrack:(BOOL)respectRepeatTrack;
 - (void)playPrevTrack:(BOOL)respectRepeatTrack;
 

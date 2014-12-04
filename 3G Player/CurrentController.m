@@ -21,7 +21,7 @@
 @property (nonatomic, retain) NSMutableArray* playlist;
 @property (nonatomic, retain) NSMutableArray* sections;
 
-@property (nonatomic)         int currentIndex;
+@property (nonatomic)         long currentIndex;
 @property (nonatomic, retain) NSDate* playerStartedAt;
 
 @property (nonatomic)         enum { RepeatDisabled, RepeatPlaylist, RepeatTrack } repeat;
@@ -109,7 +109,7 @@
 
 - (void)addFiles:(NSArray*)files mode:(AddMode)addMode
 {
-    int index = [self.playlist count];
+    long index = [self.playlist count];
     if (addMode == AddAfterCurrentAlbum)
     {
         for (NSDictionary* section in self.sections)
@@ -171,12 +171,12 @@
     [self updateUI];
 }
 
-- (void)playAtIndex:(int)index
+- (void)playAtIndex:(long)index
 {
     [self playAtIndex:index atPosition:0];
 }
 
-- (void)playAtIndex:(int)index atPosition:(NSTimeInterval)position
+- (void)playAtIndex:(long)index atPosition:(NSTimeInterval)position
 {
     if (self.player)
     {
@@ -317,7 +317,7 @@
     NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
     if (indexPath)
     {
-        int index = [self itemIndexForIndexPath:indexPath];
+        long index = [self itemIndexForIndexPath:indexPath];
         if (index < self.currentIndex)
         {
             self.currentIndex--;
@@ -446,7 +446,8 @@
 
 - (void)audioPlayerBeginInterruption:(AVAudioPlayer *)player
 {
-    [self.player pause];}
+    [self.player pause];
+}
 
 - (void)audioPlayerEndInterruption:(AVAudioPlayer *)player withOptions:(NSUInteger)flags
 {
@@ -488,7 +489,7 @@
             [result setObject:list forKey:@"playlist"];
             
             NSMutableDictionary* current = [[NSMutableDictionary alloc] init];
-            [current setObject:[NSNumber numberWithInt:(self.currentIndex)] forKey:@"index"];
+            [current setObject:[NSNumber numberWithLong:(self.currentIndex)] forKey:@"index"];
             [current setObject:[NSNumber numberWithDouble:(self.player.currentTime)] forKey:@"position"];
             [result setObject:current forKey:@"current"];
         }
@@ -567,7 +568,7 @@
 {
     if (self.currentIndex != -1)
     {
-        for (int i = self.currentIndex; i < [self.playlist count]; i++)
+        for (long i = self.currentIndex; i < [self.playlist count]; i++)
         {
             NSDictionary* item = [self.playlist objectAtIndex:i];
             MusicFileState state = [musicFileManager getState:item];
@@ -592,7 +593,7 @@
     [musicFileManager stopBuffering];
 }
 
-- (int)itemIndexForIndexPath:(NSIndexPath*)indexPath
+- (long)itemIndexForIndexPath:(NSIndexPath*)indexPath
 {
     return [[[[self.sections objectAtIndex:indexPath.section] objectForKey:@"files"] objectAtIndex:indexPath.row] integerValue];
 }
