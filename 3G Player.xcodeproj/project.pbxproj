@@ -716,12 +716,9 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/3G",
-					Player,
-					"$(PROJECT_DIR)/3G",
-					Player/HockeySDK.embeddedframework,
-					"$(PROJECT_DIR)/3G",
-					Player/HockeySDK.embeddedframework,
+					"\"$(PROJECT_DIR)/3G Player\"",
+					"\"$(PROJECT_DIR)/3G Player/HockeySDK.embeddedframework\"",
+					"\"$(PROJECT_DIR)/3G Player/HockeySDK.embeddedframework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
@@ -740,12 +737,9 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/3G",
-					Player,
-					"$(PROJECT_DIR)/3G",
-					Player/HockeySDK.embeddedframework,
-					"$(PROJECT_DIR)/3G",
-					Player/HockeySDK.embeddedframework,
+					"\"$(PROJECT_DIR)/3G Player\"",
+					"\"$(PROJECT_DIR)/3G Player/HockeySDK.embeddedframework\"",
+					"\"$(PROJECT_DIR)/3G Player/HockeySDK.embeddedframework\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
