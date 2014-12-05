@@ -8,7 +8,9 @@
 
 #import "RecentsController.h"
 
+#import "AppDelegate.h"
 #import "Globals.h"
+#import "LibraryPageController.h"
 
 @interface RecentsController () <UIBarPositioningDelegate>
 
@@ -38,6 +40,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.edgesForExtendedLayout = UIRectEdgeNone;
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updateRecents)
@@ -87,7 +90,40 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    //
+    NSDictionary* item = [self getItemForIndexPath:indexPath];
+    
+    NSMutableArray* libraryControllers = [[NSMutableArray alloc] init];
+    NSMutableArray* scrollTargets = [[NSMutableArray alloc] init];
+    NSString* parent = [item objectForKey:@"path"];
+    NSDictionary* child = item;
+    while (![(parent = [parent stringByDeletingLastPathComponent]) isEqualToString:@""])
+    {
+        NSDictionary* parentItem = [musicFileManager itemByPath:parent];
+        if (parentItem != nil)
+        {
+            LibraryPageController* controller = [[LibraryPageController alloc]
+                                                 initWithDirectory:parent
+                                                 title:[parentItem objectForKey:@"name"]];
+            [libraryControllers insertObject:controller atIndex:0];
+            [scrollTargets insertObject:child atIndex:0];
+            child = parentItem;
+            
+        }
+    }
+    
+    [controllers.library popToRootViewControllerAnimated:NO];
+    for (int i = 0; i < [libraryControllers count]; i++)
+    {
+        [controllers.library pushViewController:[libraryControllers objectAtIndex:i] animated:NO];
+    }
+    AppDelegate* delegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+    [delegate.tabBarController setSelectedViewController:controllers.library];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (int i = 0; i < [libraryControllers count]; i++)
+        {
+            [[libraryControllers objectAtIndex:i] scrollToItem:[scrollTargets objectAtIndex:i]];
+        }
+    });
 }
 
 #pragma mark - Gesture recognizer

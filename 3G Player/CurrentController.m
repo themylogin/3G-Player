@@ -26,6 +26,8 @@
 
 @property (nonatomic)         enum { RepeatDisabled, RepeatPlaylist, RepeatTrack } repeat;
 
+@property (nonatomic, retain) NSMutableDictionary* nowPlayingInfo;
+
 @property (nonatomic, retain) NSTimer* periodicTimer;
 
 @property (nonatomic, retain) NSDate* bufferingProgressReportedAt;
@@ -53,9 +55,16 @@
         
         self.repeat = RepeatDisabled;
         
+        self.nowPlayingInfo = nil;
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerStateChanged) name:@"stateChanged" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingProgress:) name:@"bufferingProgress" object:musicFileManager];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMusicFileManagerBufferingCompleted) name:@"bufferingCompleted" object:musicFileManager];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(updateCover)         
+                                                     name:@"coverDownloaded"
+                                                   object:musicFileManager];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(onAudioRouteChange:)
@@ -226,6 +235,14 @@
             self.player.currentTime = position;
         }
         
+        self.nowPlayingInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                               [item objectForKey:@"artist"], MPMediaItemPropertyArtist,
+                               [item objectForKey:@"album"], MPMediaItemPropertyAlbumTitle,
+                               [item objectForKey:@"title"], MPMediaItemPropertyTitle,
+                               nil];
+        [self updateCover];
+        [self updatedNowPlayingInfo];
+        
         [musicFileManager notifyFileUsage:item];
         
         self.playerStartedAt = [NSDate date];
@@ -235,6 +252,7 @@
     [self.tableView reloadData];
     
     [self bufferMostNecessary];
+    [musicFileManager loadCover:item];
 }
 
 - (void)pause
@@ -270,6 +288,11 @@
             self.positionSlider.maximumValue = self.player.duration;
             self.positionSlider.enabled = true;
         }
+        
+        [self.nowPlayingInfo
+         setObject:[NSNumber numberWithDouble:self.player.duration]
+         forKey:MPMediaItemPropertyPlaybackDuration];
+        [self updatedNowPlayingInfo];
     }
     else
     {
@@ -591,6 +614,7 @@
     [self.tableView reloadData];
     
     [self bufferMostNecessary];
+    [self saveState];
 }
 
 - (void)saveState
@@ -678,6 +702,8 @@
             }
         }
     }
+    
+    [self tryToResumePlayingNowBufferingFile];
 }
 
 - (void)onMusicFileManagerBufferingCompleted
@@ -776,6 +802,26 @@
     {
         [scrobbler scrobble:[self.playlist objectAtIndex:self.currentIndex] startedAt:self.playerStartedAt];
     }
+}
+
+- (void)updateCover
+{
+    if (self.currentIndex != -1 && self.nowPlayingInfo)
+    {
+        NSString* coverPath = [musicFileManager coverPath:[self.playlist objectAtIndex:self.currentIndex]];
+        if ([[NSFileManager defaultManager] fileExistsAtPath:coverPath])
+        {
+            [self.nowPlayingInfo
+             setObject:[[MPMediaItemArtwork alloc] initWithImage:[UIImage imageWithContentsOfFile:coverPath]]
+             forKey:MPMediaItemPropertyArtwork];
+            [self updatedNowPlayingInfo];
+        }
+    }
+}
+
+- (void)updatedNowPlayingInfo
+{
+    [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = self.nowPlayingInfo;
 }
 
 @end

@@ -12,6 +12,7 @@
 
 - (id)initWithDirectory:(NSString*)directory title:(NSString*)title;
 - (BOOL)update;
+- (void)scrollToItem:(NSDictionary*)item;
 
 - (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer*)recognizer;

@@ -422,11 +422,12 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
 
 - (void)notifyItemUsage:(NSDictionary*)item
 {
+    NSString* path = [item objectForKey:@"path"];
     NSMutableArray* recents = [self readRecentsFile];
     BOOL found = false;
     for (int i = 0; i < [recents count]; i++)
     {
-        if ([[recents objectAtIndex:i] isEqualToDictionary:item])
+        if ([[[recents objectAtIndex:i] objectForKey:@"path"] isEqualToString:path])
         {
             [recents removeObjectAtIndex:i];
             found = true;
