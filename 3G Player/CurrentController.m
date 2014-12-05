@@ -73,8 +73,12 @@
             self.repeat = [[current objectForKey:@"repeat"] intValue];
             [self updateUI];
             
-            [self initAtIndex:[[current objectForKey:@"index"] longValue]
-                   atPosition:[[current objectForKey:@"position"] doubleValue]];
+            long index = [[current objectForKey:@"index"] longValue];
+            double position = [[current objectForKey:@"position"] doubleValue];
+            if (index >= 0 && index < [self.playlist count])
+            {
+                [self initAtIndex:index atPosition:position];
+            }
         }
     }
     return self;
