@@ -148,7 +148,8 @@
     self.bufferingIsError = false;
     self.bufferingExpectedLength = 0;
     
-    [self startBufferingRequest:musicFile];    
+    [self startBufferingRequest:musicFile];
+    [self loadCover:musicFile];
     
     [self notifyStateChanged];
 }
@@ -283,6 +284,61 @@
         [self.bufferingFileHandle closeFile];
         self.bufferingFileHandle = nil;
     }
+}
+
+- (void)loadCover:(NSDictionary*)musicFile
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSString* coverPath = [self coverPath:musicFile];
+        if ([self.fileManager fileExistsAtPath:coverPath])
+        {
+            return;
+        }
+        
+        NSString* albumPath = [[musicFile objectForKey:@"path"] stringByDeletingLastPathComponent];
+        NSString* albumParentPath = [albumPath stringByDeletingLastPathComponent];
+        NSArray* albumDirectoryIndex = [musicTableService loadIndexFor:albumParentPath];
+        NSString* remoteCoverPath = nil;
+        for (int i = 0; i < [albumDirectoryIndex count]; i++)
+        {
+            NSDictionary* item = [albumDirectoryIndex objectAtIndex:i];
+            if ([[item objectForKey:@"path"] isEqualToString:albumPath])
+            {
+                remoteCoverPath = [item objectForKey:@"cover"];
+                break;
+            }
+        }
+        if (remoteCoverPath == nil)
+        {
+            return;
+        }
+        
+        NSURL* coverUrl = [NSURL URLWithString:
+                           [playerUrl stringByAppendingString:
+                            [NSString stringWithFormat:@"/cover?path=%@", remoteCoverPath, nil]]];
+        ASIHTTPRequest* coverRequest = [ASIHTTPRequest requestWithURL:coverUrl];
+        [coverRequest setShouldContinueWhenAppEntersBackground:YES];
+        [coverRequest setDownloadDestinationPath:coverPath];
+        [coverRequest setTimeOutSeconds:120];
+        [coverRequest startSynchronous];
+        if ([coverRequest error] || [coverRequest responseStatusCode] != 200)
+        {
+            [ASIHTTPRequest removeFileAtPath:coverPath error:nil];
+        }
+        else
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.notificationCenter postNotificationName:@"coverDownloaded" object:self userInfo:nil];
+            });
+        }
+    });
+}
+
+- (NSString*)coverPath:(NSDictionary *)musicFile
+{
+    return [[[self filePath:musicFile]
+             stringByDeletingLastPathComponent]
+            stringByAppendingString:@"/cover.jpg"];
 }
 
 - (void)deleteFileOrdirectory:(NSDictionary*)fileOrDirectory

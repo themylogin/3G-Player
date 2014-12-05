@@ -33,6 +33,9 @@ typedef union {
 - (void)buffer:(NSDictionary*)musicFile;
 - (void)stopBuffering;
 
+- (void)loadCover:(NSDictionary*)musicFile;
+- (NSString*)coverPath:(NSDictionary*)musicFile;
+
 - (void)deleteFileOrdirectory:(NSDictionary*)fileOrDirectory;
 
 - (void)notifyFileUsage:(NSDictionary*)musicFile;
