@@ -62,9 +62,12 @@
     self.candidatesForDeletion.text = [readableCandidates componentsJoinedByString:@"\n"];
     
     CGRect currentFrame = self.candidatesForDeletion.frame;
-    CGSize max = CGSizeMake(self.candidatesForDeletion.frame.size.width, 1024);
-    CGSize expected = [self.candidatesForDeletion.text sizeWithFont:self.candidatesForDeletion.font constrainedToSize:max lineBreakMode:self.candidatesForDeletion.lineBreakMode];
-    currentFrame.size.height = expected.height;
+    CGRect rect = [self.candidatesForDeletion.text
+                   boundingRectWithSize:CGSizeMake(self.candidatesForDeletion.frame.size.width, 0)
+                   options:NSStringDrawingUsesLineFragmentOrigin
+                   attributes:@{NSFontAttributeName: self.candidatesForDeletion.font}
+                   context:nil];
+    currentFrame.size.height = rect.size.height;
     self.candidatesForDeletion.frame = currentFrame;
     
     if ([candidates count] > 0)
