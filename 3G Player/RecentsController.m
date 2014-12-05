@@ -45,25 +45,6 @@
     [self updateRecents];
 }
 
-- (void)viewDidLayoutSubviews
-{
-    /*
-    if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
-    {
-        self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-        if ([self respondsToSelector:@selector(edgesForExtendedLayout)])
-        {
-            self.edgesForExtendedLayout = UIRectEdgeNone;
-        }
-        CGRect viewBounds = self.view.bounds;
-        CGFloat topBarOffset = self.topLayoutGuide.length;
-        viewBounds.origin.y = topBarOffset * -1;
-        self.view.bounds = viewBounds;
-        self.navigationController.navigationBar.translucent = NO;
-    }
-     */
-}
-
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
