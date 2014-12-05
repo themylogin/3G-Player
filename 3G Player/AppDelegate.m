@@ -27,6 +27,30 @@ dispatch_queue_t serverSocketQueue;
 {
     application.idleTimerDisabled = YES;
     
+    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"dbbd8a892285975286a99826bfc72d2c"];
+    [[BITHockeyManager sharedHockeyManager] startManager];
+    
+    if ([self didCrashInLastSessionOnStartup])
+    {
+        // show intermediate UI
+    }
+    else
+    {
+        [self setupApplication];
+    }
+    [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
+    
+    return YES;
+}
+
+- (BOOL)didCrashInLastSessionOnStartup
+{
+    return ([[BITHockeyManager sharedHockeyManager].crashManager didCrashInLastSession] &&
+            [[BITHockeyManager sharedHockeyManager].crashManager timeintervalCrashInLastSessionOccured] < 5);
+}
+
+- (void)setupApplication
+{
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     [[AVAudioSession sharedInstance] setActive:YES error:nil];
     
@@ -68,7 +92,6 @@ dispatch_queue_t serverSocketQueue;
     self.window.backgroundColor = [UIColor whiteColor];
     self.window.rootViewController = self.tabBarController;
     [self.window makeKeyAndVisible];
-    return YES;
 }
 
 - (void)readDefaults
@@ -177,6 +200,32 @@ dispatch_queue_t serverSocketQueue;
     
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
     [defaultsToRegister release];
+}
+
+#pragma mark - BITCrashManagerDelegate
+
+- (void)crashManagerWillCancelSendingCrashReport:(BITCrashManager *)crashManager
+{
+    if ([self didCrashInLastSessionOnStartup])
+    {
+        [self setupApplication];
+    }
+}
+
+- (void)crashManager:(BITCrashManager *)crashManager didFailWithError:(NSError *)error
+{
+    if ([self didCrashInLastSessionOnStartup])
+    {
+        [self setupApplication];
+    }
+}
+
+- (void)crashManagerDidFinishSendingCrashReport:(BITCrashManager *)crashManager
+{
+    if ([self didCrashInLastSessionOnStartup])
+    {
+        [self setupApplication];
+    }
 }
 
 @end

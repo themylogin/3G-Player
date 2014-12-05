@@ -12,6 +12,12 @@
 		84075B6A1A3094AF001E395C /* MusicTableService.m in Sources */ = {isa = PBXBuildFile; fileRef = 84075B691A3094AF001E395C /* MusicTableService.m */; };
 		841F388D1A31B8E60046CDD2 /* tabbar_recents.png in Resources */ = {isa = PBXBuildFile; fileRef = 841F388B1A31B8E60046CDD2 /* tabbar_recents.png */; };
 		841F388E1A31B8E60046CDD2 /* tabbar_recents@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 841F388C1A31B8E60046CDD2 /* tabbar_recents@2x.png */; };
+		841F38A91A31BD050046CDD2 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841F38A81A31BD050046CDD2 /* AssetsLibrary.framework */; };
+		841F38AB1A31BD5A0046CDD2 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841F38AA1A31BD5A0046CDD2 /* CoreText.framework */; };
+		841F38AD1A31BD9B0046CDD2 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841F38AC1A31BD9B0046CDD2 /* QuickLook.framework */; };
+		843106481A31C25F00CFA73E /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 843106441A31C25F00CFA73E /* HockeySDK.framework */; };
+		843106491A31C25F00CFA73E /* HockeySDK.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 843106461A31C25F00CFA73E /* HockeySDK.xcconfig */; };
+		8431064A1A31C25F00CFA73E /* HockeySDKResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 843106471A31C25F00CFA73E /* HockeySDKResources.bundle */; };
 		84943CBC17CBB33A00A1CD17 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 84943CBA17CBB33A00A1CD17 /* Icon.png */; };
 		84943CBD17CBB33A00A1CD17 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84943CBB17CBB33A00A1CD17 /* Icon@2x.png */; };
 		84B5D20717CBB730007FB471 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 84B5D20017CBB730007FB471 /* Icon-72.png */; };
@@ -96,6 +102,12 @@
 		84075B691A3094AF001E395C /* MusicTableService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicTableService.m; sourceTree = "<group>"; };
 		841F388B1A31B8E60046CDD2 /* tabbar_recents.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tabbar_recents.png; sourceTree = "<group>"; };
 		841F388C1A31B8E60046CDD2 /* tabbar_recents@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tabbar_recents@2x.png"; sourceTree = "<group>"; };
+		841F38A81A31BD050046CDD2 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
+		841F38AA1A31BD5A0046CDD2 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
+		841F38AC1A31BD9B0046CDD2 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
+		843106441A31C25F00CFA73E /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HockeySDK.framework; sourceTree = "<group>"; };
+		843106461A31C25F00CFA73E /* HockeySDK.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = HockeySDK.xcconfig; sourceTree = "<group>"; };
+		843106471A31C25F00CFA73E /* HockeySDKResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HockeySDKResources.bundle; sourceTree = "<group>"; };
 		84943CBA17CBB33A00A1CD17 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		84943CBB17CBB33A00A1CD17 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
 		84B5D20017CBB730007FB471 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = "<group>"; };
@@ -215,8 +227,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				84C3099D188A94D20087352B /* libz.dylib in Frameworks */,
 				84C29E8617F8683000D259F3 /* Security.framework in Frameworks */,
+				841F38AD1A31BD9B0046CDD2 /* QuickLook.framework in Frameworks */,
+				841F38AB1A31BD5A0046CDD2 /* CoreText.framework in Frameworks */,
+				84C10BEF1782E08E004220BC /* CoreGraphics.framework in Frameworks */,
+				843106481A31C25F00CFA73E /* HockeySDK.framework in Frameworks */,
+				841F38A91A31BD050046CDD2 /* AssetsLibrary.framework in Frameworks */,
+				84C3099D188A94D20087352B /* libz.dylib in Frameworks */,
 				84C29E7D17F8562600D259F3 /* AudioToolbox.framework in Frameworks */,
 				84C4CA211785B36E00A95DB9 /* AVFoundation.framework in Frameworks */,
 				84C4CA1F1785B1BC00A95DB9 /* MediaPlayer.framework in Frameworks */,
@@ -226,19 +243,38 @@
 				84C919F117841BC600810B88 /* CFNetwork.framework in Frameworks */,
 				84C10BEB1782E08E004220BC /* UIKit.framework in Frameworks */,
 				84C10BED1782E08E004220BC /* Foundation.framework in Frameworks */,
-				84C10BEF1782E08E004220BC /* CoreGraphics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		843106431A31C25F00CFA73E /* HockeySDK.embeddedframework */ = {
+			isa = PBXGroup;
+			children = (
+				843106441A31C25F00CFA73E /* HockeySDK.framework */,
+				843106451A31C25F00CFA73E /* Resources */,
+			);
+			name = HockeySDK.embeddedframework;
+			path = "3G Player/HockeySDK.embeddedframework";
+			sourceTree = "<group>";
+		};
+		843106451A31C25F00CFA73E /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				843106461A31C25F00CFA73E /* HockeySDK.xcconfig */,
+				843106471A31C25F00CFA73E /* HockeySDKResources.bundle */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		84C10BDE1782E08D004220BC = {
 			isa = PBXGroup;
 			children = (
 				84C10BF01782E08E004220BC /* 3G Player */,
 				84C10BE91782E08D004220BC /* Frameworks */,
 				84C10BE81782E08D004220BC /* Products */,
+				843106431A31C25F00CFA73E /* HockeySDK.embeddedframework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -253,6 +289,9 @@
 		84C10BE91782E08D004220BC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				841F38AC1A31BD9B0046CDD2 /* QuickLook.framework */,
+				841F38AA1A31BD5A0046CDD2 /* CoreText.framework */,
+				841F38A81A31BD050046CDD2 /* AssetsLibrary.framework */,
 				84C3099C188A94D20087352B /* libz.dylib */,
 				84C29E8517F8682F00D259F3 /* Security.framework */,
 				84C29E7C17F8562600D259F3 /* AudioToolbox.framework */,
@@ -545,9 +584,11 @@
 				84B5D20917CBB730007FB471 /* Icon-Small-50.png in Resources */,
 				84DEA2D5191FC2A1000F9832 /* tabbar_info.png in Resources */,
 				84B5D20A17CBB730007FB471 /* Icon-Small-50@2x.png in Resources */,
+				8431064A1A31C25F00CFA73E /* HockeySDKResources.bundle in Resources */,
 				84B5D20B17CBB730007FB471 /* Icon-Small.png in Resources */,
 				84B5D20C17CBB730007FB471 /* Icon-Small@2x.png in Resources */,
 				84C836AC18F0779F00033739 /* tabbar_library@2x.png in Resources */,
+				843106491A31C25F00CFA73E /* HockeySDK.xcconfig in Resources */,
 				841F388D1A31B8E60046CDD2 /* tabbar_recents.png in Resources */,
 				84B5D20D17CBB730007FB471 /* iTunesArtwork.png in Resources */,
 				84DEA2D6191FC2A1000F9832 /* tabbar_info@2x.png in Resources */,
@@ -673,6 +714,15 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/3G",
+					Player,
+					"$(PROJECT_DIR)/3G",
+					Player/HockeySDK.embeddedframework,
+					"$(PROJECT_DIR)/3G",
+					Player/HockeySDK.embeddedframework,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
 				INFOPLIST_FILE = "3G Player/3G Player-Info.plist";
@@ -688,6 +738,15 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/3G",
+					Player,
+					"$(PROJECT_DIR)/3G",
+					Player/HockeySDK.embeddedframework,
+					"$(PROJECT_DIR)/3G",
+					Player/HockeySDK.embeddedframework,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
 				INFOPLIST_FILE = "3G Player/3G Player-Info.plist";
