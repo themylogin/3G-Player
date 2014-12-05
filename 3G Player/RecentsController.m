@@ -10,9 +10,10 @@
 
 #import "Globals.h"
 
-@interface RecentsController ()
+@interface RecentsController () <UIBarPositioningDelegate>
 
 @property (nonatomic, retain) NSArray* recents;
+@property (nonatomic, retain) IBOutlet UITableView *tableView;
 
 @end
 
@@ -55,6 +56,13 @@
 {
     self.recents = [musicTableService readRecentsFile];
     [self.tableView reloadData];
+}
+
+#pragma mark — navbar positioning
+
+- (UIBarPosition)positionForBar:(id<UIBarPositioning>)bar
+{
+    return UIBarPositionTopAttached;
 }
 
 #pragma mark - Table view data source

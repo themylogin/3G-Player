@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface RecentsController : UITableViewController
+@interface RecentsController : UIViewController
 
 @end
