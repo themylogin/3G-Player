@@ -702,6 +702,8 @@
             }
         }
     }
+    
+    [self tryToResumePlayingNowBufferingFile];
 }
 
 - (void)onMusicFileManagerBufferingCompleted
