@@ -295,23 +295,9 @@
             return;
         }
         
-        NSString* albumPath = [[musicFile objectForKey:@"path"] stringByDeletingLastPathComponent];
-        NSString* albumParentPath = [albumPath stringByDeletingLastPathComponent];
-        NSArray* albumDirectoryIndex = [musicTableService loadIndexFor:albumParentPath];
-        NSString* remoteCoverPath = nil;
-        for (int i = 0; i < [albumDirectoryIndex count]; i++)
-        {
-            NSDictionary* item = [albumDirectoryIndex objectAtIndex:i];
-            if ([[item objectForKey:@"path"] isEqualToString:albumPath])
-            {
-                remoteCoverPath = [item objectForKey:@"cover"];
-                break;
-            }
-        }
-        if (remoteCoverPath == nil)
-        {
-            return;
-        }
+        NSDictionary* album = [self itemByPath:[[musicFile objectForKey:@"path"]
+                                                stringByDeletingLastPathComponent]];
+        NSString* remoteCoverPath = [album objectForKey:@"cover"];
         
         NSURL* coverUrl = [NSURL URLWithString:
                            [playerUrl stringByAppendingString:
@@ -579,6 +565,26 @@
         }
     }
     return parts;
+}
+
+- (NSDictionary*)itemByPath:(NSString*)path
+{
+    if ([path isEqualToString:@""])
+    {
+        return nil;
+    }
+    
+    NSString* parentPath = [path stringByDeletingLastPathComponent];
+    NSArray* parentIndex = [musicTableService loadIndexFor:parentPath];
+    for (int i = 0; i < [parentIndex count]; i++)
+    {
+        NSDictionary* item = [parentIndex objectAtIndex:i];
+        if ([[item objectForKey:@"path"] isEqualToString:path])
+        {
+            return item;
+        }
+    }
+    return nil;
 }
 
 @end

@@ -42,4 +42,6 @@ typedef union {
 - (NSArray*)listOldDirectories;
 - (NSArray*)pathForDirectory:(NSString*)directory;
 
+- (NSDictionary*)itemByPath:(NSString*)path;
+
 @end

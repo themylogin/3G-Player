@@ -75,6 +75,20 @@
     }
 }
 
+- (void)scrollToItem:(NSDictionary*)item
+{
+    for (int i = 0; i < [self.index count]; i++)
+    {
+        if ([[[self.index objectAtIndex:i] objectForKey:@"path"] isEqualToString:[item objectForKey:@"path"]])
+        {
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]
+                                  atScrollPosition:UITableViewScrollPositionTop
+                                          animated:NO];
+            break;
+        }
+    }
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
