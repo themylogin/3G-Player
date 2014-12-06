@@ -15,6 +15,7 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack } AddMode
 @interface CurrentController : UIViewController <AVAudioPlayerDelegate>
 
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
+@property (nonatomic, retain) IBOutlet UIView* toolbar;
 @property (nonatomic, retain) IBOutlet UIButton* playPauseButton;
 @property (nonatomic, retain) IBOutlet UISlider* positionSlider;
 @property (nonatomic, retain) IBOutlet UILabel* elapsedLabel;
@@ -39,5 +40,7 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack } AddMode
 - (IBAction)handleToolbarSwipeUp:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handleToolbarSwipeDown:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer;
+- (IBAction)handleGoogleButtonTouchDown:(id)sender;
+- (IBAction)handleLoveButtonTouchDown:(id)sender;
 
 @end

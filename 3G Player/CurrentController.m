@@ -18,6 +18,8 @@
 
 @interface CurrentController ()
 
+@property (nonatomic)         bool toolbarOpen;
+
 @property (nonatomic, retain) NSMutableArray* playlist;
 @property (nonatomic, retain) NSMutableArray* sections;
 
@@ -46,6 +48,8 @@
     {
         self.tabBarItem.title = NSLocalizedString(@"Current", NIL);
         self.tabBarItem.image = [UIImage imageNamed:@"tabbar_current.png"];
+        
+        self.toolbarOpen = NO;
         
         self.playlist = [[NSMutableArray alloc] init];
         self.sections = [[NSMutableArray alloc] init];
@@ -384,14 +388,30 @@
 
 - (IBAction)handleToolbarSwipeUp:(UISwipeGestureRecognizer*)recognizer
 {
-    
+    if (!self.toolbarOpen)
+    {
+        self.toolbarOpen = YES;
+        [UIView animateWithDuration:0.5f animations:^{
+            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, -96);
+        }];
+    }
 }
 
 - (IBAction)handleToolbarSwipeDown:(UISwipeGestureRecognizer*)recognizer
 {
-    
+    [self closeToolbar];
 }
 
+- (void)closeToolbar
+{
+    if (self.toolbarOpen)
+    {
+        self.toolbarOpen = NO;
+        [UIView animateWithDuration:0.5f animations:^{
+            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, 96);
+        }];
+    }
+}
 
 - (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer
 {
@@ -833,6 +853,32 @@
 - (void)updatedNowPlayingInfo
 {
     [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = self.nowPlayingInfo;
+}
+
+- (void)handleGoogleButtonTouchDown:(id)sender
+{
+    if (self.currentIndex != -1)
+    {
+        NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
+        NSString* query = [NSString stringWithFormat:@"%@ - %@ lyrics",
+                           [item objectForKey:@"artist"], [item objectForKey:@"title"]];
+        NSURL* url = [NSURL URLWithString:
+                      [@"http://google.com/search?q=" stringByAppendingString:
+                       [query stringByAddingPercentEncodingWithAllowedCharacters:
+                        [NSCharacterSet URLHostAllowedCharacterSet]]]];
+        [[UIApplication sharedApplication] openURL:url];
+        [self closeToolbar];
+    }
+}
+
+- (void)handleLoveButtonTouchDown:(id)sender
+{
+    if (self.currentIndex != -1)
+    {
+        NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
+        [scrobbler love:item];
+        [self closeToolbar];
+    }
 }
 
 @end

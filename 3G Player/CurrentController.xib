@@ -12,6 +12,7 @@
                 <outlet property="positionSlider" destination="111" id="157"/>
                 <outlet property="repeatButton" destination="97" id="100"/>
                 <outlet property="tableView" destination="12" id="48"/>
+                <outlet property="toolbar" destination="212" id="Fig-k5-wtB"/>
                 <outlet property="totalLabel" destination="126" id="159"/>
                 <outlet property="view" destination="1" id="3"/>
                 <outlet property="volumeView" destination="215" id="216"/>
@@ -33,14 +34,9 @@
                     </connections>
                 </tableView>
                 <view contentMode="scaleToFill" id="212" userLabel="Toolbar">
-                    <rect key="frame" x="0.0" y="386" width="320" height="168"/>
+                    <rect key="frame" x="0.0" y="386" width="320" height="94"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="wBI-t2-LyE">
-                            <rect key="frame" x="96" y="20" width="128" height="128"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <state key="normal" image="google.png"/>
-                        </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" id="78" userLabel="Play/Pause">
                             <rect key="frame" x="20" y="18" width="26" height="26"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -97,6 +93,24 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         </view>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="wBI-t2-LyE" userLabel="Google">
+                            <rect key="frame" x="16" y="94" width="64" height="64"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" image="google.png"/>
+                            <connections>
+                                <action selector="handleGoogleButtonTouchDown:" destination="-1" eventType="touchDown" id="kYX-WC-LSD"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="AUU-6r-Bio" userLabel="Love">
+                            <rect key="frame" x="96" y="94" width="64" height="64"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Button" image="love.png">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="handleLoveButtonTouchDown:" destination="-1" eventType="touchDown" id="mAF-bm-vLA"/>
+                            </connections>
+                        </button>
                     </subviews>
                     <color key="backgroundColor" red="0.16862745100000001" green="0.16862745100000001" blue="0.16862745100000001" alpha="1" colorSpace="calibratedRGB"/>
                     <connections>
@@ -133,7 +147,8 @@
         </pinchGestureRecognizer>
     </objects>
     <resources>
-        <image name="google.png" width="128" height="128"/>
+        <image name="google.png" width="64" height="64"/>
+        <image name="love.png" width="64" height="64"/>
         <image name="play_inactive.png" width="26" height="26"/>
         <image name="repeat_disabled.png" width="26" height="26"/>
     </resources>
