@@ -32,11 +32,18 @@
                         <outletCollection property="gestureRecognizers" destination="50" appends="YES" id="52"/>
                     </connections>
                 </tableView>
-                <view contentMode="scaleToFill" id="212">
-                    <rect key="frame" x="0.0" y="386" width="320" height="94"/>
+                <view contentMode="scaleToFill" id="212" userLabel="Toolbar">
+                    <rect key="frame" x="0.0" y="386" width="320" height="168"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" id="78">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="wBI-t2-LyE">
+                            <rect key="frame" x="137" y="69" width="46" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" id="78" userLabel="Play/Pause">
                             <rect key="frame" x="20" y="18" width="26" height="26"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="boldSystem" size="button"/>
@@ -51,28 +58,28 @@
                                 <action selector="handlePlayPauseButtonTouchDown:" destination="-1" eventType="touchDown" id="208"/>
                             </connections>
                         </button>
-                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" id="111">
+                        <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" id="111" userLabel="Position">
                             <rect key="frame" x="52" y="17" width="176" height="29"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <connections>
                                 <action selector="handlePositionSliderTouchUpInside:" destination="-1" eventType="touchUpInside" id="160"/>
                             </connections>
                         </slider>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="00:00" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="115">
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="00:00" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="115" userLabel="Elapsed">
                             <rect key="frame" x="234" y="18" width="32" height="13"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="10"/>
                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="00:00" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="126">
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="00:00" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="126" userLabel="Remaining">
                             <rect key="frame" x="234" y="31" width="32" height="13"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="10"/>
                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" id="97">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" id="97" userLabel="Repeat">
                             <rect key="frame" x="274" y="18" width="26" height="26"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
@@ -87,13 +94,17 @@
                                 <action selector="handleRepeatButtonTouchDown:" destination="-1" eventType="touchDown" id="207"/>
                             </connections>
                         </button>
-                        <view contentMode="scaleToFill" id="215">
+                        <view contentMode="scaleToFill" id="215" userLabel="Volume">
                             <rect key="frame" x="20" y="52" width="280" height="22"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" white="1" alpha="0.0" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         </view>
                     </subviews>
                     <color key="backgroundColor" red="0.16862745100000001" green="0.16862745100000001" blue="0.16862745100000001" alpha="1" colorSpace="calibratedRGB"/>
+                    <connections>
+                        <outletCollection property="gestureRecognizers" destination="oM4-lk-YO3" appends="YES" id="RPI-xj-3c1"/>
+                        <outletCollection property="gestureRecognizers" destination="w7P-3p-aEW" appends="YES" id="Mcj-9O-hQB"/>
+                    </connections>
                 </view>
             </subviews>
             <gestureRecognizers/>
@@ -104,7 +115,17 @@
         </view>
         <swipeGestureRecognizer direction="right" id="50">
             <connections>
-                <action selector="handleSwipe:" destination="-1" id="53"/>
+                <action selector="handlePlaylistSwipe:" destination="-1" id="97i-vr-rE1"/>
+            </connections>
+        </swipeGestureRecognizer>
+        <swipeGestureRecognizer direction="up" id="oM4-lk-YO3" userLabel="Toolbar Swipe Up Gesture Recognizer">
+            <connections>
+                <action selector="handleToolbarSwipeUp:" destination="-1" id="4cQ-zT-udW"/>
+            </connections>
+        </swipeGestureRecognizer>
+        <swipeGestureRecognizer direction="down" id="w7P-3p-aEW" userLabel="Toolbar Swipe Down Gesture Recognizer">
+            <connections>
+                <action selector="handleToolbarSwipeDown:" destination="-1" id="6yY-tM-ibr"/>
             </connections>
         </swipeGestureRecognizer>
         <pinchGestureRecognizer id="209">

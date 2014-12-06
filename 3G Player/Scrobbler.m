@@ -33,9 +33,9 @@
         
     self.flushTimer = [NSTimer scheduledTimerWithTimeInterval:60.0 target:self selector:@selector(flushQueue) userInfo:nil repeats:YES];
     
-    if ([[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] == nil)
+    if ([[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"] == nil)
     {
-        [[NSUserDefaults standardUserDefaults] setObject:[NSMutableArray array] forKey:@"scrobblerQueue"];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSMutableArray array] forKey:@"lastFmQueue"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     
@@ -64,13 +64,34 @@
 
 - (void)scrobble:(NSDictionary*)file startedAt:(NSDate*)date
 {
+    [self _queueAction:@"scrobble"
+              withFile:file
+             arguments:[NSDictionary dictionaryWithObject:
+                        [NSString stringWithFormat:@"%d", (int)[date timeIntervalSince1970]]
+                                                   forKey:@"timestamp"]];
+    [self flushQueue];
+}
+
+- (void)love:(NSDictionary*)file
+{
+    [self _queueAction:@"love"
+              withFile:file
+             arguments:[NSDictionary dictionary]];
+    [self flushQueue];
+}
+
+- (void) _queueAction:(NSString*)action withFile:(NSDictionary*)file arguments:(NSDictionary*)arguments
+{
     @synchronized([NSUserDefaults standardUserDefaults])
     {
-        [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] addObject:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                                                                      [file objectForKey:@"artist"], @"artist",
-                                                                                                      [file objectForKey:@"title"], @"title",
-                                                                                                      [NSString stringWithFormat:@"%d", (int)[date timeIntervalSince1970]], @"timestamp",
-                                                                                                      nil]];
+        NSMutableDictionary* queueItem = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                          [file objectForKey:@"artist"], @"artist",
+                                          [file objectForKey:@"title"], @"title",
+                                          action, @"action",
+                                          nil];
+        [queueItem addEntriesFromDictionary:arguments];
+        
+        [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"] addObject:queueItem];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     
@@ -88,55 +109,100 @@
                 return;
             }
             
-            NSArray* recentTracks = [self getRecentTracks];
-            if (!recentTracks)
-            {
-                return;
-            }
-            
             NSMutableArray* queue;
             @synchronized([NSUserDefaults standardUserDefaults])
             {
-                NSMutableArray* scrobblerQueue = [[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"];
-                if ([scrobblerQueue count] == 0)
+                NSMutableArray* storedQueue = [[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"];
+                if ([storedQueue count] == 0)
                 {
                     return;
-                }                    
-                    
-                queue = [NSMutableArray arrayWithArray:scrobblerQueue];
-                [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] removeAllObjects];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-            }
-    
-            for (NSDictionary* scrobble in queue)
-            {
-                BOOL alreadyScrobbled = NO;
-                for (NSDictionary* track in recentTracks)
-                {
-                    if ([[[track objectForKey:@"date"] objectForKey:@"uts"] isEqualToString:[scrobble objectForKey:@"timestamp"]])
-                    {
-                        alreadyScrobbled = YES;
-                        break;
-                    }
-                }
-                if (alreadyScrobbled)
-                {
-                    continue;
                 }
                 
-                BOOL scrobbled = [self doScrobble:scrobble];
-                if (!scrobbled)
+                queue = [NSMutableArray arrayWithArray:storedQueue];
+            }
+    
+            NSMutableDictionary* context = [[NSMutableDictionary alloc] init];
+            for (NSDictionary* action in queue)
+            {
+                BOOL ok = [self _performAction:[action objectForKey:@"action"]
+                                 withArguments:action
+                                     inContext:context];
+                if (ok)
                 {
                     @synchronized([NSUserDefaults standardUserDefaults])
                     {
-                        [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"scrobblerQueue"] addObject:scrobble];
+                        [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"] removeObject:action];
                         [[NSUserDefaults standardUserDefaults] synchronize];
                     }
                     
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"actionCompleted"
+                                                                            object:self
+                                                                          userInfo:action];
+                    });
                 }
             }
+            [context release];
         }
     });
+}
+
+- (BOOL) _performAction:(NSString*)action withArguments:(NSDictionary*)arguments inContext:(NSMutableDictionary*)context
+{
+    if ([action isEqualToString:@"scrobble"])
+    {
+        NSArray* recentTracks = [context objectForKey:@"recentTracks"];
+        if (!recentTracks)
+        {
+            recentTracks = [self getRecentTracks];
+            if (!recentTracks)
+            {
+                recentTracks = (NSArray*)[NSNull null];
+            }
+            [context setObject:recentTracks forKey:@"recentTracks"];
+        }
+        if ([recentTracks isKindOfClass:[NSNull class]])
+        {
+            return NO;
+        }
+        
+        for (NSDictionary* track in recentTracks)
+        {
+            if ([[[track objectForKey:@"date"] objectForKey:@"uts"]
+                 isEqualToString:[arguments objectForKey:@"timestamp"]])
+            {
+                return YES;
+            }
+        }
+        
+        return [self doScrobble:arguments];
+    }
+    
+    if ([action isEqualToString:@"love"])
+    {
+        FMEngine* fmEngine = [[FMEngine alloc] init];
+        NSData* reply = [fmEngine dataForMethod:@"track.love"
+                                withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                [arguments objectForKey:@"artist"], @"artist",
+                                                [arguments objectForKey:@"title"], @"track",
+                                                self.sessionKey, @"sk",
+                                                _LASTFM_API_KEY_, @"api_key",
+                                                nil]
+                                   useSignature:YES
+                                     httpMethod:POST_TYPE
+                                          error:nil];
+        if (reply)
+        {
+            NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
+            if ([[response objectForKey:@"status"] isEqualToString:@"ok"])
+            {
+                return YES;
+            }
+        }
+        [fmEngine release];
+    }
+    
+    return NO;
 }
 
 - (void)beAuthorized

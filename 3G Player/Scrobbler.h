@@ -13,5 +13,6 @@
 - (id)init;
 - (void)sendNowPlaying:(NSDictionary*)file;
 - (void)scrobble:(NSDictionary*)file startedAt:(NSDate*)date;
+- (void)love:(NSDictionary*)file;
 
 @end

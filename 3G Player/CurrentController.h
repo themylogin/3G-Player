@@ -35,7 +35,9 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack } AddMode
 - (IBAction)handlePlayPauseButtonTouchDown:(id)sender;
 - (IBAction)handlePositionSliderTouchUpInside:(id)sender;
 - (IBAction)handleRepeatButtonTouchDown:(id)sender;
-- (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer;
+- (IBAction)handlePlaylistSwipe:(UISwipeGestureRecognizer*)recognizer;
+- (IBAction)handleToolbarSwipeUp:(UISwipeGestureRecognizer*)recognizer;
+- (IBAction)handleToolbarSwipeDown:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer;
 
 @end

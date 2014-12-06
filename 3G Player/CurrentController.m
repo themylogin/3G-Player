@@ -363,7 +363,7 @@
     [self updateUI];
 }
 
-- (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer
+- (IBAction)handlePlaylistSwipe:(UISwipeGestureRecognizer*)recognizer
 {
     NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
     if (indexPath)
@@ -381,6 +381,17 @@
         [self _playlistChanged];
     }
 }
+
+- (IBAction)handleToolbarSwipeUp:(UISwipeGestureRecognizer*)recognizer
+{
+    
+}
+
+- (IBAction)handleToolbarSwipeDown:(UISwipeGestureRecognizer*)recognizer
+{
+    
+}
+
 
 - (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer
 {
