@@ -18,6 +18,8 @@
 		843106481A31C25F00CFA73E /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 843106441A31C25F00CFA73E /* HockeySDK.framework */; };
 		843106491A31C25F00CFA73E /* HockeySDK.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 843106461A31C25F00CFA73E /* HockeySDK.xcconfig */; };
 		8431064A1A31C25F00CFA73E /* HockeySDKResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 843106471A31C25F00CFA73E /* HockeySDKResources.bundle */; };
+		84838B541A33280C00D68AF2 /* google@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84838B521A33280C00D68AF2 /* google@2x.png */; };
+		84838B551A33280C00D68AF2 /* love@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84838B531A33280C00D68AF2 /* love@2x.png */; };
 		84943CBC17CBB33A00A1CD17 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 84943CBA17CBB33A00A1CD17 /* Icon.png */; };
 		84943CBD17CBB33A00A1CD17 /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84943CBB17CBB33A00A1CD17 /* Icon@2x.png */; };
 		84B5D20717CBB730007FB471 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 84B5D20017CBB730007FB471 /* Icon-72.png */; };
@@ -108,6 +110,8 @@
 		843106441A31C25F00CFA73E /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HockeySDK.framework; sourceTree = "<group>"; };
 		843106461A31C25F00CFA73E /* HockeySDK.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = HockeySDK.xcconfig; sourceTree = "<group>"; };
 		843106471A31C25F00CFA73E /* HockeySDKResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HockeySDKResources.bundle; sourceTree = "<group>"; };
+		84838B521A33280C00D68AF2 /* google@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "google@2x.png"; sourceTree = "<group>"; };
+		84838B531A33280C00D68AF2 /* love@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "love@2x.png"; sourceTree = "<group>"; };
 		84943CBA17CBB33A00A1CD17 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		84943CBB17CBB33A00A1CD17 /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
 		84B5D20017CBB730007FB471 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = "<group>"; };
@@ -349,6 +353,8 @@
 		84C10BF11782E08E004220BC /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				84838B521A33280C00D68AF2 /* google@2x.png */,
+				84838B531A33280C00D68AF2 /* love@2x.png */,
 				84DEA2D4191FC2A1000F9832 /* tabbar_current.png */,
 				84C836A918F0779F00033739 /* tabbar_current@2x.png */,
 				84DEA2D3191FC2A1000F9832 /* tabbar_library.png */,
@@ -568,6 +574,7 @@
 				84C4CA2C1785E3ED00A95DB9 /* pause_inactive.png in Resources */,
 				84C4CA2D1785E3ED00A95DB9 /* play_active.png in Resources */,
 				84C4CA2E1785E3ED00A95DB9 /* play_inactive.png in Resources */,
+				84838B551A33280C00D68AF2 /* love@2x.png in Resources */,
 				84C4CA2F1785E3ED00A95DB9 /* repeat_disabled.png in Resources */,
 				84C4CA301785E3ED00A95DB9 /* repeat_playlist.png in Resources */,
 				84DEA2D7191FC2A1000F9832 /* tabbar_library.png in Resources */,
@@ -583,6 +590,7 @@
 				84B5D20817CBB730007FB471 /* Icon-72@2x.png in Resources */,
 				84B5D20917CBB730007FB471 /* Icon-Small-50.png in Resources */,
 				84DEA2D5191FC2A1000F9832 /* tabbar_info.png in Resources */,
+				84838B541A33280C00D68AF2 /* google@2x.png in Resources */,
 				84B5D20A17CBB730007FB471 /* Icon-Small-50@2x.png in Resources */,
 				8431064A1A31C25F00CFA73E /* HockeySDKResources.bundle in Resources */,
 				84B5D20B17CBB730007FB471 /* Icon-Small.png in Resources */,
