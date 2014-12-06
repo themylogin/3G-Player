@@ -842,10 +842,13 @@
         NSString* coverPath = [musicFileManager coverPath:[self.playlist objectAtIndex:self.currentIndex]];
         if ([[NSFileManager defaultManager] fileExistsAtPath:coverPath])
         {
-            [self.nowPlayingInfo
-             setObject:[[MPMediaItemArtwork alloc] initWithImage:[UIImage imageWithContentsOfFile:coverPath]]
-             forKey:MPMediaItemPropertyArtwork];
-            [self updatedNowPlayingInfo];
+            MPMediaItemArtwork* artwork = [[MPMediaItemArtwork alloc]
+                                           initWithImage:[UIImage imageWithContentsOfFile:coverPath]];
+            if (artwork)
+            {
+                [self.nowPlayingInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
+                [self updatedNowPlayingInfo];
+            }
         }
     }
 }
