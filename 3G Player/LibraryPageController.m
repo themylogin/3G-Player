@@ -173,7 +173,9 @@
     if (indexPath)
     {
         NSDictionary* item = [self getItemForIndexPath:indexPath];
-        [musicTableService showActionSheetForItem:item inView:self.view];
+        [musicTableService showActionSheetForItem:item
+                                           inView:self.view
+                                 withExtraButtons:BlacklistExtraButton];
     }
 }
 
