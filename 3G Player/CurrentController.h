@@ -10,7 +10,7 @@
 
 #import <AVFoundation/AVFoundation.h>
 
-typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack } AddMode;
+typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfterJustAdded } AddMode;
 
 @interface CurrentController : UIViewController <AVAudioPlayerDelegate>
 
@@ -25,6 +25,7 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack } AddMode
 
 @property (nonatomic, retain) AVAudioPlayer* player;
 
+- (BOOL)canAddAfterAdded;
 - (void)addFiles:(NSArray*)files mode:(AddMode)addMode;
 - (void)clear;
 

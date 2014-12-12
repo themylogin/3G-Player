@@ -111,7 +111,6 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
                                                destructiveButtonTitle:nil
                                                     otherButtonTitles:nil];
     NSMutableArray* buttons = [[NSMutableArray alloc] init];
-    NSMutableArray* buttonTitles = [[NSMutableArray alloc] init];
     
     [actionSheet addButtonWithTitle:NSLocalizedString(@"Replace", nil)];
     [buttons addObject:@"REPLACE"];
@@ -128,7 +127,7 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     [actionSheet addButtonWithTitle:NSLocalizedString(@"Add after current track", nil)];
     [buttons addObject:@"ADD_AFTER_TRACK"];
     
-    if (extraButtons & AddAfterJustAddedExtraButton)
+    if ([controllers.current canAddAfterAdded])
     {
         [actionSheet addButtonWithTitle:NSLocalizedString(@"Add after just added", nil)];
         [buttons addObject:@"ADD_AFTER_ADDED"];
@@ -156,12 +155,12 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
 - (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     NSArray* buttons = objc_getAssociatedObject(actionSheet, BUTTONS);
-    NSString* button = [buttons objectAtIndex:buttonIndex];
-    
     if (buttonIndex >= [buttons count])
     {
         return;
     }
+    
+    NSString* button = [buttons objectAtIndex:buttonIndex];    
     
     NSDictionary* item = objc_getAssociatedObject(actionSheet, ITEM);
     
@@ -198,6 +197,10 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     if ([button isEqualToString:@"ADD_AFTER_TRACK"])
     {
         addMode = AddAfterCurrentTrack;
+    }
+    if ([button isEqualToString:@"ADD_AFTER_ADDED"])
+    {
+        addMode = AddAfterJustAdded;
     }
     
     [self addItemToPlaylist:item mode:addMode playAfter:[button isEqualToString:@"REPLACE_AND_PLAY"]];

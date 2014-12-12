@@ -20,6 +20,7 @@
 
 @property (nonatomic)         bool toolbarOpen;
 
+@property (nonatomic)         long lastAddedIndex;
 @property (nonatomic, retain) NSMutableArray* playlist;
 @property (nonatomic, retain) NSMutableArray* sections;
 
@@ -51,6 +52,7 @@
         
         self.toolbarOpen = NO;
         
+        self.lastAddedIndex = -1;
         self.playlist = [[NSMutableArray alloc] init];
         self.sections = [[NSMutableArray alloc] init];
         
@@ -137,6 +139,11 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (BOOL)canAddAfterAdded
+{
+    return self.lastAddedIndex != -1;
+}
+
 - (void)addFiles:(NSArray*)files mode:(AddMode)addMode
 {
     long index = [self.playlist count];
@@ -168,12 +175,18 @@
     {
         index = self.currentIndex + 1;
     }
+    if (addMode == AddAfterJustAdded && self.lastAddedIndex != -1)
+    {
+        index = self.lastAddedIndex;
+    }
     
     for (NSDictionary* file in files)
     {
         [self.playlist insertObject:file atIndex:index];
         index++;
     }
+    
+    self.lastAddedIndex = index;
     
     [self _playlistChanged];
 }
@@ -184,6 +197,7 @@
     
     [musicFileManager stopBuffering];
     
+    self.lastAddedIndex = -1;
     [self.playlist removeAllObjects];
     [self _playlistChanged];
     
@@ -385,6 +399,7 @@
         {
             self.currentIndex--;
         }
+        self.lastAddedIndex = -1;
         [self.playlist removeObjectAtIndex:index];
         [self _playlistChanged];
     }
@@ -421,6 +436,7 @@
         {
             self.currentIndex -= [files count];
         }
+        self.lastAddedIndex = -1;
         [self.playlist removeObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(firstFile, lastFile - firstFile + 1)]];
         [self _playlistChanged];
     }

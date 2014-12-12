@@ -14,7 +14,7 @@
 
 @interface MusicTableService : NSObject <UIActionSheetDelegate>
 
-typedef enum { AddAfterJustAddedExtraButton, BlacklistExtraButton } ExtraButtons;
+typedef enum { BlacklistExtraButton } ExtraButtons;
 
 - (id)init;
 
