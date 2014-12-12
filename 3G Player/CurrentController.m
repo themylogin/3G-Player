@@ -147,7 +147,7 @@
             BOOL isCurrentSection = NO;
             for (NSNumber* nsi in [section objectForKey:@"files"])
             {
-                int i = [nsi intValue];
+                long i = [nsi longValue];
                 
                 if (i == self.currentIndex)
                 {
@@ -179,17 +179,8 @@
 }
 
 - (void)clear
-{    
-    if (self.player)
-    {
-        if (self.player.playing)
-        {
-            [self scrobbleIfNecessary];
-        }
-        
-        [self.player stop];
-        self.player = nil;
-    }
+{
+    [self stop];
     
     [musicFileManager stopBuffering];
     
@@ -214,16 +205,7 @@
 
 - (void)initAtIndex:(long)index atPosition:(NSTimeInterval)position
 {
-    if (self.player)
-    {
-        if (self.player.playing)
-        {
-            [self scrobbleIfNecessary];
-        }
-        
-        [self.player stop];
-        self.player = nil;
-    }
+    [self stop];
     
     self.currentIndex = index;
     NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
@@ -263,6 +245,23 @@
 {
     [self saveState];
     [self.player pause];
+}
+
+- (void)stop
+{
+    if (self.player)
+    {
+        if (self.player.playing)
+        {
+            [self scrobbleIfNecessary];
+        }
+        
+        [self.player stop];
+        
+        self.player = nil;
+        
+        [self updateUI];
+    }
 }
 
 - (void)periodic
@@ -367,21 +366,62 @@
     [self updateUI];
 }
 
-- (IBAction)handlePlaylistSwipe:(UISwipeGestureRecognizer*)recognizer
+- (IBAction)handlePlaylistRightSwipe:(UISwipeGestureRecognizer*)recognizer
 {
     NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
     if (indexPath)
     {
         long index = [self itemIndexForIndexPath:indexPath];
-        if (index < self.currentIndex)
+        if (index == self.currentIndex)
+        {
+            [self stop];
+            if (self.currentIndex + 1 < [self.playlist count])
+            {
+                [self playAtIndex:self.currentIndex + 1];
+                self.currentIndex--;
+            }
+        }
+        else if (index < self.currentIndex)
         {
             self.currentIndex--;
         }
-        else if (index == self.currentIndex)
-        {
-            return;
-        }
         [self.playlist removeObjectAtIndex:index];
+        [self _playlistChanged];
+    }
+}
+
+- (IBAction)handlePlaylistLeftSwipe:(UISwipeGestureRecognizer*)recognizer
+{
+    NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
+    if (indexPath)
+    {
+        NSDictionary* section = [self.sections objectAtIndex:indexPath.section];
+        NSArray* files = [section objectForKey:@"files"];
+        long firstFile = [[files firstObject] longValue];
+        long lastFile = [[files lastObject] longValue];
+        if (firstFile <= self.currentIndex && self.currentIndex <= lastFile)
+        {
+            for (NSNumber* nsi in [section objectForKey:@"files"])
+            {
+                if ([nsi longValue] == self.currentIndex)
+                {
+                    [self stop];
+                    if (indexPath.section + 1 < [self.sections count])
+                    {
+                        [self playAtIndex:[[[[self.sections objectAtIndex:indexPath.section + 1]
+                                             objectForKey:@"files"]
+                                            objectAtIndex:0]
+                                           longValue]];
+                        self.currentIndex -= [files count];
+                    }
+                }
+            }
+        }
+        else if (firstFile < self.currentIndex)
+        {
+            self.currentIndex -= [files count];
+        }
+        [self.playlist removeObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(firstFile, lastFile - firstFile + 1)]];
         [self _playlistChanged];
     }
 }
@@ -600,7 +640,7 @@
 {
     [self.sections removeAllObjects];
 
-    for (int i = 0; i < [self.playlist count]; i++)
+    for (long i = 0; i < [self.playlist count]; i++)
     {
         NSDictionary* file = [self.playlist objectAtIndex:i];
         
@@ -639,7 +679,7 @@
             }
         }
         
-        [[[self.sections lastObject] objectForKey:@"files"] addObject:[NSNumber numberWithInt:i]];
+        [[[self.sections lastObject] objectForKey:@"files"] addObject:[NSNumber numberWithLong:i]];
     }
     
     [self.tableView reloadData];
@@ -694,7 +734,7 @@
 
 - (long)itemIndexForIndexPath:(NSIndexPath*)indexPath
 {
-    return [[[[self.sections objectAtIndex:indexPath.section] objectForKey:@"files"] objectAtIndex:indexPath.row] integerValue];
+    return [[[[self.sections objectAtIndex:indexPath.section] objectForKey:@"files"] objectAtIndex:indexPath.row] longValue];
 }
 
 - (NSDictionary*)itemForIndexPath:(NSIndexPath*)indexPath

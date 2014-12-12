@@ -29,8 +29,9 @@
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="47"/>
-                        <outlet property="delegate" destination="-1" id="49"/>
+                        <outlet property="delegate" destination="-1" id="TZQ-WQ-d5u"/>
                         <outletCollection property="gestureRecognizers" destination="50" appends="YES" id="52"/>
+                        <outletCollection property="gestureRecognizers" destination="CD8-hm-FQ0" appends="YES" id="xAf-C3-DtR"/>
                     </connections>
                 </tableView>
                 <view contentMode="scaleToFill" id="212" userLabel="Toolbar">
@@ -125,9 +126,14 @@
                 <outletCollection property="gestureRecognizers" destination="209" appends="YES" id="211"/>
             </connections>
         </view>
-        <swipeGestureRecognizer direction="right" id="50">
+        <swipeGestureRecognizer direction="right" id="50" userLabel="Playlist Right Swipe Gesture Recognizer">
             <connections>
-                <action selector="handlePlaylistSwipe:" destination="-1" id="97i-vr-rE1"/>
+                <action selector="handlePlaylistRightSwipe:" destination="-1" id="Vat-ie-oMb"/>
+            </connections>
+        </swipeGestureRecognizer>
+        <swipeGestureRecognizer direction="left" id="CD8-hm-FQ0" userLabel="Playlist Left Swipe Gesture Recognizer">
+            <connections>
+                <action selector="handlePlaylistLeftSwipe:" destination="-1" id="LOu-tO-mcG"/>
             </connections>
         </swipeGestureRecognizer>
         <swipeGestureRecognizer direction="up" id="oM4-lk-YO3" userLabel="Toolbar Swipe Up Gesture Recognizer">
