@@ -103,7 +103,20 @@
 {
     [super viewDidLoad];
     
-    MPVolumeView* volumeView = [[MPVolumeView alloc] initWithFrame:self.volumeView.bounds];
+    CGRect tableViewRect = self.tableView.frame;
+    tableViewRect.size.height -= 100 + 20;
+    self.tableView.frame = tableViewRect;
+    
+    CGRect toolbarRect = self.toolbar.frame;
+    toolbarRect.size.height = 100;
+    toolbarRect.origin.y += 11;
+    self.toolbar.frame = toolbarRect;
+    
+    #if TARGET_IPHONE_SIMULATOR
+        UISlider* volumeView = [[UISlider alloc] initWithFrame:self.volumeView.bounds];
+    #else
+        MPVolumeView* volumeView = [[MPVolumeView alloc] initWithFrame:self.volumeView.bounds];
+    #endif
     [self.volumeView addSubview:volumeView];
     [volumeView release];
     
@@ -448,7 +461,7 @@
     {
         self.toolbarOpen = YES;
         [UIView animateWithDuration:0.5f animations:^{
-            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, -96);
+            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, -80);
         }];
     }
 }
@@ -464,7 +477,7 @@
     {
         self.toolbarOpen = NO;
         [UIView animateWithDuration:0.5f animations:^{
-            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, 96);
+            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, 80);
         }];
     }
 }
