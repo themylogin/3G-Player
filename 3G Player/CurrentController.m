@@ -335,6 +335,9 @@
         }
         
         [self.nowPlayingInfo
+         setObject:[NSNumber numberWithDouble:self.player.currentTime]
+         forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+        [self.nowPlayingInfo
          setObject:[NSNumber numberWithDouble:self.player.duration]
          forKey:MPMediaItemPropertyPlaybackDuration];
         [self updatedNowPlayingInfo];
