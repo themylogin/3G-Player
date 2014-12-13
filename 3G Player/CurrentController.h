@@ -32,6 +32,7 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfter
 - (void)playAtIndex:(long)index;
 - (void)playNextTrack:(BOOL)respectRepeatTrack;
 - (void)playPrevTrack:(BOOL)respectRepeatTrack;
+- (void)handleSeeking:(UIEventSubtype)event;
 - (void)pause;
 
 - (IBAction)handlePlayPauseButtonTouchDown:(id)sender;

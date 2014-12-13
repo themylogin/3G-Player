@@ -937,6 +937,31 @@
     }
 }
 
+- (void)handleSeeking:(UIEventSubtype)event
+{
+    switch (event)
+    {
+        case UIEventSubtypeRemoteControlBeginSeekingBackward:
+            [self.player setEnableRate:YES];
+            [self.player setRate:-10.0];
+            break;
+
+        case UIEventSubtypeRemoteControlBeginSeekingForward:
+            [self.player setEnableRate:YES];
+            [self.player setRate:10.0];
+            break;
+            
+        case UIEventSubtypeRemoteControlEndSeekingBackward:
+        case UIEventSubtypeRemoteControlEndSeekingForward:
+            [self.player setEnableRate:NO];
+            [self.player setRate:1.0];
+            break;
+            
+        default:
+            break;
+    }
+}
+
 - (void)updateCover
 {
     if (self.currentIndex != -1 && self.nowPlayingInfo)
