@@ -695,10 +695,18 @@
         
         if (
             [self.sections count] == 0 ||
-            ![title isEqualToString:[[self.sections lastObject] objectForKey:@"title"]]
+            ![title isEqualToString:[[self.sections lastObject] objectForKey:@"title"]] ||
+            [[file objectForKey:@"track"] integerValue] <
+                [[[self.playlist objectAtIndex:(i - 1)] objectForKey:@"track"] integerValue]
         )
         {
-            if ([self.sections count] > 0 && ![album isEqualToString:@""] && [album isEqualToString:[[self.sections lastObject] objectForKey:@"album"]])
+            if (
+                [self.sections count] > 0 &&
+                ![album isEqualToString:@""] &&
+                [album isEqualToString:[[self.sections lastObject] objectForKey:@"album"]] &&
+                [[file objectForKey:@"track"] integerValue] >=
+                    [[[self.playlist objectAtIndex:(i - 1)] objectForKey:@"track"] integerValue]
+            )
             {
                 [[self.sections lastObject] setObject:album forKey:@"title"];
             }
