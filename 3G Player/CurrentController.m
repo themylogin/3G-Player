@@ -20,9 +20,11 @@
 
 @property (nonatomic)         bool toolbarOpen;
 
-@property (nonatomic)         long lastAddedIndex;
 @property (nonatomic, retain) NSMutableArray* playlist;
 @property (nonatomic, retain) NSMutableArray* sections;
+
+@property (nonatomic)         long lastAddedIndex;
+@property (nonatomic, retain) NSMutableArray* playlistUndoHistory;
 
 @property (nonatomic)         long currentIndex;
 @property (nonatomic, retain) NSDate* playerStartedAt;
@@ -52,9 +54,11 @@
         
         self.toolbarOpen = NO;
         
-        self.lastAddedIndex = -1;
         self.playlist = [[NSMutableArray alloc] init];
         self.sections = [[NSMutableArray alloc] init];
+        
+        self.lastAddedIndex = -1;
+        [self invalidatePlaylistUndoHistory];
         
         self.currentIndex = -1;
         self.player = nil;
@@ -200,6 +204,7 @@
     }
     
     self.lastAddedIndex = index;
+    [self invalidatePlaylistUndoHistory];
     
     [self _playlistChanged];
 }
@@ -232,6 +237,16 @@
 
 - (void)initAtIndex:(long)index atPosition:(NSTimeInterval)position
 {
+    [self initAtIndex:index atPosition:position invalidatingPlaylistUndoHistory:YES];
+}
+
+- (void)initAtIndex:(long)index atPosition:(NSTimeInterval)position invalidatingPlaylistUndoHistory:(BOOL)invalidatePlaylistUndoHistory
+{
+    if (invalidatePlaylistUndoHistory)
+    {
+        [self invalidatePlaylistUndoHistory];
+    }
+    
     [self stop];
     
     self.currentIndex = index;
@@ -398,6 +413,8 @@
     NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
     if (indexPath)
     {
+        [self storePlaylistUndoHistory];
+        
         long index = [self itemIndexForIndexPath:indexPath];
         if (index == self.currentIndex)
         {
@@ -423,6 +440,8 @@
     NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
     if (indexPath)
     {
+        [self storePlaylistUndoHistory];
+        
         NSDictionary* section = [self.sections objectAtIndex:indexPath.section];
         NSArray* files = [section objectForKey:@"files"];
         long firstFile = [[files firstObject] longValue];
@@ -489,6 +508,7 @@
         return;
     }
     
+    [self storePlaylistUndoHistory];
     [self clear];
 }
 
@@ -531,7 +551,9 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [self playAtIndex:[self itemIndexForIndexPath:indexPath]];
+    [self storePlaylistUndoHistory];
+    [self initAtIndex:[self itemIndexForIndexPath:indexPath] atPosition:0 invalidatingPlaylistUndoHistory:NO];
+    [self.player play];
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -958,6 +980,72 @@
         NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
         [scrobbler love:item];
         [self closeToolbar];
+    }
+}
+
+- (void)storePlaylistUndoHistory
+{
+    [self.playlistUndoHistory addObject:
+     [NSDictionary dictionaryWithObjectsAndKeys:[NSMutableArray arrayWithArray:self.playlist], @"playlist",
+      [NSNumber numberWithLong:self.currentIndex], @"index",
+      [NSNumber numberWithDouble:self.player.currentTime], @"position",
+      [NSNumber numberWithBool:self.player.playing], @"playing",
+      nil]];
+    
+    if ([self.playlistUndoHistory count] > 10)
+    {
+        [self.playlistUndoHistory removeObjectAtIndex:0];
+    }
+}
+
+- (void)invalidatePlaylistUndoHistory
+{
+    self.playlistUndoHistory = [[NSMutableArray alloc] init];
+}
+
+- (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer
+{
+    if (recognizer.state == UIGestureRecognizerStateRecognized)
+    {
+        if (recognizer.rotation < -M_PI_4)
+        {
+            if ([self.playlistUndoHistory count] > 0)
+            {
+                NSDictionary* undo = [self.playlistUndoHistory lastObject];
+                
+                NSMutableArray* undoPlaylist = [undo objectForKey:@"playlist"];
+                long undoIndex = [[undo objectForKey:@"index"] intValue];
+                double undoPosition = [[undo objectForKey:@"position"] doubleValue];
+                bool undoWasPlaying = [[undo objectForKey:@"playing"] boolValue];
+                
+                bool currentItemIsEqualToUndoItem = NO;
+                if (self.currentIndex != -1 &&
+                    undoIndex != -1 &&
+                    [[[self.playlist objectAtIndex:self.currentIndex] objectForKey:@"path"] isEqualToString:
+                     [[undoPlaylist objectAtIndex:undoIndex] objectForKey:@"path"]])
+                {
+                    currentItemIsEqualToUndoItem = YES;
+                }
+                
+                self.playlist = undoPlaylist;
+                [self _playlistChanged];
+                
+                [self.playlistUndoHistory removeLastObject];
+                
+                if (currentItemIsEqualToUndoItem)
+                {
+                    self.currentIndex = undoIndex;
+                }
+                else
+                {
+                    [self initAtIndex:undoIndex atPosition:undoPosition invalidatingPlaylistUndoHistory:NO];
+                    if (undoWasPlaying)
+                    {
+                        [self.player play];
+                    }
+                }
+            }
+        }
     }
 }
 

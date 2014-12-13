@@ -181,7 +181,7 @@
 
 - (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer
 {
-    if (recognizer.state == UIGestureRecognizerStateRecognized && recognizer.rotation > M_PI_2)
+    if (recognizer.state == UIGestureRecognizerStateRecognized && recognizer.rotation > M_PI_4)
     {
         bool everythingIsBlacklisted = YES;
         for (NSDictionary* item in self.index)

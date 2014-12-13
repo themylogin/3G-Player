@@ -44,5 +44,6 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfter
 - (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer;
 - (IBAction)handleGoogleButtonTouchDown:(id)sender;
 - (IBAction)handleLoveButtonTouchDown:(id)sender;
+- (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer;
 
 @end

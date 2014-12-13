@@ -128,7 +128,8 @@
             <gestureRecognizers/>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
             <connections>
-                <outletCollection property="gestureRecognizers" destination="209" appends="YES" id="211"/>
+                <outletCollection property="gestureRecognizers" destination="209" appends="YES" id="v8A-sD-gpY"/>
+                <outletCollection property="gestureRecognizers" destination="Kha-BX-sIs" appends="YES" id="PLE-qA-aPd"/>
             </connections>
         </view>
         <swipeGestureRecognizer direction="right" id="50" userLabel="Playlist Right Swipe Gesture Recognizer">
@@ -156,6 +157,11 @@
                 <action selector="handlePinch:" destination="-1" id="210"/>
             </connections>
         </pinchGestureRecognizer>
+        <rotationGestureRecognizer id="Kha-BX-sIs">
+            <connections>
+                <action selector="handleRotation:" destination="-1" id="SVO-9a-bb3"/>
+            </connections>
+        </rotationGestureRecognizer>
     </objects>
     <resources>
         <image name="google.png" width="64" height="64"/>
