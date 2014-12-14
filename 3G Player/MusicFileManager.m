@@ -179,6 +179,7 @@
     NSString* url = [[playerUrl stringByAppendingString:@"/file?path="] stringByAppendingString:[musicFile objectForKey:@"url"]];
     NSString* sizeUrl = [[playerUrl stringByAppendingString:@"/file_size?path="] stringByAppendingString:[musicFile objectForKey:@"url"]];
     NSString* incompletePath = [self incompleteFilePath:musicFile];
+    NSString* destinationPath = [self filePath:musicFile];
     if ([self.fileManager fileExistsAtPath:incompletePath])
     {
         unsigned long long fileSize = [[self.fileManager attributesOfItemAtPath:incompletePath error:nil] fileSize];
@@ -244,7 +245,7 @@
         
         [self stopBufferingRequest];
         
-        [self.fileManager moveItemAtPath:incompletePath toPath:[self filePath:self.bufferingFile] error:nil];
+        [self.fileManager moveItemAtPath:incompletePath toPath:destinationPath error:nil];
         
         self.bufferingFile = nil;
         self.bufferingIsError = false;
