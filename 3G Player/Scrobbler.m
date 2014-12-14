@@ -171,7 +171,8 @@
         
         for (NSDictionary* track in recentTracks)
         {
-            if ([[track objectForKey:@"date"] isKindOfClass:[NSDictionary class]] &&
+            if ([track isKindOfClass:[NSDictionary class]] &&
+                [[track objectForKey:@"date"] isKindOfClass:[NSDictionary class]] &&
                 [[[track objectForKey:@"date"] objectForKey:@"uts"]
                  isEqualToString:[arguments objectForKey:@"timestamp"]])
             {
