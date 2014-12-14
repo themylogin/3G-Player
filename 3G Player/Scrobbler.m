@@ -44,22 +44,9 @@
 
 - (void)sendNowPlaying:(NSDictionary*)file
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{        
-        [self beAuthorized];
-        if (!self.sessionKey)
-        {
-            return;
-        }
-        
-        FMEngine* fmEngine = [[FMEngine alloc] init];
-        [fmEngine dataForMethod:@"track.updateNowPlaying" withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                                          [file objectForKey:@"artist"], @"artist",
-                                                                          [file objectForKey:@"title"], @"track",
-                                                                          self.sessionKey, @"sk",
-                                                                          _LASTFM_API_KEY_, @"api_key",
-                                                                          nil] useSignature:YES httpMethod:POST_TYPE error:nil];
-        [fmEngine release];
-    });
+    [self _queueAction:@"sendNowPlaying"
+              withFile:file
+             arguments:[NSDictionary dictionary]];
 }
 
 - (void)scrobble:(NSDictionary*)file startedAt:(NSDate*)date
@@ -149,6 +136,21 @@
 
 - (BOOL) _performAction:(NSString*)action withArguments:(NSDictionary*)arguments inContext:(NSMutableDictionary*)context
 {
+    if ([action isEqualToString:@"sendNowPlaying"])
+    {
+        FMEngine* fmEngine = [[FMEngine alloc] init];
+        [fmEngine dataForMethod:@"track.updateNowPlaying"
+                 withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
+                                 [arguments objectForKey:@"artist"], @"artist",
+                                 [arguments objectForKey:@"title"], @"track",
+                                 self.sessionKey, @"sk",
+                                 _LASTFM_API_KEY_, @"api_key",
+                                 nil] useSignature:YES httpMethod:POST_TYPE error:nil];
+        [fmEngine release];
+        
+        return YES;
+    }
+    
     if ([action isEqualToString:@"scrobble"])
     {
         NSArray* recentTracks = [context objectForKey:@"recentTracks"];
