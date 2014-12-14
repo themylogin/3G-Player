@@ -47,6 +47,7 @@
     [self _queueAction:@"sendNowPlaying"
               withFile:file
              arguments:[NSDictionary dictionary]];
+    [self flushQueue];
 }
 
 - (void)scrobble:(NSDictionary*)file startedAt:(NSDate*)date
