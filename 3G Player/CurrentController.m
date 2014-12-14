@@ -359,6 +359,9 @@
         self.positionSlider.value = 0;
         self.positionSlider.maximumValue = 0;
         self.positionSlider.enabled = false;
+        
+        self.nowPlayingInfo = nil;
+        [self updatedNowPlayingInfo];
     }
     
     if (self.repeat == RepeatDisabled)
@@ -885,6 +888,7 @@
                 self.player = nil;
             
                 [self.tableView reloadData];
+                [self updateUI];
                 
                 [self bufferMostNecessary];
             
@@ -918,6 +922,7 @@
                 self.player = nil;
                 
                 [self.tableView reloadData];
+                [self updateUI];
                 
                 [self bufferMostNecessary];
                 
@@ -931,6 +936,11 @@
 
 - (void)scrobbleIfNecessary
 {
+    if (self.currentIndex == -1)
+    {
+        return;
+    }
+    
     if ([[NSDate date] timeIntervalSinceDate:self.playerStartedAt] >= MIN(self.player.duration / 2, 240))
     {
         [scrobbler scrobble:[self.playlist objectAtIndex:self.currentIndex] startedAt:self.playerStartedAt];
