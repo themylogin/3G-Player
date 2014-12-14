@@ -108,12 +108,12 @@
     [super viewDidLoad];
     
     CGRect tableViewRect = self.tableView.frame;
-    tableViewRect.size.height -= 100 + 20;
+    tableViewRect.size.height = [UIScreen mainScreen].bounds.size.height - 168;
     self.tableView.frame = tableViewRect;
     
     CGRect toolbarRect = self.toolbar.frame;
     toolbarRect.size.height = 100;
-    toolbarRect.origin.y += 11;
+    toolbarRect.origin.y = tableViewRect.size.height;
     self.toolbar.frame = toolbarRect;
     
     #if TARGET_IPHONE_SIMULATOR
