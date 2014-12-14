@@ -1076,10 +1076,18 @@
                 }
                 else
                 {
-                    [self initAtIndex:undoIndex atPosition:undoPosition invalidatingPlaylistUndoHistory:NO];
-                    if (undoWasPlaying)
+                    if (undoIndex != -1)
                     {
-                        [self.player play];
+                        [self initAtIndex:undoIndex atPosition:undoPosition invalidatingPlaylistUndoHistory:NO];
+                        if (undoWasPlaying)
+                        {
+                            [self.player play];
+                        }
+                    }
+                    else
+                    {
+                        self.currentIndex = -1;
+                        [self.tableView reloadData];
                     }
                 }
             }
