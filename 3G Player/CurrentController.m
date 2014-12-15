@@ -24,6 +24,7 @@
 @property (nonatomic, retain) NSMutableArray* sections;
 
 @property (nonatomic)         long lastAddedIndex;
+@property (nonatomic, retain) NSDate* lastTimeTableTouchedAt;
 @property (nonatomic, retain) NSMutableArray* playlistUndoHistory;
 
 @property (nonatomic)         long currentIndex;
@@ -58,6 +59,7 @@
         self.sections = [[NSMutableArray alloc] init];
         
         self.lastAddedIndex = -1;
+        self.lastTimeTableTouchedAt = nil;
         [self invalidatePlaylistUndoHistory];
         
         self.currentIndex = -1;
@@ -278,6 +280,17 @@
     }
     
     [self.tableView reloadData];
+    if (self.lastTimeTableTouchedAt == nil ||
+        [[NSDate date] timeIntervalSinceDate:self.lastTimeTableTouchedAt] >= 300)
+    {
+        NSIndexPath* indexPath = [self indexPathForIndex:self.currentIndex];
+        if (indexPath)
+        {
+            [self.tableView scrollToRowAtIndexPath:indexPath
+                                  atScrollPosition:UITableViewScrollPositionMiddle
+                                          animated:TRUE];
+        }
+    }
     
     [self bufferMostNecessary];
     [musicFileManager loadCover:item];
@@ -416,6 +429,8 @@
 
 - (IBAction)handlePlaylistRightSwipe:(UISwipeGestureRecognizer*)recognizer
 {
+    self.lastTimeTableTouchedAt = [NSDate date];
+    
     NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
     if (indexPath)
     {
@@ -443,6 +458,8 @@
 
 - (IBAction)handlePlaylistLeftSwipe:(UISwipeGestureRecognizer*)recognizer
 {
+    self.lastTimeTableTouchedAt = [NSDate date];
+    
     NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
     if (indexPath)
     {
@@ -557,6 +574,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    self.lastTimeTableTouchedAt = [NSDate date];
+    
     [self storePlaylistUndoHistory];
     [self initAtIndex:[self itemIndexForIndexPath:indexPath] atPosition:0 invalidatingPlaylistUndoHistory:NO];
     [self.player play];
@@ -607,6 +626,11 @@
     [view.layer insertSublayer:gradient atIndex:0];
     cell.backgroundView = view;
     [view release];
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    self.lastTimeTableTouchedAt = [NSDate date];
 }
 
 #pragma mark - AVAudioPlayer delegate
@@ -805,6 +829,24 @@
 - (NSDictionary*)itemForIndexPath:(NSIndexPath*)indexPath
 {
     return [self.playlist objectAtIndex:[self itemIndexForIndexPath:indexPath]];
+}
+
+- (NSIndexPath*)indexPathForIndex:(long)index
+{
+    long row, section;
+    for (section = 0; section < [self.sections count]; section++)
+    {
+        NSArray* sectionFiles = [[self.sections objectAtIndex:section] objectForKey:@"files"];
+        for (row = 0; row < [sectionFiles count]; row++)
+        {
+            if ([[sectionFiles objectAtIndex:row] longValue] == self.currentIndex)
+            {
+                return [NSIndexPath indexPathForRow:row inSection:section];
+            }
+        }
+    }
+    
+    return nil;
 }
 
 - (void)onMusicFileManagerStateChanged
