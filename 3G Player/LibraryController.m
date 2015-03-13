@@ -61,140 +61,81 @@
 
 - (void)updateLibrary
 {
-    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Update Library", nil)
-                                                    message:NSLocalizedString(@"Should server update its library first?", nil)
-                                                   delegate:self
-                                          cancelButtonTitle:NSLocalizedString(@"Yes", nil)
-                                          otherButtonTitles:NSLocalizedString(@"No", nil), nil];
-    [alert show];
-    [alert release];
-}
-
-- (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    [self doUpdateLibrary:(buttonIndex == 0)];
-}
-
-- (void)doUpdateLibrary:(BOOL)serverShouldUpdate
-{
     updateLibraryButton.enabled = NO;
     self.updateLibraryProgressLabel.text = @"Updating";
     self.toolbarHidden = NO;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        BOOL shouldUpdate = TRUE;
+        NSString* libraryFile = [libraryDirectory stringByAppendingString:@"/library.zip"];
+        [[NSFileManager defaultManager] removeItemAtPath:libraryFile error:nil];
         
-        if (serverShouldUpdate)
+        NSString* revision;
+        NSString* revisionFile = [libraryDirectory stringByAppendingString:@"/revision.txt"];
+        if ([[NSFileManager defaultManager] isReadableFileAtPath:revisionFile])
         {
-            NSURL* updateUrl = [NSURL URLWithString:[playerUrl stringByAppendingString:@"/update"]];
-            ASIHTTPRequest* updateRequest = [ASIHTTPRequest requestWithURL:updateUrl];
-            [updateRequest setAllowCompressedResponse:NO];
-            [updateRequest setShouldContinueWhenAppEntersBackground:YES];
-            [updateRequest setDataReceivedBlock:^(NSData* data){
-                NSString* string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-                NSArray* items = [[string stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]] componentsSeparatedByString:@"\n"];            
-                self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Updating: %@", [items lastObject], nil];
-            }];
-            [updateRequest setTimeOutSeconds:120];
-            [updateRequest startSynchronous];        
-            if ([updateRequest error] || [updateRequest responseStatusCode] != 200)
-            {
-                shouldUpdate = FALSE;
-                
-                NSString* errorDescription;
-                if ([updateRequest error])
-                {
-                    errorDescription = [[updateRequest error] localizedDescription];
-                }
-                else
-                {
-                    errorDescription = [updateRequest responseStatusMessage];
-                }
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Server library update error", nil)
-                                                                    message:errorDescription
-                                                                   delegate:nil
-                                                          cancelButtonTitle:NSLocalizedString(@"OK", nil)
-                                                          otherButtonTitles:nil];
-                    [alert show];
-                });
-            }
+            revision = [NSString stringWithContentsOfFile:revisionFile encoding:NSUTF8StringEncoding error:nil];
+        }
+        else
+        {
+            revision = @"";
         }
         
-        if (shouldUpdate)
+        NSURL* libraryUrl = [NSURL URLWithString:[playerUrl stringByAppendingString:[NSString stringWithFormat:@"/library?revision=%@", revision, nil]]];
+        ASIFormDataRequest* libraryRequest = [ASIFormDataRequest requestWithURL:libraryUrl];
+        [libraryRequest setShouldContinueWhenAppEntersBackground:YES];
+        [libraryRequest setDownloadDestinationPath:libraryFile];
+        [libraryRequest setBytesSentBlock:^(unsigned long long size, unsigned long long total) {
+            self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Sending library request: (%.0f%%)", (float)size / total * 100, nil];
+        }];
+        [libraryRequest setBytesReceivedBlock:^(unsigned long long size, unsigned long long total) {
+            self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Receiving library: (%.0f%%)", (float)size / total * 100, nil];
+        }];
+        [libraryRequest setTimeOutSeconds:120];
+        [libraryRequest startSynchronous];
+        if ([libraryRequest error] || [libraryRequest responseStatusCode] != 200)
         {
-            NSString* libraryFile = [libraryDirectory stringByAppendingString:@"/library.zip"];
-            [[NSFileManager defaultManager] removeItemAtPath:libraryFile error:nil];
-            
-            NSString* revision;
-            NSString* revisionFile = [libraryDirectory stringByAppendingString:@"/revision.txt"];
-            if ([[NSFileManager defaultManager] isReadableFileAtPath:revisionFile])
+            NSString* errorDescription;
+            if ([libraryRequest error])
             {
-                revision = [NSString stringWithContentsOfFile:revisionFile encoding:NSUTF8StringEncoding error:nil];
+                errorDescription = [[libraryRequest error] localizedDescription];
             }
             else
             {
-                revision = @"";
+                errorDescription = [libraryRequest responseStatusMessage];
             }
             
-            NSURL* libraryUrl = [NSURL URLWithString:[playerUrl stringByAppendingString:[NSString stringWithFormat:@"/library?revision=%@", revision, nil]]];
-            ASIFormDataRequest* libraryRequest = [ASIFormDataRequest requestWithURL:libraryUrl];
-            [libraryRequest setShouldContinueWhenAppEntersBackground:YES];
-            [libraryRequest setDownloadDestinationPath:libraryFile];
-            [libraryRequest setBytesSentBlock:^(unsigned long long size, unsigned long long total) {
-                self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Sending library request: (%.0f%%)", (float)size / total * 100, nil];
-            }];
-            [libraryRequest setBytesReceivedBlock:^(unsigned long long size, unsigned long long total) {
-                self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Receiving library: (%.0f%%)", (float)size / total * 100, nil];
-            }];
-            [libraryRequest setTimeOutSeconds:120];
-            [libraryRequest startSynchronous];
-            if ([libraryRequest error] || [libraryRequest responseStatusCode] != 200)
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Library update error", nil)
+                                                                message:errorDescription
+                                                               delegate:nil
+                                                      cancelButtonTitle:NSLocalizedString(@"OK", nil)
+                                                      otherButtonTitles:nil];
+                [alert show];
+            });
+        }
+        else
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Unpacking"];
+            });
+            ZipArchive* zipArchive = [[ZipArchive alloc] init];
+            [zipArchive UnzipOpenFile:libraryFile];
+            [zipArchive UnzipFileTo:libraryDirectory overWrite:YES];
+            [zipArchive UnzipCloseFile];
+            [zipArchive release];
+                        
+            [[NSFileManager defaultManager] removeItemAtPath:libraryFile error:nil];            
+            
+            NSString* deleteDirectoriesFile = [libraryDirectory stringByAppendingString:@"/delete_directories.txt"];
+            NSArray* deleteDirectories = [[NSString stringWithContentsOfFile:deleteDirectoriesFile encoding:NSASCIIStringEncoding error:nil] componentsSeparatedByString:@"\n"];
+            for (NSString* directory in deleteDirectories)
             {
-                NSString* errorDescription;
-                if ([libraryRequest error])
+                if (![directory isEqualToString:@""])
                 {
-                    errorDescription = [[libraryRequest error] localizedDescription];
+                    [[NSFileManager defaultManager] removeItemAtPath:[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:directory] error:nil];                    
                 }
-                else
-                {
-                    errorDescription = [libraryRequest responseStatusMessage];
-                }
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Library update error", nil)
-                                                                    message:errorDescription
-                                                                   delegate:nil
-                                                          cancelButtonTitle:NSLocalizedString(@"OK", nil)
-                                                          otherButtonTitles:nil];
-                    [alert show];
-                });
             }
-            else
-            {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Unpacking"];
-                });
-                ZipArchive* zipArchive = [[ZipArchive alloc] init];
-                [zipArchive UnzipOpenFile:libraryFile];
-                [zipArchive UnzipFileTo:libraryDirectory overWrite:YES];
-                [zipArchive UnzipCloseFile];
-                [zipArchive release];
-                            
-                [[NSFileManager defaultManager] removeItemAtPath:libraryFile error:nil];            
-                
-                NSString* deleteDirectoriesFile = [libraryDirectory stringByAppendingString:@"/delete_directories.txt"];
-                NSArray* deleteDirectories = [[NSString stringWithContentsOfFile:deleteDirectoriesFile encoding:NSASCIIStringEncoding error:nil] componentsSeparatedByString:@"\n"];
-                for (NSString* directory in deleteDirectories)
-                {
-                    if (![directory isEqualToString:@""])
-                    {
-                        [[NSFileManager defaultManager] removeItemAtPath:[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:directory] error:nil];                    
-                    }
-                }
-                [[NSFileManager defaultManager] removeItemAtPath:deleteDirectoriesFile error:nil];
-            }
+            [[NSFileManager defaultManager] removeItemAtPath:deleteDirectoriesFile error:nil];
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
