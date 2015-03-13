@@ -225,11 +225,11 @@
                                                                                      authToken, @"authToken",
                                                                                      _LASTFM_API_KEY_, @"api_key",
                                                                                      nil] useSignature:YES httpMethod:POST_TYPE error:nil];
+    [fmEngine release];
     if (reply)
     {
         self.sessionKey = [[[[JSONDecoder decoder] objectWithData:reply] objectForKey:@"session"] objectForKey:@"key"];
     }
-    [fmEngine release];
 }
 
 - (NSArray*)getRecentTracks
@@ -239,6 +239,7 @@
                                                                                     self.sessionKeyUsername, @"user",
                                                                                     _LASTFM_API_KEY_, @"api_key",
                                                                                     nil] useSignature:NO httpMethod:GET_TYPE error:nil];
+    [fmEngine release];
     if (reply)
     {
         NSDictionary* recentScrobbles = [[JSONDecoder decoder] objectWithData:reply];
@@ -261,6 +262,7 @@
                                                                               self.sessionKey, @"sk",
                                                                               _LASTFM_API_KEY_, @"api_key",
                                                                               nil] useSignature:YES httpMethod:POST_TYPE error:nil];
+    [fmEngine release];
     if (reply)
     {
         NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
