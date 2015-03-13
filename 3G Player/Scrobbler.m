@@ -47,7 +47,6 @@
     [self _queueAction:@"sendNowPlaying"
               withFile:file
              arguments:[NSDictionary dictionary]];
-    [self flushQueue];
 }
 
 - (void)scrobble:(NSDictionary*)file startedAt:(NSDate*)date
@@ -57,7 +56,6 @@
              arguments:[NSDictionary dictionaryWithObject:
                         [NSString stringWithFormat:@"%d", (int)[date timeIntervalSince1970]]
                                                    forKey:@"timestamp"]];
-    [self flushQueue];
 }
 
 - (void)love:(NSDictionary*)file
@@ -65,7 +63,6 @@
     [self _queueAction:@"love"
               withFile:file
              arguments:[NSDictionary dictionary]];
-    [self flushQueue];
 }
 
 - (void) _queueAction:(NSString*)action withFile:(NSDictionary*)file arguments:(NSDictionary*)arguments
