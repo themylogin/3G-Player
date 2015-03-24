@@ -170,6 +170,13 @@ dispatch_queue_t serverSocketQueue;
                 [controllers.current playNextTrack:FALSE];
                 break;
                 
+            case UIEventSubtypeRemoteControlBeginSeekingBackward:
+            case UIEventSubtypeRemoteControlEndSeekingBackward:
+            case UIEventSubtypeRemoteControlBeginSeekingForward:
+            case UIEventSubtypeRemoteControlEndSeekingForward:
+                [controllers.current handleSeeking:receivedEvent.subtype];
+                break;
+                
             default:
                 break;
         }

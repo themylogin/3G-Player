@@ -10,11 +10,12 @@
 
 #import <AVFoundation/AVFoundation.h>
 
-typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack } AddMode;
+typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfterJustAdded } AddMode;
 
 @interface CurrentController : UIViewController <AVAudioPlayerDelegate>
 
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
+@property (nonatomic, retain) IBOutlet UIView* toolbar;
 @property (nonatomic, retain) IBOutlet UIButton* playPauseButton;
 @property (nonatomic, retain) IBOutlet UISlider* positionSlider;
 @property (nonatomic, retain) IBOutlet UILabel* elapsedLabel;
@@ -24,20 +25,26 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack } AddMode
 
 @property (nonatomic, retain) AVAudioPlayer* player;
 
+- (BOOL)canAddAfterAdded;
 - (void)addFiles:(NSArray*)files mode:(AddMode)addMode;
 - (void)clear;
 
 - (void)playAtIndex:(long)index;
 - (void)playNextTrack:(BOOL)respectRepeatTrack;
 - (void)playPrevTrack:(BOOL)respectRepeatTrack;
+- (void)handleSeeking:(UIEventSubtype)event;
 - (void)pause;
 
 - (IBAction)handlePlayPauseButtonTouchDown:(id)sender;
 - (IBAction)handlePositionSliderTouchUpInside:(id)sender;
 - (IBAction)handleRepeatButtonTouchDown:(id)sender;
-- (IBAction)handlePlaylistSwipe:(UISwipeGestureRecognizer*)recognizer;
+- (IBAction)handlePlaylistRightSwipe:(UISwipeGestureRecognizer*)recognizer;
+- (IBAction)handlePlaylistLeftSwipe:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handleToolbarSwipeUp:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handleToolbarSwipeDown:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer;
+- (IBAction)handleGoogleButtonTouchDown:(id)sender;
+- (IBAction)handleLoveButtonTouchDown:(id)sender;
+- (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer;
 
 @end

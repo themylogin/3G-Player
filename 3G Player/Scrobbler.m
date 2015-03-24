@@ -44,22 +44,9 @@
 
 - (void)sendNowPlaying:(NSDictionary*)file
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{        
-        [self beAuthorized];
-        if (!self.sessionKey)
-        {
-            return;
-        }
-        
-        FMEngine* fmEngine = [[FMEngine alloc] init];
-        [fmEngine dataForMethod:@"track.updateNowPlaying" withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                                          [file objectForKey:@"artist"], @"artist",
-                                                                          [file objectForKey:@"title"], @"track",
-                                                                          self.sessionKey, @"sk",
-                                                                          _LASTFM_API_KEY_, @"api_key",
-                                                                          nil] useSignature:YES httpMethod:POST_TYPE error:nil];
-        [fmEngine release];
-    });
+    [self _queueAction:@"sendNowPlaying"
+              withFile:file
+             arguments:[NSDictionary dictionary]];
 }
 
 - (void)scrobble:(NSDictionary*)file startedAt:(NSDate*)date
@@ -69,7 +56,6 @@
              arguments:[NSDictionary dictionaryWithObject:
                         [NSString stringWithFormat:@"%d", (int)[date timeIntervalSince1970]]
                                                    forKey:@"timestamp"]];
-    [self flushQueue];
 }
 
 - (void)love:(NSDictionary*)file
@@ -77,7 +63,6 @@
     [self _queueAction:@"love"
               withFile:file
              arguments:[NSDictionary dictionary]];
-    [self flushQueue];
 }
 
 - (void) _queueAction:(NSString*)action withFile:(NSDictionary*)file arguments:(NSDictionary*)arguments
@@ -149,6 +134,21 @@
 
 - (BOOL) _performAction:(NSString*)action withArguments:(NSDictionary*)arguments inContext:(NSMutableDictionary*)context
 {
+    if ([action isEqualToString:@"sendNowPlaying"])
+    {
+        FMEngine* fmEngine = [[FMEngine alloc] init];
+        [fmEngine dataForMethod:@"track.updateNowPlaying"
+                 withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
+                                 [arguments objectForKey:@"artist"], @"artist",
+                                 [arguments objectForKey:@"title"], @"track",
+                                 self.sessionKey, @"sk",
+                                 _LASTFM_API_KEY_, @"api_key",
+                                 nil] useSignature:YES httpMethod:POST_TYPE error:nil];
+        [fmEngine release];
+        
+        return YES;
+    }
+    
     if ([action isEqualToString:@"scrobble"])
     {
         NSArray* recentTracks = [context objectForKey:@"recentTracks"];
@@ -168,7 +168,9 @@
         
         for (NSDictionary* track in recentTracks)
         {
-            if ([[[track objectForKey:@"date"] objectForKey:@"uts"]
+            if ([track isKindOfClass:[NSDictionary class]] &&
+                [[track objectForKey:@"date"] isKindOfClass:[NSDictionary class]] &&
+                [[[track objectForKey:@"date"] objectForKey:@"uts"]
                  isEqualToString:[arguments objectForKey:@"timestamp"]])
             {
                 return YES;
@@ -223,11 +225,11 @@
                                                                                      authToken, @"authToken",
                                                                                      _LASTFM_API_KEY_, @"api_key",
                                                                                      nil] useSignature:YES httpMethod:POST_TYPE error:nil];
+    [fmEngine release];
     if (reply)
     {
         self.sessionKey = [[[[JSONDecoder decoder] objectWithData:reply] objectForKey:@"session"] objectForKey:@"key"];
     }
-    [fmEngine release];
 }
 
 - (NSArray*)getRecentTracks
@@ -237,6 +239,7 @@
                                                                                     self.sessionKeyUsername, @"user",
                                                                                     _LASTFM_API_KEY_, @"api_key",
                                                                                     nil] useSignature:NO httpMethod:GET_TYPE error:nil];
+    [fmEngine release];
     if (reply)
     {
         NSDictionary* recentScrobbles = [[JSONDecoder decoder] objectWithData:reply];
@@ -259,6 +262,7 @@
                                                                               self.sessionKey, @"sk",
                                                                               _LASTFM_API_KEY_, @"api_key",
                                                                               nil] useSignature:YES httpMethod:POST_TYPE error:nil];
+    [fmEngine release];
     if (reply)
     {
         NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];

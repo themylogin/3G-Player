@@ -16,6 +16,7 @@
 
 static char const* const ALERTVIEW = "ALERTVIEW";
 static char const* const ADD_MODE = "ADD_MODE";
+static char const* const BUTTONS = "BUTTONS";
 static char const* const DIRECTORY = "DIRECTORY";
 static char const* const ITEM = "ITEM";
 static char const* const PLAY_AFTER = "PLAY_AFTER";
@@ -88,7 +89,7 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     return cell;
 }
 
-- (void)showActionSheetForItem:(NSDictionary*)item inView:(UIView*)view
+- (void)showActionSheetForItem:(NSDictionary*)item inView:(UIView*)view withExtraButtons:(int)extraButtons;
 {
     if ([self isBlacklisted:item])
     {
@@ -106,17 +107,44 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     
     UIActionSheet* actionSheet = [[UIActionSheet alloc] initWithTitle:[item objectForKey:@"name"]
                                                              delegate:self
-                                                    cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
+                                                    cancelButtonTitle:nil
                                                destructiveButtonTitle:nil
-                                                    otherButtonTitles:NSLocalizedString(@"Replace", nil),
-                                  NSLocalizedString(@"Replace and play", nil),
-                                  NSLocalizedString(@"Add", nil),
-                                  NSLocalizedString(@"Add after current album", nil),
-                                  NSLocalizedString(@"Add after current track", nil),
-                                  NSLocalizedString(@"Blacklist", nil),
-                                  NSLocalizedString(@"Delete", nil),
-                                  nil];
-    actionSheet.destructiveButtonIndex = 6;
+                                                    otherButtonTitles:nil];
+    NSMutableArray* buttons = [[NSMutableArray alloc] init];
+    
+    [actionSheet addButtonWithTitle:NSLocalizedString(@"Replace", nil)];
+    [buttons addObject:@"REPLACE"];
+    
+    [actionSheet addButtonWithTitle:NSLocalizedString(@"Replace and play", nil)];
+    [buttons addObject:@"REPLACE_AND_PLAY"];
+    
+    [actionSheet addButtonWithTitle:NSLocalizedString(@"Add", nil)];
+    [buttons addObject:@"ADD"];
+    
+    [actionSheet addButtonWithTitle:NSLocalizedString(@"Add after current album", nil)];
+    [buttons addObject:@"ADD_AFTER_ALBUM"];
+    
+    [actionSheet addButtonWithTitle:NSLocalizedString(@"Add after current track", nil)];
+    [buttons addObject:@"ADD_AFTER_TRACK"];
+    
+    if ([controllers.current canAddAfterAdded])
+    {
+        [actionSheet addButtonWithTitle:NSLocalizedString(@"Add after just added", nil)];
+        [buttons addObject:@"ADD_AFTER_ADDED"];
+    }
+    
+    if (extraButtons & BlacklistExtraButton)
+    {
+        [actionSheet addButtonWithTitle:NSLocalizedString(@"Blacklist", nil)];
+        [buttons addObject:@"BLACKLIST"];
+    }
+    
+    [buttons addObject:@"DELETE"];
+    actionSheet.destructiveButtonIndex = [actionSheet addButtonWithTitle:NSLocalizedString(@"Delete", nil)];
+    
+    actionSheet.cancelButtonIndex = [actionSheet addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
+    
+    objc_setAssociatedObject(actionSheet, BUTTONS, buttons, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     objc_setAssociatedObject(actionSheet, ITEM, item, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     [actionSheet showInView:[view window]];
     [actionSheet release];
@@ -126,23 +154,17 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
 
 - (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    const int REPLACE           = 0;
-    const int REPLACE_AND_PLAY  = 1;
-    const int ADD __unused      = 2;
-    const int ADD_AFTER_ALBUM   = 3;
-    const int ADD_AFTER_TRACK   = 4;
-    const int BLACKLIST         = 5;
-    const int DELETE            = 6;
-    const int CANCEL            = 7;
-    
-    if (buttonIndex == CANCEL)
+    NSArray* buttons = objc_getAssociatedObject(actionSheet, BUTTONS);
+    if (buttonIndex >= [buttons count])
     {
         return;
     }
     
+    NSString* button = [buttons objectAtIndex:buttonIndex];    
+    
     NSDictionary* item = objc_getAssociatedObject(actionSheet, ITEM);
     
-    if (buttonIndex == DELETE)
+    if ([button isEqualToString:@"DELETE"])
     {
         UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Question", nil)
                                                         message:[NSString stringWithFormat:NSLocalizedString(@"Delete «%@»?", nil), [item objectForKey:@"name"]]
@@ -156,28 +178,32 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
         return;
     }
     
-    if (buttonIndex == BLACKLIST)
+    if ([button isEqualToString:@"BLACKLIST"])
     {
         [self blacklistItem:item];
         return;
     }
     
-    if (buttonIndex == REPLACE || buttonIndex == REPLACE_AND_PLAY)
+    if ([button isEqualToString:@"REPLACE"] || [button isEqualToString:@"REPLACE_AND_PLAY"])
     {
         [controllers.current clear];
     }
     
     AddMode addMode = AddToTheEnd;
-    if (buttonIndex == ADD_AFTER_ALBUM)
+    if ([button isEqualToString:@"ADD_AFTER_ALBUM"])
     {
         addMode = AddAfterCurrentAlbum;
     }
-    if (buttonIndex == ADD_AFTER_TRACK)
+    if ([button isEqualToString:@"ADD_AFTER_TRACK"])
     {
         addMode = AddAfterCurrentTrack;
     }
+    if ([button isEqualToString:@"ADD_AFTER_ADDED"])
+    {
+        addMode = AddAfterJustAdded;
+    }
     
-    [self addItemToPlaylist:item mode:addMode playAfter:buttonIndex == REPLACE_AND_PLAY];
+    [self addItemToPlaylist:item mode:addMode playAfter:[button isEqualToString:@"REPLACE_AND_PLAY"]];
 }
 
 - (void)addItemToPlaylist:(NSDictionary*)item mode:(AddMode)addMode playAfter:(BOOL)playAfter

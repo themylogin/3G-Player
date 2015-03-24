@@ -14,10 +14,12 @@
 
 @interface MusicTableService : NSObject <UIActionSheetDelegate>
 
+typedef enum { BlacklistExtraButton } ExtraButtons;
+
 - (id)init;
 
 - (UITableViewCell*)cellForMusicItem:(NSDictionary*)item tableView:(UITableView *)tableView;
-- (void)showActionSheetForItem:(NSDictionary*)item inView:(UIView*)view;
+- (void)showActionSheetForItem:(NSDictionary*)item inView:(UIView*)view withExtraButtons:(int)extraButtons;
 
 - (void)addItemToPlaylist:(NSDictionary*)item mode:(AddMode)addMode playAfter:(BOOL)playAfter;
 - (NSMutableArray*)readRecentsFile;

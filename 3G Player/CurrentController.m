@@ -18,8 +18,14 @@
 
 @interface CurrentController ()
 
+@property (nonatomic)         bool toolbarOpen;
+
 @property (nonatomic, retain) NSMutableArray* playlist;
 @property (nonatomic, retain) NSMutableArray* sections;
+
+@property (nonatomic)         long lastAddedIndex;
+@property (nonatomic, retain) NSDate* lastTimeTableTouchedAt;
+@property (nonatomic, retain) NSMutableArray* playlistUndoHistory;
 
 @property (nonatomic)         long currentIndex;
 @property (nonatomic, retain) NSDate* playerStartedAt;
@@ -47,8 +53,14 @@
         self.tabBarItem.title = NSLocalizedString(@"Current", NIL);
         self.tabBarItem.image = [UIImage imageNamed:@"tabbar_current.png"];
         
+        self.toolbarOpen = NO;
+        
         self.playlist = [[NSMutableArray alloc] init];
         self.sections = [[NSMutableArray alloc] init];
+        
+        self.lastAddedIndex = -1;
+        self.lastTimeTableTouchedAt = nil;
+        [self invalidatePlaylistUndoHistory];
         
         self.currentIndex = -1;
         self.player = nil;
@@ -97,7 +109,20 @@
 {
     [super viewDidLoad];
     
-    MPVolumeView* volumeView = [[MPVolumeView alloc] initWithFrame:self.volumeView.bounds];
+    CGRect tableViewRect = self.tableView.frame;
+    tableViewRect.size.height = [UIScreen mainScreen].bounds.size.height - 168;
+    self.tableView.frame = tableViewRect;
+    
+    CGRect toolbarRect = self.toolbar.frame;
+    toolbarRect.size.height = 100;
+    toolbarRect.origin.y = tableViewRect.size.height;
+    self.toolbar.frame = toolbarRect;
+    
+    #if TARGET_IPHONE_SIMULATOR
+        UISlider* volumeView = [[UISlider alloc] initWithFrame:self.volumeView.bounds];
+    #else
+        MPVolumeView* volumeView = [[MPVolumeView alloc] initWithFrame:self.volumeView.bounds];
+    #endif
     [self.volumeView addSubview:volumeView];
     [volumeView release];
     
@@ -133,6 +158,11 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (BOOL)canAddAfterAdded
+{
+    return self.lastAddedIndex != -1;
+}
+
 - (void)addFiles:(NSArray*)files mode:(AddMode)addMode
 {
     long index = [self.playlist count];
@@ -143,7 +173,7 @@
             BOOL isCurrentSection = NO;
             for (NSNumber* nsi in [section objectForKey:@"files"])
             {
-                int i = [nsi intValue];
+                long i = [nsi longValue];
                 
                 if (i == self.currentIndex)
                 {
@@ -164,6 +194,10 @@
     {
         index = self.currentIndex + 1;
     }
+    if (addMode == AddAfterJustAdded && self.lastAddedIndex != -1)
+    {
+        index = self.lastAddedIndex;
+    }
     
     for (NSDictionary* file in files)
     {
@@ -171,24 +205,19 @@
         index++;
     }
     
+    self.lastAddedIndex = index;
+    [self invalidatePlaylistUndoHistory];
+    
     [self _playlistChanged];
 }
 
 - (void)clear
-{    
-    if (self.player)
-    {
-        if (self.player.playing)
-        {
-            [self scrobbleIfNecessary];
-        }
-        
-        [self.player stop];
-        self.player = nil;
-    }
+{
+    [self stop];
     
     [musicFileManager stopBuffering];
     
+    self.lastAddedIndex = -1;
     [self.playlist removeAllObjects];
     [self _playlistChanged];
     
@@ -210,16 +239,17 @@
 
 - (void)initAtIndex:(long)index atPosition:(NSTimeInterval)position
 {
-    if (self.player)
+    [self initAtIndex:index atPosition:position invalidatingPlaylistUndoHistory:YES];
+}
+
+- (void)initAtIndex:(long)index atPosition:(NSTimeInterval)position invalidatingPlaylistUndoHistory:(BOOL)invalidatePlaylistUndoHistory
+{
+    if (invalidatePlaylistUndoHistory)
     {
-        if (self.player.playing)
-        {
-            [self scrobbleIfNecessary];
-        }
-        
-        [self.player stop];
-        self.player = nil;
+        [self invalidatePlaylistUndoHistory];
     }
+    
+    [self stop];
     
     self.currentIndex = index;
     NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
@@ -250,6 +280,17 @@
     }
     
     [self.tableView reloadData];
+    if (self.lastTimeTableTouchedAt == nil ||
+        [[NSDate date] timeIntervalSinceDate:self.lastTimeTableTouchedAt] >= 300)
+    {
+        NSIndexPath* indexPath = [self indexPathForIndex:self.currentIndex];
+        if (indexPath)
+        {
+            [self.tableView scrollToRowAtIndexPath:indexPath
+                                  atScrollPosition:UITableViewScrollPositionMiddle
+                                          animated:TRUE];
+        }
+    }
     
     [self bufferMostNecessary];
     [musicFileManager loadCover:item];
@@ -259,6 +300,23 @@
 {
     [self saveState];
     [self.player pause];
+}
+
+- (void)stop
+{
+    if (self.player)
+    {
+        if (self.player.playing)
+        {
+            [self scrobbleIfNecessary];
+        }
+        
+        [self.player stop];
+        
+        self.player = nil;
+        
+        [self updateUI];
+    }
 }
 
 - (void)periodic
@@ -290,6 +348,9 @@
         }
         
         [self.nowPlayingInfo
+         setObject:[NSNumber numberWithDouble:self.player.currentTime]
+         forKey:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+        [self.nowPlayingInfo
          setObject:[NSNumber numberWithDouble:self.player.duration]
          forKey:MPMediaItemPropertyPlaybackDuration];
         [self updatedNowPlayingInfo];
@@ -311,6 +372,9 @@
         self.positionSlider.value = 0;
         self.positionSlider.maximumValue = 0;
         self.positionSlider.enabled = false;
+        
+        self.nowPlayingInfo = nil;
+        [self updatedNowPlayingInfo];
     }
     
     if (self.repeat == RepeatDisabled)
@@ -363,35 +427,102 @@
     [self updateUI];
 }
 
-- (IBAction)handlePlaylistSwipe:(UISwipeGestureRecognizer*)recognizer
+- (IBAction)handlePlaylistRightSwipe:(UISwipeGestureRecognizer*)recognizer
 {
+    self.lastTimeTableTouchedAt = [NSDate date];
+    
     NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
     if (indexPath)
     {
+        [self storePlaylistUndoHistory];
+        
         long index = [self itemIndexForIndexPath:indexPath];
-        if (index < self.currentIndex)
+        if (index == self.currentIndex)
+        {
+            [self stop];
+            if (self.currentIndex + 1 < [self.playlist count])
+            {
+                [self playAtIndex:self.currentIndex + 1];
+                self.currentIndex--;
+            }
+        }
+        else if (index < self.currentIndex)
         {
             self.currentIndex--;
         }
-        else if (index == self.currentIndex)
-        {
-            return;
-        }
+        self.lastAddedIndex = -1;
         [self.playlist removeObjectAtIndex:index];
+        [self _playlistChanged];
+    }
+}
+
+- (IBAction)handlePlaylistLeftSwipe:(UISwipeGestureRecognizer*)recognizer
+{
+    self.lastTimeTableTouchedAt = [NSDate date];
+    
+    NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
+    if (indexPath)
+    {
+        [self storePlaylistUndoHistory];
+        
+        NSDictionary* section = [self.sections objectAtIndex:indexPath.section];
+        NSArray* files = [section objectForKey:@"files"];
+        long firstFile = [[files firstObject] longValue];
+        long lastFile = [[files lastObject] longValue];
+        if (firstFile <= self.currentIndex && self.currentIndex <= lastFile)
+        {
+            for (NSNumber* nsi in [section objectForKey:@"files"])
+            {
+                if ([nsi longValue] == self.currentIndex)
+                {
+                    [self stop];
+                    if (indexPath.section + 1 < [self.sections count])
+                    {
+                        [self playAtIndex:[[[[self.sections objectAtIndex:indexPath.section + 1]
+                                             objectForKey:@"files"]
+                                            objectAtIndex:0]
+                                           longValue]];
+                        self.currentIndex -= [files count];
+                    }
+                }
+            }
+        }
+        else if (firstFile < self.currentIndex)
+        {
+            self.currentIndex -= [files count];
+        }
+        self.lastAddedIndex = -1;
+        [self.playlist removeObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(firstFile, lastFile - firstFile + 1)]];
         [self _playlistChanged];
     }
 }
 
 - (IBAction)handleToolbarSwipeUp:(UISwipeGestureRecognizer*)recognizer
 {
-    
+    if (!self.toolbarOpen)
+    {
+        self.toolbarOpen = YES;
+        [UIView animateWithDuration:0.5f animations:^{
+            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, -80);
+        }];
+    }
 }
 
 - (IBAction)handleToolbarSwipeDown:(UISwipeGestureRecognizer*)recognizer
 {
-    
+    [self closeToolbar];
 }
 
+- (void)closeToolbar
+{
+    if (self.toolbarOpen)
+    {
+        self.toolbarOpen = NO;
+        [UIView animateWithDuration:0.5f animations:^{
+            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, 80);
+        }];
+    }
+}
 
 - (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer
 {
@@ -400,6 +531,7 @@
         return;
     }
     
+    [self storePlaylistUndoHistory];
     [self clear];
 }
 
@@ -442,7 +574,11 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [self playAtIndex:[self itemIndexForIndexPath:indexPath]];
+    self.lastTimeTableTouchedAt = [NSDate date];
+    
+    [self storePlaylistUndoHistory];
+    [self initAtIndex:[self itemIndexForIndexPath:indexPath] atPosition:0 invalidatingPlaylistUndoHistory:NO];
+    [self.player play];
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -490,6 +626,11 @@
     [view.layer insertSublayer:gradient atIndex:0];
     cell.backgroundView = view;
     [view release];
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    self.lastTimeTableTouchedAt = [NSDate date];
 }
 
 #pragma mark - AVAudioPlayer delegate
@@ -580,7 +721,7 @@
 {
     [self.sections removeAllObjects];
 
-    for (int i = 0; i < [self.playlist count]; i++)
+    for (long i = 0; i < [self.playlist count]; i++)
     {
         NSDictionary* file = [self.playlist objectAtIndex:i];
         
@@ -606,10 +747,18 @@
         
         if (
             [self.sections count] == 0 ||
-            ![title isEqualToString:[[self.sections lastObject] objectForKey:@"title"]]
+            ![title isEqualToString:[[self.sections lastObject] objectForKey:@"title"]] ||
+            [[file objectForKey:@"track"] integerValue] <
+                [[[self.playlist objectAtIndex:(i - 1)] objectForKey:@"track"] integerValue]
         )
         {
-            if ([self.sections count] > 0 && ![album isEqualToString:@""] && [album isEqualToString:[[self.sections lastObject] objectForKey:@"album"]])
+            if (
+                [self.sections count] > 0 &&
+                ![album isEqualToString:@""] &&
+                [album isEqualToString:[[self.sections lastObject] objectForKey:@"album"]] &&
+                [[file objectForKey:@"track"] integerValue] >=
+                    [[[self.playlist objectAtIndex:(i - 1)] objectForKey:@"track"] integerValue]
+            )
             {
                 [[self.sections lastObject] setObject:album forKey:@"title"];
             }
@@ -619,7 +768,7 @@
             }
         }
         
-        [[[self.sections lastObject] objectForKey:@"files"] addObject:[NSNumber numberWithInt:i]];
+        [[[self.sections lastObject] objectForKey:@"files"] addObject:[NSNumber numberWithLong:i]];
     }
     
     [self.tableView reloadData];
@@ -674,12 +823,30 @@
 
 - (long)itemIndexForIndexPath:(NSIndexPath*)indexPath
 {
-    return [[[[self.sections objectAtIndex:indexPath.section] objectForKey:@"files"] objectAtIndex:indexPath.row] integerValue];
+    return [[[[self.sections objectAtIndex:indexPath.section] objectForKey:@"files"] objectAtIndex:indexPath.row] longValue];
 }
 
 - (NSDictionary*)itemForIndexPath:(NSIndexPath*)indexPath
 {
     return [self.playlist objectAtIndex:[self itemIndexForIndexPath:indexPath]];
+}
+
+- (NSIndexPath*)indexPathForIndex:(long)index
+{
+    long row, section;
+    for (section = 0; section < [self.sections count]; section++)
+    {
+        NSArray* sectionFiles = [[self.sections objectAtIndex:section] objectForKey:@"files"];
+        for (row = 0; row < [sectionFiles count]; row++)
+        {
+            if ([[sectionFiles objectAtIndex:row] longValue] == self.currentIndex)
+            {
+                return [NSIndexPath indexPathForRow:row inSection:section];
+            }
+        }
+    }
+    
+    return nil;
 }
 
 - (void)onMusicFileManagerStateChanged
@@ -763,6 +930,7 @@
                 self.player = nil;
             
                 [self.tableView reloadData];
+                [self updateUI];
                 
                 [self bufferMostNecessary];
             
@@ -796,6 +964,7 @@
                 self.player = nil;
                 
                 [self.tableView reloadData];
+                [self updateUI];
                 
                 [self bufferMostNecessary];
                 
@@ -809,9 +978,39 @@
 
 - (void)scrobbleIfNecessary
 {
+    if (self.currentIndex == -1)
+    {
+        return;
+    }
+    
     if ([[NSDate date] timeIntervalSinceDate:self.playerStartedAt] >= MIN(self.player.duration / 2, 240))
     {
         [scrobbler scrobble:[self.playlist objectAtIndex:self.currentIndex] startedAt:self.playerStartedAt];
+    }
+}
+
+- (void)handleSeeking:(UIEventSubtype)event
+{
+    switch (event)
+    {
+        case UIEventSubtypeRemoteControlBeginSeekingBackward:
+            [self.player setEnableRate:YES];
+            [self.player setRate:-10.0];
+            break;
+
+        case UIEventSubtypeRemoteControlBeginSeekingForward:
+            [self.player setEnableRate:YES];
+            [self.player setRate:10.0];
+            break;
+            
+        case UIEventSubtypeRemoteControlEndSeekingBackward:
+        case UIEventSubtypeRemoteControlEndSeekingForward:
+            [self.player setEnableRate:NO];
+            [self.player setRate:1.0];
+            break;
+            
+        default:
+            break;
     }
 }
 
@@ -822,10 +1021,13 @@
         NSString* coverPath = [musicFileManager coverPath:[self.playlist objectAtIndex:self.currentIndex]];
         if ([[NSFileManager defaultManager] fileExistsAtPath:coverPath])
         {
-            [self.nowPlayingInfo
-             setObject:[[MPMediaItemArtwork alloc] initWithImage:[UIImage imageWithContentsOfFile:coverPath]]
-             forKey:MPMediaItemPropertyArtwork];
-            [self updatedNowPlayingInfo];
+            MPMediaItemArtwork* artwork = [[MPMediaItemArtwork alloc]
+                                           initWithImage:[UIImage imageWithContentsOfFile:coverPath]];
+            if (artwork)
+            {
+                [self.nowPlayingInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
+                [self updatedNowPlayingInfo];
+            }
         }
     }
 }
@@ -833,6 +1035,106 @@
 - (void)updatedNowPlayingInfo
 {
     [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = self.nowPlayingInfo;
+}
+
+- (void)handleGoogleButtonTouchDown:(id)sender
+{
+    if (self.currentIndex != -1)
+    {
+        NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
+        NSString* query = [NSString stringWithFormat:@"%@ - %@ lyrics",
+                           [item objectForKey:@"artist"], [item objectForKey:@"title"]];
+        NSURL* url = [NSURL URLWithString:
+                      [@"http://google.com/search?q=" stringByAppendingString:
+                       [query stringByAddingPercentEncodingWithAllowedCharacters:
+                        [NSCharacterSet URLHostAllowedCharacterSet]]]];
+        [[UIApplication sharedApplication] openURL:url];
+        [self closeToolbar];
+    }
+}
+
+- (void)handleLoveButtonTouchDown:(id)sender
+{
+    if (self.currentIndex != -1)
+    {
+        NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
+        [scrobbler love:item];
+        [self closeToolbar];
+    }
+}
+
+- (void)storePlaylistUndoHistory
+{
+    [self.playlistUndoHistory addObject:
+     [NSDictionary dictionaryWithObjectsAndKeys:[NSMutableArray arrayWithArray:self.playlist], @"playlist",
+      [NSNumber numberWithLong:self.currentIndex], @"index",
+      [NSNumber numberWithDouble:self.player.currentTime], @"position",
+      [NSNumber numberWithBool:self.player.playing], @"playing",
+      nil]];
+    
+    if ([self.playlistUndoHistory count] > 10)
+    {
+        [self.playlistUndoHistory removeObjectAtIndex:0];
+    }
+}
+
+- (void)invalidatePlaylistUndoHistory
+{
+    self.playlistUndoHistory = [[NSMutableArray alloc] init];
+}
+
+- (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer
+{
+    if (recognizer.state == UIGestureRecognizerStateRecognized)
+    {
+        if (recognizer.rotation < -M_PI_4)
+        {
+            if ([self.playlistUndoHistory count] > 0)
+            {
+                NSDictionary* undo = [self.playlistUndoHistory lastObject];
+                
+                NSMutableArray* undoPlaylist = [undo objectForKey:@"playlist"];
+                long undoIndex = [[undo objectForKey:@"index"] intValue];
+                double undoPosition = [[undo objectForKey:@"position"] doubleValue];
+                bool undoWasPlaying = [[undo objectForKey:@"playing"] boolValue];
+                
+                bool currentItemIsEqualToUndoItem = NO;
+                if (self.currentIndex != -1 &&
+                    undoIndex != -1 &&
+                    [[[self.playlist objectAtIndex:self.currentIndex] objectForKey:@"path"] isEqualToString:
+                     [[undoPlaylist objectAtIndex:undoIndex] objectForKey:@"path"]])
+                {
+                    currentItemIsEqualToUndoItem = YES;
+                }
+                
+                self.playlist = undoPlaylist;
+                [self _playlistChanged];
+                
+                [self.playlistUndoHistory removeLastObject];
+                
+                if (currentItemIsEqualToUndoItem)
+                {
+                    self.currentIndex = undoIndex;
+                }
+                else
+                {
+                    if (undoIndex != -1)
+                    {
+                        [self initAtIndex:undoIndex atPosition:undoPosition invalidatingPlaylistUndoHistory:NO];
+                        if (undoWasPlaying)
+                        {
+                            [self.player play];
+                        }
+                    }
+                    else
+                    {
+                        self.currentIndex = -1;
+                        [self.tableView reloadData];
+                    }
+                }
+            }
+        }
+    }
 }
 
 @end
