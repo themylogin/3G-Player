@@ -207,6 +207,7 @@
                                    useSignature:YES
                                      httpMethod:POST_TYPE
                                           error:nil];
+        [fmEngine release];
         if (reply)
         {
             NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
@@ -215,7 +216,6 @@
                 return YES;
             }
         }
-        [fmEngine release];
     }
     
     return NO;
