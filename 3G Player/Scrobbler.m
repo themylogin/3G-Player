@@ -78,6 +78,8 @@
         
         [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"] addObject:queueItem];
         [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"queueChanged" object:self userInfo:nil];
     }
     
     [self flushQueue];
@@ -124,6 +126,8 @@
                         [[NSNotificationCenter defaultCenter] postNotificationName:@"actionCompleted"
                                                                             object:self
                                                                           userInfo:action];
+                        
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"queueChanged" object:self userInfo:nil];
                     });
                 }
             }
@@ -273,6 +277,11 @@
     }
     
     return NO;
+}
+
+- (int)queueSize
+{
+    return [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"] count];
 }
 
 @end

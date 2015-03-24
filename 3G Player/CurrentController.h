@@ -22,6 +22,7 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfter
 @property (nonatomic, retain) IBOutlet UILabel* totalLabel;
 @property (nonatomic, retain) IBOutlet UIButton* repeatButton;
 @property (nonatomic, retain) IBOutlet UIView* volumeView;
+@property (nonatomic, retain) IBOutlet UIButton* scrobblerButton;
 
 @property (nonatomic, retain) AVAudioPlayer* player;
 

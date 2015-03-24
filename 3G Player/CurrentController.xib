@@ -11,6 +11,7 @@
                 <outlet property="playPauseButton" destination="78" id="89"/>
                 <outlet property="positionSlider" destination="111" id="157"/>
                 <outlet property="repeatButton" destination="97" id="100"/>
+                <outlet property="scrobblerButton" destination="oy1-bK-fmZ" id="tMv-1E-joE"/>
                 <outlet property="tableView" destination="12" id="48"/>
                 <outlet property="toolbar" destination="212" id="Fig-k5-wtB"/>
                 <outlet property="totalLabel" destination="126" id="159"/>
@@ -175,6 +176,6 @@
         <image name="love.png" width="64" height="64"/>
         <image name="play_inactive.png" width="26" height="26"/>
         <image name="repeat_disabled.png" width="26" height="26"/>
-        <image name="scrobbler.png" width="26" height="26"/>
+        <image name="scrobbler.png" width="64" height="64"/>
     </resources>
 </document>

@@ -15,10 +15,12 @@
 
 #import "CocoaAsyncSocket/GCDAsyncSocket.h"
 #import "JSONKit.h"
+#import "MKNumberBadgeView.h"
 
 @interface CurrentController ()
 
 @property (nonatomic)         bool toolbarOpen;
+@property (nonatomic, retain) MKNumberBadgeView* scrobblerBadge;
 
 @property (nonatomic, retain) NSMutableArray* playlist;
 @property (nonatomic, retain) NSMutableArray* sections;
@@ -83,6 +85,11 @@
                                                      name:AVAudioSessionRouteChangeNotification
                                                    object:[AVAudioSession sharedInstance]];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(onScrobblerQueueChanged)
+                                                     name:@"queueChanged"
+                                                   object:scrobbler];
+        
         self.bufferingProgressReportedAt = nil;
         
         NSDictionary* current = [[NSUserDefaults standardUserDefaults] objectForKey:@"current"];
@@ -117,6 +124,11 @@
     toolbarRect.size.height = 100;
     toolbarRect.origin.y = tableViewRect.size.height;
     self.toolbar.frame = toolbarRect;
+    
+    self.scrobblerBadge = [[MKNumberBadgeView alloc] initWithFrame:CGRectMake(28, 0, 36, 24)];
+    self.scrobblerBadge.shine = NO;
+    self.scrobblerBadge.shadow = NO;
+    [self onScrobblerQueueChanged];
     
     #if TARGET_IPHONE_SIMULATOR
         UISlider* volumeView = [[UISlider alloc] initWithFrame:self.volumeView.bounds];
@@ -1134,6 +1146,26 @@
                 }
             }
         }
+    }
+}
+
+- (void)onScrobblerQueueChanged
+{
+    int count = [scrobbler queueSize];
+    if (count > 0)
+    {
+        self.scrobblerBadge.value = count;
+        if ([self.scrobblerBadge superview] == NULL)
+        {
+            [self.scrobblerButton addSubview:self.scrobblerBadge];
+        }
+    }
+    else
+    {
+        if ([self.scrobblerBadge superview] != NULL)
+        {
+            [self.scrobblerBadge removeFromSuperview];
+        }    
     }
 }
 

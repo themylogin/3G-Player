@@ -15,4 +15,6 @@
 - (void)scrobble:(NSDictionary*)file startedAt:(NSDate*)date;
 - (void)love:(NSDictionary*)file;
 
+- (int)queueSize;
+
 @end
