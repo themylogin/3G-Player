@@ -280,7 +280,7 @@
     if (reply)
     {
         NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
-        if ([response objectForKey:@"scrobbles"])
+        if (response != nil)
         {
             return YES;
         }
