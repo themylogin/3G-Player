@@ -124,6 +124,9 @@
                             <state key="normal" title="Button" image="scrobbler.png">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
+                            <connections>
+                                <action selector="handleScrobblerButtonTouchDown:" destination="-1" eventType="touchDown" id="ssa-Ri-D9x"/>
+                            </connections>
                         </button>
                     </subviews>
                     <color key="backgroundColor" red="0.16862745100000001" green="0.16862745100000001" blue="0.16862745100000001" alpha="1" colorSpace="calibratedRGB"/>

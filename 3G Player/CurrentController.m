@@ -125,6 +125,8 @@
     toolbarRect.origin.y = tableViewRect.size.height;
     self.toolbar.frame = toolbarRect;
     
+    [self showScrobblerEnabled];
+    
     self.scrobblerBadge = [[MKNumberBadgeView alloc] initWithFrame:CGRectMake(28, 0, 36, 24)];
     self.scrobblerBadge.shine = NO;
     self.scrobblerBadge.shadow = NO;
@@ -1075,6 +1077,12 @@
     }
 }
 
+- (void)handleScrobblerButtonTouchDown:(id)sender
+{
+    scrobbler.enabled = !scrobbler.enabled;
+    [self showScrobblerEnabled];
+}
+
 - (void)storePlaylistUndoHistory
 {
     [self.playlistUndoHistory addObject:
@@ -1146,6 +1154,18 @@
                 }
             }
         }
+    }
+}
+
+- (void)showScrobblerEnabled
+{
+    if (scrobbler.enabled)
+    {
+        self.scrobblerButton.alpha = 1.0;
+    }
+    else
+    {
+        self.scrobblerButton.alpha = 0.2;
     }
 }
 

@@ -44,6 +44,11 @@
 
 - (void)sendNowPlaying:(NSDictionary*)file
 {
+    if (!self.enabled)
+    {
+        return;
+    }
+    
     [self _queueAction:@"sendNowPlaying"
               withFile:file
              arguments:[NSDictionary dictionary]];
@@ -87,6 +92,11 @@
 
 - (void)flushQueue
 {
+    if (!self.enabled)
+    {
+        return;
+    }
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         @synchronized(self)
         {
@@ -277,6 +287,30 @@
     }
     
     return NO;
+}
+
+- (BOOL)enabled
+{
+    return [[NSUserDefaults standardUserDefaults] objectForKey:@"scrobblingDisabled"] == NULL;
+}
+
+- (void)setEnabled:(BOOL)enabled
+{
+    @synchronized([NSUserDefaults standardUserDefaults])
+    {
+        if (enabled)
+        {
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"scrobblingDisabled"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            
+            [self flushQueue];
+        }
+        else
+        {
+            [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:true] forKey:@"scrobblingDisabled"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+    }
 }
 
 - (int)queueSize
