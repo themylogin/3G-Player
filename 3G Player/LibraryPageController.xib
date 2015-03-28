@@ -21,11 +21,17 @@
                 <outletCollection property="gestureRecognizers" destination="33" appends="YES" id="37"/>
                 <outletCollection property="gestureRecognizers" destination="38" appends="YES" id="41"/>
                 <outletCollection property="gestureRecognizers" destination="Klb-iT-VuA" appends="YES" id="YAO-A4-H4r"/>
+                <outletCollection property="gestureRecognizers" destination="r2e-RD-AYh" appends="YES" id="fEA-o9-qze"/>
             </connections>
         </tableView>
-        <swipeGestureRecognizer direction="right" id="33">
+        <swipeGestureRecognizer direction="left" id="33">
             <connections>
-                <action selector="handleSwipe:" destination="-1" id="48"/>
+                <action selector="handleLeftSwipe:" destination="-1" id="TZ0-wA-N8I"/>
+            </connections>
+        </swipeGestureRecognizer>
+        <swipeGestureRecognizer direction="right" id="r2e-RD-AYh">
+            <connections>
+                <action selector="handleRightSwipe:" destination="-1" id="MH8-6c-c5w"/>
             </connections>
         </swipeGestureRecognizer>
         <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="38">

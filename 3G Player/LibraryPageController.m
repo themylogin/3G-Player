@@ -152,7 +152,12 @@
 
 #pragma mark - Gesture recognizer
 
-- (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer
+- (IBAction)handleLeftSwipe:(UISwipeGestureRecognizer*)recognizer
+{
+    [self.navigationController popToRootViewControllerAnimated:YES];
+}
+
+- (IBAction)handleRightSwipe:(UISwipeGestureRecognizer*)recognizer
 {
     NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
     if (indexPath)
