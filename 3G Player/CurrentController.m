@@ -35,6 +35,8 @@ static char const* const BUTTONS = "BUTTONS";
 
 @property (nonatomic)         long currentIndex;
 @property (nonatomic, retain) NSDate* playerStartedAt;
+@property (nonatomic)         int seekToWhenFirstItemIsBuffered;
+@property (nonatomic)         bool skipScrobblingCurrent;
 
 @property (nonatomic)         enum { RepeatDisabled, RepeatPlaylist, RepeatTrack } repeat;
 
@@ -70,6 +72,8 @@ static char const* const BUTTONS = "BUTTONS";
         
         self.currentIndex = -1;
         self.player = nil;
+        
+        self.seekToWhenFirstItemIsBuffered = -1;
         
         self.repeat = RepeatDisabled;
         
@@ -294,6 +298,7 @@ static char const* const BUTTONS = "BUTTONS";
         [musicFileManager notifyFileUsage:item];
         
         self.playerStartedAt = [NSDate date];
+        self.skipScrobblingCurrent = false;
         [scrobbler sendNowPlaying:item];
     }
     
@@ -950,6 +955,14 @@ static char const* const BUTTONS = "BUTTONS";
 
 - (void)onMusicFileManagerBufferingCompleted
 {
+    if (self.seekToWhenFirstItemIsBuffered != -1)
+    {
+        bool oldSkipScrobblingCurrent = self.skipScrobblingCurrent;
+        [self playAtIndex:0 atPosition:self.seekToWhenFirstItemIsBuffered];
+        self.seekToWhenFirstItemIsBuffered = -1;
+        self.skipScrobblingCurrent = oldSkipScrobblingCurrent;
+    }
+    
     [self bufferMostNecessary];
 }
 
@@ -1047,6 +1060,12 @@ static char const* const BUTTONS = "BUTTONS";
         return;
     }
     
+    if (self.skipScrobblingCurrent)
+    {
+        self.skipScrobblingCurrent = false;
+        return;
+    }
+    
     if ([[NSDate date] timeIntervalSinceDate:self.playerStartedAt] >= MIN(self.player.duration / 2, 240))
     {
         [scrobbler scrobble:[self.playlist objectAtIndex:self.currentIndex] startedAt:self.playerStartedAt];
@@ -1131,6 +1150,49 @@ static char const* const BUTTONS = "BUTTONS";
 {
     scrobbler.enabled = !scrobbler.enabled;
     [self showScrobblerEnabled];
+}
+
+- (void)handleSuperseedButtonTouchDown:(id)sender
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSURL* url = [NSURL URLWithString:[playerUrl stringByAppendingString:@"/player/become_superseeded"]];
+        NSDictionary* data = [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfURL:url]];
+        NSArray* dataPlaylist = [data objectForKey:@"playlist"];
+        
+        NSMutableArray* items = [[NSMutableArray alloc] init];
+        for (int i = [[data objectForKey:@"position"] intValue]; i < dataPlaylist.count; i++)
+        {
+            NSString* directory = [[dataPlaylist objectAtIndex:i] stringByDeletingLastPathComponent];
+            NSString* file = [[dataPlaylist objectAtIndex:i] lastPathComponent];
+            
+            NSDictionary* index = [musicTableService loadRawIndexFor:directory];
+            NSDictionary* item = [index objectForKey:file];
+            if (item != NULL)
+            {
+                [items addObject:item];
+            }
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self clearPlaylist];
+            [self addFiles:items mode:AddToTheEnd];
+            if (items.count)
+            {
+                if ([musicFileManager getState:[items objectAtIndex:0]].state == MusicFileBuffered)
+                {
+                    [self playAtIndex:0 atPosition:[[data objectForKey:@"elapsed"] intValue]];
+                }
+                else
+                {
+                    self.seekToWhenFirstItemIsBuffered = [[data objectForKey:@"elapsed"] intValue];
+                }
+                self.skipScrobblingCurrent = [[data objectForKey:@"scrobbled"] boolValue];
+            }
+            [items release];
+
+        });
+    });
+    [self closeToolbar];
 }
 
 - (void)storePlaylistUndoHistory

@@ -24,6 +24,7 @@ typedef enum { BlacklistExtraButton } ExtraButtons;
 - (void)addItemToPlaylist:(NSDictionary*)item mode:(AddMode)addMode playAfter:(BOOL)playAfter;
 - (NSMutableArray*)readRecentsFile;
 
+- (NSDictionary*)loadRawIndexFor:(NSString*)path;
 - (NSArray*)loadIndexFor:(NSString*)path;
 - (BOOL)isDirectory:(NSDictionary*)item;
 - (BOOL)isBlacklisted:(NSDictionary*)item;

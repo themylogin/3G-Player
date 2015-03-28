@@ -257,37 +257,42 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
 
 #pragma mark - Internals
 
-- (NSArray*)loadIndexFor:(NSString*)path
+- (NSDictionary*)loadRawIndexFor:(NSString *)path
 {
     NSString* indexJsonPath = [[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:path] stringByAppendingString:@"/index.json"];
     if ([self.fileManager fileExistsAtPath:indexJsonPath])
     {
-        NSDictionary* index = [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfFile:indexJsonPath]];
-        return [[index allValues] sortedArrayUsingComparator: ^(id _a, id _b)
-                {
-                    NSDictionary* a = (NSDictionary*) _a;
-                    NSDictionary* b = (NSDictionary*) _b;
-                    
-                    if ([[a objectForKey:@"type"] isEqualToString:@"directory"] && [[b objectForKey:@"type"] isEqualToString:@"file"])
-                    {
-                        return (NSComparisonResult)NSOrderedAscending;
-                    }
-                    if ([[a objectForKey:@"type"] isEqualToString:@"file"] && [[b objectForKey:@"type"] isEqualToString:@"directory"])
-                    {
-                        return (NSComparisonResult)NSOrderedDescending;
-                    }
-                    if ([[a objectForKey:@"type"] isEqualToString:@"file"] && [[b objectForKey:@"type"] isEqualToString:@"file"] &&
-                        ![[a objectForKey:@"disc"] isEqual:[b objectForKey:@"disc"]])
-                    {
-                        return [[a objectForKey:@"disc"] compare:[b objectForKey:@"disc"]];
-                    }
-                    return [[a objectForKey:@"name"] compare:[b objectForKey:@"name"] options:NSCaseInsensitiveSearch];
-                }];
+        return [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfFile:indexJsonPath]];
     }
     else
     {
-        return [[[NSArray alloc] init] autorelease];
+        return [NSDictionary dictionary];
     }
+}
+
+- (NSArray*)loadIndexFor:(NSString*)path
+{
+    NSDictionary* index = [self loadRawIndexFor:path];
+    return [[index allValues] sortedArrayUsingComparator: ^(id _a, id _b)
+            {
+                NSDictionary* a = (NSDictionary*) _a;
+                NSDictionary* b = (NSDictionary*) _b;
+                
+                if ([[a objectForKey:@"type"] isEqualToString:@"directory"] && [[b objectForKey:@"type"] isEqualToString:@"file"])
+                {
+                    return (NSComparisonResult)NSOrderedAscending;
+                }
+                if ([[a objectForKey:@"type"] isEqualToString:@"file"] && [[b objectForKey:@"type"] isEqualToString:@"directory"])
+                {
+                    return (NSComparisonResult)NSOrderedDescending;
+                }
+                if ([[a objectForKey:@"type"] isEqualToString:@"file"] && [[b objectForKey:@"type"] isEqualToString:@"file"] &&
+                    ![[a objectForKey:@"disc"] isEqual:[b objectForKey:@"disc"]])
+                {
+                    return [[a objectForKey:@"disc"] compare:[b objectForKey:@"disc"]];
+                }
+                return [[a objectForKey:@"name"] compare:[b objectForKey:@"name"] options:NSCaseInsensitiveSearch];
+            }];
 }
 
 - (void)addDirectoryToPlaylist:(NSString*)directory mode:(AddMode)addMode askConfirmation:(BOOL)ask playAfter:(BOOL)play

@@ -119,13 +119,23 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="oy1-bK-fmZ" userLabel="Scrobbler">
-                            <rect key="frame" x="176" y="100" width="64" height="64"/>
+                            <rect key="frame" x="171" y="100" width="64" height="64"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <state key="normal" title="Button" image="scrobbler.png">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
                             <connections>
                                 <action selector="handleScrobblerButtonTouchDown:" destination="-1" eventType="touchDown" id="ssa-Ri-D9x"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="wgK-cI-pkG" userLabel="Superseed">
+                            <rect key="frame" x="246" y="100" width="64" height="64"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Button" image="superseed.png">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="handleSuperseedButtonTouchDown:" destination="-1" eventType="touchDown" id="Gvc-aL-kCF"/>
                             </connections>
                         </button>
                     </subviews>
@@ -174,5 +184,6 @@
         <image name="play_inactive.png" width="26" height="26"/>
         <image name="repeat_disabled.png" width="26" height="26"/>
         <image name="scrobbler.png" width="64" height="64"/>
+        <image name="superseed.png" width="64" height="64"/>
     </resources>
 </document>

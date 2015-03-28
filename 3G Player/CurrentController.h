@@ -47,5 +47,6 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfter
 - (IBAction)handleGoogleButtonTouchDown:(id)sender;
 - (IBAction)handleLoveButtonTouchDown:(id)sender;
 - (IBAction)handleScrobblerButtonTouchDown:(id)sender;
+- (IBAction)handleSuperseedButtonTouchDown:(id)sender;
 
 @end

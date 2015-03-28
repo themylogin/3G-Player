@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		840177A71AC6B7A200AC3792 /* superseed.png in Resources */ = {isa = PBXBuildFile; fileRef = 840177A51AC6B7A200AC3792 /* superseed.png */; };
+		840177A81AC6B7A200AC3792 /* superseed@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 840177A61AC6B7A200AC3792 /* superseed@2x.png */; };
 		84075B661A3086A3001E395C /* RecentsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84075B641A3086A3001E395C /* RecentsController.m */; };
 		84075B671A3086A3001E395C /* RecentsController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84075B651A3086A3001E395C /* RecentsController.xib */; };
 		84075B6A1A3094AF001E395C /* MusicTableService.m in Sources */ = {isa = PBXBuildFile; fileRef = 84075B691A3094AF001E395C /* MusicTableService.m */; };
@@ -102,6 +104,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		840177A51AC6B7A200AC3792 /* superseed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = superseed.png; sourceTree = "<group>"; };
+		840177A61AC6B7A200AC3792 /* superseed@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "superseed@2x.png"; sourceTree = "<group>"; };
 		84075B631A3086A3001E395C /* RecentsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecentsController.h; sourceTree = "<group>"; };
 		84075B641A3086A3001E395C /* RecentsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecentsController.m; sourceTree = "<group>"; };
 		84075B651A3086A3001E395C /* RecentsController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RecentsController.xib; sourceTree = "<group>"; };
@@ -367,11 +371,13 @@
 			isa = PBXGroup;
 			children = (
 				84838B561A33292900D68AF2 /* google.png */,
-				84838B571A33292900D68AF2 /* love.png */,
-				84D38D541AC1E031007564D3 /* scrobbler.png */,
 				84838B521A33280C00D68AF2 /* google@2x.png */,
+				84838B571A33292900D68AF2 /* love.png */,
 				84838B531A33280C00D68AF2 /* love@2x.png */,
+				84D38D541AC1E031007564D3 /* scrobbler.png */,
 				84D38D551AC1E031007564D3 /* scrobbler@2x.png */,
+				840177A51AC6B7A200AC3792 /* superseed.png */,
+				840177A61AC6B7A200AC3792 /* superseed@2x.png */,
 				84DEA2D4191FC2A1000F9832 /* tabbar_current.png */,
 				84C836A918F0779F00033739 /* tabbar_current@2x.png */,
 				84DEA2D3191FC2A1000F9832 /* tabbar_library.png */,
@@ -596,6 +602,7 @@
 				84C4CA2F1785E3ED00A95DB9 /* repeat_disabled.png in Resources */,
 				84C4CA301785E3ED00A95DB9 /* repeat_playlist.png in Resources */,
 				84DEA2D7191FC2A1000F9832 /* tabbar_library.png in Resources */,
+				840177A71AC6B7A200AC3792 /* superseed.png in Resources */,
 				84C4CA311785E3ED00A95DB9 /* repeat_track.png in Resources */,
 				84C4CA431786F4EB00A95DB9 /* Settings.bundle in Resources */,
 				84943CBC17CBB33A00A1CD17 /* Icon.png in Resources */,
@@ -616,6 +623,7 @@
 				84B5D20B17CBB730007FB471 /* Icon-Small.png in Resources */,
 				84838B591A33292900D68AF2 /* love.png in Resources */,
 				84B5D20C17CBB730007FB471 /* Icon-Small@2x.png in Resources */,
+				840177A81AC6B7A200AC3792 /* superseed@2x.png in Resources */,
 				84C836AC18F0779F00033739 /* tabbar_library@2x.png in Resources */,
 				843106491A31C25F00CFA73E /* HockeySDK.xcconfig in Resources */,
 				841F388D1A31B8E60046CDD2 /* tabbar_recents.png in Resources */,
