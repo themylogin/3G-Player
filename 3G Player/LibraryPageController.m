@@ -184,36 +184,40 @@
     }
 }
 
-- (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer
+- (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer
 {
-    if (recognizer.state == UIGestureRecognizerStateRecognized && recognizer.rotation > M_PI_4)
+    if (recognizer.state != UIGestureRecognizerStateEnded)
     {
-        bool everythingIsBlacklisted = YES;
+        return;
+    }
+    
+    bool everythingIsBlacklisted = YES;
+    for (NSDictionary* item in self.index)
+    {
+        if (![musicTableService isBlacklisted:item])
+        {
+            everythingIsBlacklisted = NO;
+            break;
+        }
+    }
+    
+    if (everythingIsBlacklisted)
+    {
         for (NSDictionary* item in self.index)
         {
-            if (![musicTableService isBlacklisted:item])
-            {
-                everythingIsBlacklisted = NO;
-                break;
-            }
+            [musicTableService unblacklistItem:item];
         }
-        
-        if (everythingIsBlacklisted)
+    }
+    else
+    {
+        for (NSDictionary* item in self.index)
         {
-            for (NSDictionary* item in self.index)
-            {
-                [musicTableService unblacklistItem:item];
-            }
-        }
-        else
-        {
-            for (NSDictionary* item in self.index)
-            {
-                [musicTableService blacklistItem:item];
-            }
+            [musicTableService blacklistItem:item];
         }
     }
 }
+
+#pragma mark - Internals
 
 - (NSDictionary*)getItemForIndexPath:(NSIndexPath*)indexPath
 {

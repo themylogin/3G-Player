@@ -20,8 +20,8 @@
                 <outlet property="delegate" destination="-1" id="31"/>
                 <outletCollection property="gestureRecognizers" destination="33" appends="YES" id="37"/>
                 <outletCollection property="gestureRecognizers" destination="38" appends="YES" id="41"/>
-                <outletCollection property="gestureRecognizers" destination="Klb-iT-VuA" appends="YES" id="YAO-A4-H4r"/>
                 <outletCollection property="gestureRecognizers" destination="r2e-RD-AYh" appends="YES" id="fEA-o9-qze"/>
+                <outletCollection property="gestureRecognizers" destination="38L-pZ-M7m" appends="YES" id="09y-XK-b4X"/>
             </connections>
         </tableView>
         <swipeGestureRecognizer direction="left" id="33">
@@ -39,10 +39,10 @@
                 <action selector="handleLongPress:" destination="-1" id="47"/>
             </connections>
         </pongPressGestureRecognizer>
-        <rotationGestureRecognizer id="Klb-iT-VuA">
+        <pinchGestureRecognizer id="38L-pZ-M7m">
             <connections>
-                <action selector="handleRotation:" destination="-1" id="jw1-pF-Piz"/>
+                <action selector="handlePinch:" destination="-1" id="oNk-Kh-dlA"/>
             </connections>
-        </rotationGestureRecognizer>
+        </pinchGestureRecognizer>
     </objects>
 </document>
