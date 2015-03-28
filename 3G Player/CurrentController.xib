@@ -143,14 +143,14 @@
                 <outletCollection property="gestureRecognizers" destination="Kha-BX-sIs" appends="YES" id="PLE-qA-aPd"/>
             </connections>
         </view>
-        <swipeGestureRecognizer direction="right" id="50" userLabel="Playlist Right Swipe Gesture Recognizer">
-            <connections>
-                <action selector="handlePlaylistRightSwipe:" destination="-1" id="Vat-ie-oMb"/>
-            </connections>
-        </swipeGestureRecognizer>
         <swipeGestureRecognizer direction="left" id="CD8-hm-FQ0" userLabel="Playlist Left Swipe Gesture Recognizer">
             <connections>
-                <action selector="handlePlaylistLeftSwipe:" destination="-1" id="LOu-tO-mcG"/>
+                <action selector="handlePlaylistLeftSwipe:" destination="-1" id="ig2-qz-E4c"/>
+            </connections>
+        </swipeGestureRecognizer>
+        <swipeGestureRecognizer direction="left" numberOfTouchesRequired="2" id="50" userLabel="Playlist Left Double Swipe Gesture Recognizer">
+            <connections>
+                <action selector="handlePlaylistLeftDoubleSwipe:" destination="-1" id="Qx7-ZU-Wbd"/>
             </connections>
         </swipeGestureRecognizer>
         <swipeGestureRecognizer direction="up" id="oM4-lk-YO3" userLabel="Toolbar Swipe Up Gesture Recognizer">

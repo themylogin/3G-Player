@@ -24,12 +24,12 @@
                 <outletCollection property="gestureRecognizers" destination="38L-pZ-M7m" appends="YES" id="09y-XK-b4X"/>
             </connections>
         </tableView>
-        <swipeGestureRecognizer direction="left" id="33">
+        <swipeGestureRecognizer direction="left" id="33" userLabel="Left Swipe Gesture Recognizer">
             <connections>
                 <action selector="handleLeftSwipe:" destination="-1" id="TZ0-wA-N8I"/>
             </connections>
         </swipeGestureRecognizer>
-        <swipeGestureRecognizer direction="right" id="r2e-RD-AYh">
+        <swipeGestureRecognizer direction="right" id="r2e-RD-AYh" userLabel="Right Swipe Gesture Recognizer">
             <connections>
                 <action selector="handleRightSwipe:" destination="-1" id="MH8-6c-c5w"/>
             </connections>

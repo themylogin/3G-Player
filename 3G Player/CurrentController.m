@@ -441,7 +441,7 @@
     [self updateUI];
 }
 
-- (IBAction)handlePlaylistRightSwipe:(UISwipeGestureRecognizer*)recognizer
+- (IBAction)handlePlaylistLeftSwipe:(UISwipeGestureRecognizer*)recognizer
 {
     self.lastTimeTableTouchedAt = [NSDate date];
     
@@ -470,7 +470,7 @@
     }
 }
 
-- (IBAction)handlePlaylistLeftSwipe:(UISwipeGestureRecognizer*)recognizer
+- (IBAction)handlePlaylistLeftDoubleSwipe:(UISwipeGestureRecognizer*)recognizer
 {
     self.lastTimeTableTouchedAt = [NSDate date];
     
