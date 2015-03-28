@@ -12,7 +12,7 @@
 
 typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfterJustAdded } AddMode;
 
-@interface CurrentController : UIViewController <AVAudioPlayerDelegate>
+@interface CurrentController : UIViewController <AVAudioPlayerDelegate, UIActionSheetDelegate>
 
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
 @property (nonatomic, retain) IBOutlet UIView* toolbar;
@@ -47,6 +47,5 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfter
 - (IBAction)handleGoogleButtonTouchDown:(id)sender;
 - (IBAction)handleLoveButtonTouchDown:(id)sender;
 - (IBAction)handleScrobblerButtonTouchDown:(id)sender;
-- (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer;
 
 @end
