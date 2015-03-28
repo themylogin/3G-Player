@@ -11,6 +11,7 @@
                 <outlet property="playPauseButton" destination="78" id="89"/>
                 <outlet property="positionSlider" destination="111" id="157"/>
                 <outlet property="repeatButton" destination="97" id="100"/>
+                <outlet property="scrobblerButton" destination="oy1-bK-fmZ" id="tMv-1E-joE"/>
                 <outlet property="tableView" destination="12" id="48"/>
                 <outlet property="toolbar" destination="212" id="Fig-k5-wtB"/>
                 <outlet property="totalLabel" destination="126" id="159"/>
@@ -117,6 +118,16 @@
                                 <action selector="handleLoveButtonTouchDown:" destination="-1" eventType="touchDown" id="mAF-bm-vLA"/>
                             </connections>
                         </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="oy1-bK-fmZ" userLabel="Scrobbler">
+                            <rect key="frame" x="176" y="100" width="64" height="64"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" title="Button" image="scrobbler.png">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="handleScrobblerButtonTouchDown:" destination="-1" eventType="touchDown" id="ssa-Ri-D9x"/>
+                            </connections>
+                        </button>
                     </subviews>
                     <color key="backgroundColor" red="0.16862745100000001" green="0.16862745100000001" blue="0.16862745100000001" alpha="1" colorSpace="calibratedRGB"/>
                     <connections>
@@ -129,17 +140,16 @@
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
             <connections>
                 <outletCollection property="gestureRecognizers" destination="209" appends="YES" id="v8A-sD-gpY"/>
-                <outletCollection property="gestureRecognizers" destination="Kha-BX-sIs" appends="YES" id="PLE-qA-aPd"/>
             </connections>
         </view>
-        <swipeGestureRecognizer direction="right" id="50" userLabel="Playlist Right Swipe Gesture Recognizer">
-            <connections>
-                <action selector="handlePlaylistRightSwipe:" destination="-1" id="Vat-ie-oMb"/>
-            </connections>
-        </swipeGestureRecognizer>
         <swipeGestureRecognizer direction="left" id="CD8-hm-FQ0" userLabel="Playlist Left Swipe Gesture Recognizer">
             <connections>
-                <action selector="handlePlaylistLeftSwipe:" destination="-1" id="LOu-tO-mcG"/>
+                <action selector="handlePlaylistLeftSwipe:" destination="-1" id="ig2-qz-E4c"/>
+            </connections>
+        </swipeGestureRecognizer>
+        <swipeGestureRecognizer direction="left" numberOfTouchesRequired="2" id="50" userLabel="Playlist Left Double Swipe Gesture Recognizer">
+            <connections>
+                <action selector="handlePlaylistLeftDoubleSwipe:" destination="-1" id="Qx7-ZU-Wbd"/>
             </connections>
         </swipeGestureRecognizer>
         <swipeGestureRecognizer direction="up" id="oM4-lk-YO3" userLabel="Toolbar Swipe Up Gesture Recognizer">
@@ -157,16 +167,12 @@
                 <action selector="handlePinch:" destination="-1" id="210"/>
             </connections>
         </pinchGestureRecognizer>
-        <rotationGestureRecognizer id="Kha-BX-sIs">
-            <connections>
-                <action selector="handleRotation:" destination="-1" id="SVO-9a-bb3"/>
-            </connections>
-        </rotationGestureRecognizer>
     </objects>
     <resources>
         <image name="google.png" width="64" height="64"/>
         <image name="love.png" width="64" height="64"/>
         <image name="play_inactive.png" width="26" height="26"/>
         <image name="repeat_disabled.png" width="26" height="26"/>
+        <image name="scrobbler.png" width="64" height="64"/>
     </resources>
 </document>

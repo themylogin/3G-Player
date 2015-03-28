@@ -10,15 +10,21 @@
 
 #import "Globals.h"
 
+#import <objc/runtime.h>
+
 #import <MediaPlayer/MediaPlayer.h>
 #import <QuartzCore/QuartzCore.h>
 
 #import "CocoaAsyncSocket/GCDAsyncSocket.h"
 #import "JSONKit.h"
+#import "MKNumberBadgeView.h"
+
+static char const* const BUTTONS = "BUTTONS";
 
 @interface CurrentController ()
 
 @property (nonatomic)         bool toolbarOpen;
+@property (nonatomic, retain) MKNumberBadgeView* scrobblerBadge;
 
 @property (nonatomic, retain) NSMutableArray* playlist;
 @property (nonatomic, retain) NSMutableArray* sections;
@@ -83,6 +89,11 @@
                                                      name:AVAudioSessionRouteChangeNotification
                                                    object:[AVAudioSession sharedInstance]];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(onScrobblerQueueChanged)
+                                                     name:@"queueChanged"
+                                                   object:scrobbler];
+        
         self.bufferingProgressReportedAt = nil;
         
         NSDictionary* current = [[NSUserDefaults standardUserDefaults] objectForKey:@"current"];
@@ -117,6 +128,13 @@
     toolbarRect.size.height = 100;
     toolbarRect.origin.y = tableViewRect.size.height;
     self.toolbar.frame = toolbarRect;
+    
+    [self showScrobblerEnabled];
+    
+    self.scrobblerBadge = [[MKNumberBadgeView alloc] initWithFrame:CGRectMake(28, 0, 36, 24)];
+    self.scrobblerBadge.shine = NO;
+    self.scrobblerBadge.shadow = NO;
+    [self onScrobblerQueueChanged];
     
     #if TARGET_IPHONE_SIMULATOR
         UISlider* volumeView = [[UISlider alloc] initWithFrame:self.volumeView.bounds];
@@ -427,7 +445,7 @@
     [self updateUI];
 }
 
-- (IBAction)handlePlaylistRightSwipe:(UISwipeGestureRecognizer*)recognizer
+- (IBAction)handlePlaylistLeftSwipe:(UISwipeGestureRecognizer*)recognizer
 {
     self.lastTimeTableTouchedAt = [NSDate date];
     
@@ -456,7 +474,7 @@
     }
 }
 
-- (IBAction)handlePlaylistLeftSwipe:(UISwipeGestureRecognizer*)recognizer
+- (IBAction)handlePlaylistLeftDoubleSwipe:(UISwipeGestureRecognizer*)recognizer
 {
     self.lastTimeTableTouchedAt = [NSDate date];
     
@@ -531,6 +549,52 @@
         return;
     }
     
+    UIActionSheet* actionSheet = [[UIActionSheet alloc] initWithTitle:@"Current playlist"
+                                                             delegate:self
+                                                    cancelButtonTitle:nil
+                                               destructiveButtonTitle:nil
+                                                    otherButtonTitles:nil];
+    NSMutableArray* buttons = [[NSMutableArray alloc] init];
+    
+    if ([self.playlistUndoHistory count] > 0)
+    {
+        [actionSheet addButtonWithTitle:NSLocalizedString(@"Undo", nil)];
+        [buttons addObject:@"UNDO"];
+    }
+    
+    [buttons addObject:@"CLEAR"];
+    actionSheet.destructiveButtonIndex = [actionSheet addButtonWithTitle:NSLocalizedString(@"Clear", nil)];
+    
+    actionSheet.cancelButtonIndex = [actionSheet addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
+    
+    objc_setAssociatedObject(actionSheet, BUTTONS, buttons, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [actionSheet showInView:[self.view window]];
+    [actionSheet release];
+}
+
+- (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSArray* buttons = objc_getAssociatedObject(actionSheet, BUTTONS);
+    if (buttonIndex >= [buttons count])
+    {
+        return;
+    }
+    
+    NSString* button = [buttons objectAtIndex:buttonIndex];
+    
+    if ([button isEqualToString:@"UNDO"])
+    {
+        [self undoLastAction];
+    }
+    
+    if ([button isEqualToString:@"CLEAR"])
+    {
+        [self clearPlaylist];
+    }
+}
+
+- (void)clearPlaylist
+{
     [self storePlaylistUndoHistory];
     [self clear];
 }
@@ -1063,6 +1127,12 @@
     }
 }
 
+- (void)handleScrobblerButtonTouchDown:(id)sender
+{
+    scrobbler.enabled = !scrobbler.enabled;
+    [self showScrobblerEnabled];
+}
+
 - (void)storePlaylistUndoHistory
 {
     [self.playlistUndoHistory addObject:
@@ -1083,57 +1153,83 @@
     self.playlistUndoHistory = [[NSMutableArray alloc] init];
 }
 
-- (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer
+- (void)undoLastAction
 {
-    if (recognizer.state == UIGestureRecognizerStateRecognized)
+    if ([self.playlistUndoHistory count] > 0)
     {
-        if (recognizer.rotation < -M_PI_4)
+        NSDictionary* undo = [self.playlistUndoHistory lastObject];
+        
+        NSMutableArray* undoPlaylist = [undo objectForKey:@"playlist"];
+        long undoIndex = [[undo objectForKey:@"index"] intValue];
+        double undoPosition = [[undo objectForKey:@"position"] doubleValue];
+        bool undoWasPlaying = [[undo objectForKey:@"playing"] boolValue];
+        
+        bool currentItemIsEqualToUndoItem = NO;
+        if (self.currentIndex != -1 &&
+            undoIndex != -1 &&
+            [[[self.playlist objectAtIndex:self.currentIndex] objectForKey:@"path"] isEqualToString:
+             [[undoPlaylist objectAtIndex:undoIndex] objectForKey:@"path"]])
         {
-            if ([self.playlistUndoHistory count] > 0)
+            currentItemIsEqualToUndoItem = YES;
+        }
+        
+        self.playlist = undoPlaylist;
+        [self _playlistChanged];
+        
+        [self.playlistUndoHistory removeLastObject];
+        
+        if (currentItemIsEqualToUndoItem)
+        {
+            self.currentIndex = undoIndex;
+        }
+        else
+        {
+            if (undoIndex != -1)
             {
-                NSDictionary* undo = [self.playlistUndoHistory lastObject];
-                
-                NSMutableArray* undoPlaylist = [undo objectForKey:@"playlist"];
-                long undoIndex = [[undo objectForKey:@"index"] intValue];
-                double undoPosition = [[undo objectForKey:@"position"] doubleValue];
-                bool undoWasPlaying = [[undo objectForKey:@"playing"] boolValue];
-                
-                bool currentItemIsEqualToUndoItem = NO;
-                if (self.currentIndex != -1 &&
-                    undoIndex != -1 &&
-                    [[[self.playlist objectAtIndex:self.currentIndex] objectForKey:@"path"] isEqualToString:
-                     [[undoPlaylist objectAtIndex:undoIndex] objectForKey:@"path"]])
+                [self initAtIndex:undoIndex atPosition:undoPosition invalidatingPlaylistUndoHistory:NO];
+                if (undoWasPlaying)
                 {
-                    currentItemIsEqualToUndoItem = YES;
-                }
-                
-                self.playlist = undoPlaylist;
-                [self _playlistChanged];
-                
-                [self.playlistUndoHistory removeLastObject];
-                
-                if (currentItemIsEqualToUndoItem)
-                {
-                    self.currentIndex = undoIndex;
-                }
-                else
-                {
-                    if (undoIndex != -1)
-                    {
-                        [self initAtIndex:undoIndex atPosition:undoPosition invalidatingPlaylistUndoHistory:NO];
-                        if (undoWasPlaying)
-                        {
-                            [self.player play];
-                        }
-                    }
-                    else
-                    {
-                        self.currentIndex = -1;
-                        [self.tableView reloadData];
-                    }
+                    [self.player play];
                 }
             }
+            else
+            {
+                self.currentIndex = -1;
+                [self.tableView reloadData];
+            }
         }
+    }
+}
+
+- (void)showScrobblerEnabled
+{
+    if (scrobbler.enabled)
+    {
+        self.scrobblerButton.alpha = 1.0;
+    }
+    else
+    {
+        self.scrobblerButton.alpha = 0.2;
+    }
+}
+
+- (void)onScrobblerQueueChanged
+{
+    int count = [scrobbler queueSize];
+    if (count > 0)
+    {
+        self.scrobblerBadge.value = count;
+        if ([self.scrobblerBadge superview] == NULL)
+        {
+            [self.scrobblerButton addSubview:self.scrobblerBadge];
+        }
+    }
+    else
+    {
+        if ([self.scrobblerBadge superview] != NULL)
+        {
+            [self.scrobblerBadge removeFromSuperview];
+        }    
     }
 }
 

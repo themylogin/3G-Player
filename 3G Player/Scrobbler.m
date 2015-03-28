@@ -44,6 +44,11 @@
 
 - (void)sendNowPlaying:(NSDictionary*)file
 {
+    if (!self.enabled)
+    {
+        return;
+    }
+    
     [self _queueAction:@"sendNowPlaying"
               withFile:file
              arguments:[NSDictionary dictionary]];
@@ -78,6 +83,8 @@
         
         [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"] addObject:queueItem];
         [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"queueChanged" object:self userInfo:nil];
     }
     
     [self flushQueue];
@@ -85,6 +92,11 @@
 
 - (void)flushQueue
 {
+    if (!self.enabled)
+    {
+        return;
+    }
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         @synchronized(self)
         {
@@ -124,6 +136,8 @@
                         [[NSNotificationCenter defaultCenter] postNotificationName:@"actionCompleted"
                                                                             object:self
                                                                           userInfo:action];
+                        
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"queueChanged" object:self userInfo:nil];
                     });
                 }
             }
@@ -193,6 +207,7 @@
                                    useSignature:YES
                                      httpMethod:POST_TYPE
                                           error:nil];
+        [fmEngine release];
         if (reply)
         {
             NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
@@ -201,7 +216,6 @@
                 return YES;
             }
         }
-        [fmEngine release];
     }
     
     return NO;
@@ -266,13 +280,42 @@
     if (reply)
     {
         NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
-        if ([response objectForKey:@"scrobbles"])
+        if (response != nil)
         {
             return YES;
         }
     }
     
     return NO;
+}
+
+- (BOOL)enabled
+{
+    return [[NSUserDefaults standardUserDefaults] objectForKey:@"scrobblingDisabled"] == NULL;
+}
+
+- (void)setEnabled:(BOOL)enabled
+{
+    @synchronized([NSUserDefaults standardUserDefaults])
+    {
+        if (enabled)
+        {
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"scrobblingDisabled"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            
+            [self flushQueue];
+        }
+        else
+        {
+            [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:true] forKey:@"scrobblingDisabled"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+    }
+}
+
+- (int)queueSize
+{
+    return [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"] count];
 }
 
 @end

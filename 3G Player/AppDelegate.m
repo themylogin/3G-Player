@@ -27,7 +27,7 @@ dispatch_queue_t serverSocketQueue;
 {
     application.idleTimerDisabled = YES;
     
-    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"dbbd8a892285975286a99826bfc72d2c"];
+    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"d34cf10bb44b40ee4c5cf35e0f9aa9da"];
     [[BITHockeyManager sharedHockeyManager] startManager];
     
     if ([self didCrashInLastSessionOnStartup])

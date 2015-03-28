@@ -90,6 +90,9 @@
 		84C91A071784255200810B88 /* ZipArchive.mm in Sources */ = {isa = PBXBuildFile; fileRef = 84C91A021784255200810B88 /* ZipArchive.mm */; };
 		84C91A0A17856C5500810B88 /* MusicFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C91A0917856C5500810B88 /* MusicFileManager.m */; };
 		84C91A0C178581EF00810B88 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C91A0B178581EF00810B88 /* QuartzCore.framework */; };
+		84D38D561AC1E031007564D3 /* scrobbler.png in Resources */ = {isa = PBXBuildFile; fileRef = 84D38D541AC1E031007564D3 /* scrobbler.png */; };
+		84D38D571AC1E031007564D3 /* scrobbler@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84D38D551AC1E031007564D3 /* scrobbler@2x.png */; };
+		84D38D5A1AC1E0BB007564D3 /* MKNumberBadgeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D38D591AC1E0BB007564D3 /* MKNumberBadgeView.m */; };
 		84DEA2D5191FC2A1000F9832 /* tabbar_info.png in Resources */ = {isa = PBXBuildFile; fileRef = 84DEA2D1191FC2A1000F9832 /* tabbar_info.png */; };
 		84DEA2D6191FC2A1000F9832 /* tabbar_info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84DEA2D2191FC2A1000F9832 /* tabbar_info@2x.png */; };
 		84DEA2D7191FC2A1000F9832 /* tabbar_library.png in Resources */ = {isa = PBXBuildFile; fileRef = 84DEA2D3191FC2A1000F9832 /* tabbar_library.png */; };
@@ -221,6 +224,10 @@
 		84C91A0817856C5500810B88 /* MusicFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicFileManager.h; sourceTree = "<group>"; };
 		84C91A0917856C5500810B88 /* MusicFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MusicFileManager.m; sourceTree = "<group>"; };
 		84C91A0B178581EF00810B88 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		84D38D541AC1E031007564D3 /* scrobbler.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = scrobbler.png; sourceTree = "<group>"; };
+		84D38D551AC1E031007564D3 /* scrobbler@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "scrobbler@2x.png"; sourceTree = "<group>"; };
+		84D38D581AC1E0BB007564D3 /* MKNumberBadgeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKNumberBadgeView.h; sourceTree = "<group>"; };
+		84D38D591AC1E0BB007564D3 /* MKNumberBadgeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MKNumberBadgeView.m; sourceTree = "<group>"; };
 		84DEA2D1191FC2A1000F9832 /* tabbar_info.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tabbar_info.png; sourceTree = "<group>"; };
 		84DEA2D2191FC2A1000F9832 /* tabbar_info@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tabbar_info@2x.png"; sourceTree = "<group>"; };
 		84DEA2D3191FC2A1000F9832 /* tabbar_library.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tabbar_library.png; sourceTree = "<group>"; };
@@ -320,6 +327,8 @@
 		84C10BF01782E08E004220BC /* 3G Player */ = {
 			isa = PBXGroup;
 			children = (
+				84D38D581AC1E0BB007564D3 /* MKNumberBadgeView.h */,
+				84D38D591AC1E0BB007564D3 /* MKNumberBadgeView.m */,
 				84C4CA111785ADA500A95DB9 /* Globals.h */,
 				84C4CA121785ADA500A95DB9 /* Globals.m */,
 				84C10BF91782E08E004220BC /* AppDelegate.h */,
@@ -359,8 +368,10 @@
 			children = (
 				84838B561A33292900D68AF2 /* google.png */,
 				84838B571A33292900D68AF2 /* love.png */,
+				84D38D541AC1E031007564D3 /* scrobbler.png */,
 				84838B521A33280C00D68AF2 /* google@2x.png */,
 				84838B531A33280C00D68AF2 /* love@2x.png */,
+				84D38D551AC1E031007564D3 /* scrobbler@2x.png */,
 				84DEA2D4191FC2A1000F9832 /* tabbar_current.png */,
 				84C836A918F0779F00033739 /* tabbar_current@2x.png */,
 				84DEA2D3191FC2A1000F9832 /* tabbar_library.png */,
@@ -571,6 +582,7 @@
 			files = (
 				84C10BF51782E08E004220BC /* InfoPlist.strings in Resources */,
 				84C10BFD1782E08E004220BC /* Default.png in Resources */,
+				84D38D561AC1E031007564D3 /* scrobbler.png in Resources */,
 				84C10BFF1782E08E004220BC /* Default@2x.png in Resources */,
 				84C10C011782E08E004220BC /* Default-568h@2x.png in Resources */,
 				84C4CA1B1785ADA500A95DB9 /* LibraryPageController.xib in Resources */,
@@ -600,6 +612,7 @@
 				84838B541A33280C00D68AF2 /* google@2x.png in Resources */,
 				84B5D20A17CBB730007FB471 /* Icon-Small-50@2x.png in Resources */,
 				8431064A1A31C25F00CFA73E /* HockeySDKResources.bundle in Resources */,
+				84D38D571AC1E031007564D3 /* scrobbler@2x.png in Resources */,
 				84B5D20B17CBB730007FB471 /* Icon-Small.png in Resources */,
 				84838B591A33292900D68AF2 /* love.png in Resources */,
 				84B5D20C17CBB730007FB471 /* Icon-Small@2x.png in Resources */,
@@ -622,6 +635,7 @@
 			files = (
 				84C10BF71782E08E004220BC /* main.m in Sources */,
 				84C10BFB1782E08E004220BC /* AppDelegate.m in Sources */,
+				84D38D5A1AC1E0BB007564D3 /* MKNumberBadgeView.m in Sources */,
 				84C10C091782E20A004220BC /* LibraryController.m in Sources */,
 				84C10C171782E72F004220BC /* JSONKit.m in Sources */,
 				84C919C917841B7C00810B88 /* ASIAuthenticationDialog.m in Sources */,

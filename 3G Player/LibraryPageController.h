@@ -14,8 +14,9 @@
 - (BOOL)update;
 - (void)scrollToItem:(NSDictionary*)item;
 
-- (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer;
+- (IBAction)handleLeftSwipe:(UISwipeGestureRecognizer*)recognizer;
+- (IBAction)handleRightSwipe:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer*)recognizer;
-- (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer;
+- (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer;
 
 @end

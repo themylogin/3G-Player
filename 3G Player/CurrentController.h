@@ -12,7 +12,7 @@
 
 typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfterJustAdded } AddMode;
 
-@interface CurrentController : UIViewController <AVAudioPlayerDelegate>
+@interface CurrentController : UIViewController <AVAudioPlayerDelegate, UIActionSheetDelegate>
 
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
 @property (nonatomic, retain) IBOutlet UIView* toolbar;
@@ -22,6 +22,7 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfter
 @property (nonatomic, retain) IBOutlet UILabel* totalLabel;
 @property (nonatomic, retain) IBOutlet UIButton* repeatButton;
 @property (nonatomic, retain) IBOutlet UIView* volumeView;
+@property (nonatomic, retain) IBOutlet UIButton* scrobblerButton;
 
 @property (nonatomic, retain) AVAudioPlayer* player;
 
@@ -38,13 +39,13 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfter
 - (IBAction)handlePlayPauseButtonTouchDown:(id)sender;
 - (IBAction)handlePositionSliderTouchUpInside:(id)sender;
 - (IBAction)handleRepeatButtonTouchDown:(id)sender;
-- (IBAction)handlePlaylistRightSwipe:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handlePlaylistLeftSwipe:(UISwipeGestureRecognizer*)recognizer;
+- (IBAction)handlePlaylistLeftDoubleSwipe:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handleToolbarSwipeUp:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handleToolbarSwipeDown:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer;
 - (IBAction)handleGoogleButtonTouchDown:(id)sender;
 - (IBAction)handleLoveButtonTouchDown:(id)sender;
-- (IBAction)handleRotation:(UIRotationGestureRecognizer*)recognizer;
+- (IBAction)handleScrobblerButtonTouchDown:(id)sender;
 
 @end
