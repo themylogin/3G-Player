@@ -18,6 +18,8 @@ Scrobbler* scrobbler;
 NSString* libraryDirectory;
 NSString* playerUrl;
 
+int freeSpaceMb;
+
 NSString* lastfmUsername;
 NSString* lastfmPassword;
 

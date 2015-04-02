@@ -529,7 +529,7 @@
     if (sys)
     {
         unsigned long long totalFreeSpace = [[sys objectForKey:NSFileSystemFreeSize] unsignedLongLongValue];
-        if (totalFreeSpace < 300 * 1024 * 1024)
+        if (totalFreeSpace < (200 + freeSpaceMb) * 1024 * 1024)
         {
             return NO;
         }

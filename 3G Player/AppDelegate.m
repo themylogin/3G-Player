@@ -99,6 +99,8 @@ dispatch_queue_t serverSocketQueue;
     playerUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"player_url"];
     [playerUrl retain];
     
+    freeSpaceMb = [[NSUserDefaults standardUserDefaults] integerForKey:@"free_space_mb"];
+    
     lastfmUsername = [[NSUserDefaults standardUserDefaults] stringForKey:@"lastfm_username"];
     [lastfmUsername retain];
     
@@ -128,6 +130,8 @@ dispatch_queue_t serverSocketQueue;
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    
+    [musicFileManager removeOldFiles];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application

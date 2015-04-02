@@ -26,6 +26,36 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
+			<string>File Manager</string>
+		</dict>
+		<dict>
+			<key>Titles</key>
+			<array>
+				<string>1 GB</string>
+				<string>500 MB</string>
+				<string>300 MB</string>
+				<string>100 MB</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<string>1000</string>
+				<string>500</string>
+				<string>300</string>
+				<string>100</string>
+			</array>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>Leave free space</string>
+			<key>Key</key>
+			<string>free_space_mb</string>
+			<key>DefaultValue</key>
+			<string>100</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
 			<string>last.fm</string>
 		</dict>
 		<dict>

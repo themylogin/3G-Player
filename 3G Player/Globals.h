@@ -36,6 +36,8 @@ extern Scrobbler* scrobbler;
 extern NSString* libraryDirectory;
 extern NSString* playerUrl;
 
+extern int freeSpaceMb;
+
 extern NSString* lastfmUsername;
 extern NSString* lastfmPassword;
 
