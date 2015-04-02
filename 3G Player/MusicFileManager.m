@@ -171,6 +171,10 @@
 - (void)startBufferingRequest:(NSDictionary*)musicFile
 {
     [self stopBufferingRequest];
+    if (musicFile == nil)
+    {
+        return;
+    }
     
     [self notifyFileUsage:musicFile];
     [self removeOldFiles];
@@ -475,7 +479,7 @@
 - (void)notifyFileUsage:(NSDictionary*)musicFile
 {
     NSMutableDictionary* history = [self readHistoryFile];
-    [history setValue:[NSNumber numberWithInt:time(NULL)] forKey:[self musicHistoryKey:[musicFile objectForKey:@"path"]]];
+    [history setValue:[NSNumber numberWithInt:(int)time(NULL)] forKey:[self musicHistoryKey:[musicFile objectForKey:@"path"]]];
     [self writeHistoryFile:history];
 }
 
