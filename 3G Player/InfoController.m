@@ -46,7 +46,7 @@
 - (void)updateCandidatesForDeletion
 {
     NSArray* old = [musicFileManager listOldDirectories];
-    NSArray* candidates = [old subarrayWithRange:NSMakeRange(0, MIN([old count], 5))];
+    NSArray* candidates = [old subarrayWithRange:NSMakeRange(0, MIN([old count], 20))];
     
     NSMutableArray* readableCandidates = [NSMutableArray array];
     for (int i = 0; i < [candidates count]; i++)
