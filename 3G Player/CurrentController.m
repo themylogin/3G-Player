@@ -1155,8 +1155,36 @@ static char const* const BUTTONS = "BUTTONS";
 - (void)handleSuperseedButtonTouchDown:(id)sender
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        NSError* error;
         NSURL* url = [NSURL URLWithString:[playerUrl stringByAppendingString:@"/player/become_superseeded"]];
-        NSDictionary* data = [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfURL:url]];
+        NSData* jsonData = [NSData dataWithContentsOfURL:url options:0 error:&error];
+        if (!jsonData)
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView* alert = [[UIAlertView alloc]
+                                      initWithTitle:[error localizedDescription]
+                                      message:[error localizedFailureReason]
+                                      delegate:nil
+                                      cancelButtonTitle:@"Dismiss"
+                                      otherButtonTitles:nil];
+                [alert show];
+            });
+            return;
+        }
+        NSDictionary* data = [[JSONDecoder decoder] objectWithData:jsonData error:&error];
+        if (!data)
+        {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView* alert = [[UIAlertView alloc]
+                                      initWithTitle:[error localizedDescription]
+                                      message:[error localizedFailureReason]
+                                      delegate:nil
+                                      cancelButtonTitle:@"Dismiss"
+                                      otherButtonTitles:nil];
+                [alert show];
+            });
+            return;
+        }
         NSArray* dataPlaylist = [data objectForKey:@"playlist"];
         
         NSMutableArray* items = [[NSMutableArray alloc] init];
