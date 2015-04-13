@@ -1104,12 +1104,15 @@ static char const* const BUTTONS = "BUTTONS";
         NSString* coverPath = [musicFileManager coverPath:[self.playlist objectAtIndex:self.currentIndex]];
         if ([[NSFileManager defaultManager] fileExistsAtPath:coverPath])
         {
-            MPMediaItemArtwork* artwork = [[MPMediaItemArtwork alloc]
-                                           initWithImage:[UIImage imageWithContentsOfFile:coverPath]];
-            if (artwork)
+            UIImage* image = [UIImage imageWithContentsOfFile:coverPath];
+            if (image)
             {
-                [self.nowPlayingInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
-                [self updatedNowPlayingInfo];
+                MPMediaItemArtwork* artwork = [[MPMediaItemArtwork alloc] initWithImage:image];
+                if (artwork)
+                {
+                    [self.nowPlayingInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
+                    [self updatedNowPlayingInfo];
+                }
             }
         }
     }
