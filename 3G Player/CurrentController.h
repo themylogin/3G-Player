@@ -49,4 +49,6 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfter
 - (IBAction)handleScrobblerButtonTouchDown:(id)sender;
 - (IBAction)handleSuperseedButtonTouchDown:(id)sender;
 
+- (NSArray*)getStatistics;
+
 @end

@@ -412,6 +412,8 @@ static char const* const BUTTONS = "BUTTONS";
     {
         [self.repeatButton setImage:[UIImage imageNamed:@"repeat_track.png"] forState:UIControlStateNormal];
     }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"statisticsChanged" object:self];
 }
 
 - (IBAction)handlePlayPauseButtonTouchDown:(id)sender
@@ -1326,6 +1328,47 @@ static char const* const BUTTONS = "BUTTONS";
         {
             [self.scrobblerBadge removeFromSuperview];
         }    
+    }
+}
+
+- (NSArray*)getStatistics
+{
+    int playlistDuration = 0;
+    for (int i = 0; i < [self.playlist count]; i++)
+    {
+        if (self.currentIndex > -1)
+        {
+            if (i < self.currentIndex)
+            {
+                continue;
+            }
+            else if (i == self.currentIndex)
+            {
+                if (self.player)
+                {
+                    playlistDuration -= self.player.currentTime;
+                }
+            }
+        }
+        
+        NSObject* duration = [[self.playlist objectAtIndex:i] objectForKey:@"duration"];
+        if (duration != nil && ![duration isKindOfClass:[NSNull class]])
+        {
+            playlistDuration += [(NSNumber*)duration intValue];
+        }
+    }
+    
+    if (playlistDuration > 0)
+    {
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.timeStyle = NSDateFormatterShortStyle;
+        dateFormatter.dateStyle = NSDateFormatterNoStyle;
+        NSDate* end = [NSDate dateWithTimeIntervalSinceNow:playlistDuration];
+        return @[[NSString stringWithFormat:@"Music will end at %@", [dateFormatter stringFromDate:end], nil]];
+    }
+    else
+    {
+        return @[@"Playlist is empty :-("];
     }
 }
 

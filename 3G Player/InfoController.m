@@ -14,6 +14,7 @@
 
 @interface InfoController ()
 
+@property (nonatomic, retain) NSArray* statistics;
 @property (nonatomic, retain) NSArray* candidatesForDeletion;
 
 @end
@@ -38,6 +39,9 @@
     CGRect tableViewRect = self.tableView.frame;
     tableViewRect.size.height = [UIScreen mainScreen].bounds.size.height - 68;
     self.tableView.frame = tableViewRect;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatistics) name:@"statisticsChanged" object:controllers.current];
+    [self updateStatistics];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateCandidatesForDeletion) name:@"historyUpdated" object:musicFileManager];
     [self updateCandidatesForDeletion];
@@ -77,7 +81,7 @@
 {
     if (section == 0)
     {
-        return 2;
+        return [self.statistics count];
     }
     
     if (section == 1)
@@ -116,14 +120,7 @@
     
     if (indexPath.section == 0)
     {
-        if (indexPath.row == 0)
-        {
-            cell.textLabel.text = @":)";
-        }
-        if (indexPath.row == 1)
-        {
-            cell.textLabel.text = @":(";
-        }
+        cell.textLabel.text = [self.statistics objectAtIndex:indexPath.row];
     }
     if (indexPath.section == 1)
     {
@@ -156,6 +153,12 @@
 }
 
 #pragma mark -
+
+- (void)updateStatistics
+{
+    self.statistics = [controllers.current getStatistics];
+    [self.tableView reloadData];
+}
 
 - (void)updateCandidatesForDeletion
 {
