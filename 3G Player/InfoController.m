@@ -14,6 +14,8 @@
 
 @interface InfoController ()
 
+@property (nonatomic, retain) NSArray* candidatesForDeletion;
+
 @end
 
 @implementation InfoController
@@ -33,8 +35,29 @@
 {
     [super viewDidLoad];
     
+    CGRect tableViewRect = self.tableView.frame;
+    tableViewRect.size.height = [UIScreen mainScreen].bounds.size.height - 68;
+    self.tableView.frame = tableViewRect;
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateCandidatesForDeletion) name:@"historyUpdated" object:musicFileManager];
     [self updateCandidatesForDeletion];
+}
+
+- (void)viewDidLayoutSubviews
+{    
+    if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1)
+    {
+        self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+        if ([self respondsToSelector:@selector(edgesForExtendedLayout)])
+        {
+            self.edgesForExtendedLayout = UIRectEdgeNone;
+        }
+        CGRect viewBounds = self.view.bounds;
+        CGFloat topBarOffset = self.topLayoutGuide.length;
+        viewBounds.origin.y = topBarOffset * -1;
+        self.view.bounds = viewBounds;
+        self.navigationController.navigationBar.translucent = NO;
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -42,6 +65,75 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+#pragma mark - Table view data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 2;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (section == 0)
+    {
+        return 2;
+    }
+    
+    if (section == 1)
+    {
+        return [self.candidatesForDeletion count];
+    }
+    
+    return 0;
+}
+
+- (NSString*)tableView:(UITableView*)tableView titleForHeaderInSection:(NSInteger)section
+{
+    if (section == 0)
+    {
+        return @"Statistics";
+    }
+    
+    if (section == 1)
+    {
+        return @"Candidates for deletion";
+    }
+    
+    return @"";
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString* cellIdentifier = @"Cell";
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    if (cell == nil)
+    {
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier] autorelease];
+        cell.textLabel.adjustsFontSizeToFitWidth = true;
+    }
+    
+    if (indexPath.section == 0)
+    {
+        if (indexPath.row == 0)
+        {
+            cell.textLabel.text = @":)";
+        }
+        if (indexPath.row == 1)
+        {
+            cell.textLabel.text = @":(";
+        }
+    }
+    if (indexPath.section == 1)
+    {
+        cell.textLabel.text = [self.candidatesForDeletion objectAtIndex:indexPath.row];
+    }
+    
+    return cell;
+}
+
+#pragma mark -
 
 - (void)updateCandidatesForDeletion
 {
@@ -58,30 +150,7 @@
         }
     }
     
-    self.candidatesForDeletion.numberOfLines = 0;
-    self.candidatesForDeletion.text = [readableCandidates componentsJoinedByString:@"\n"];
-    
-    CGRect currentFrame = self.candidatesForDeletion.frame;
-    CGRect rect = [self.candidatesForDeletion.text
-                   boundingRectWithSize:CGSizeMake(self.candidatesForDeletion.frame.size.width, 0)
-                   options:NSStringDrawingUsesLineFragmentOrigin
-                   attributes:@{NSFontAttributeName: self.candidatesForDeletion.font}
-                   context:nil];
-    currentFrame.size.height = rect.size.height;
-    self.candidatesForDeletion.frame = currentFrame;
-    
-    if ([candidates count] > 0)
-    {
-        self.candidatesForDeletionHeader.hidden = NO;
-        self.candidatesForDeletion.hidden = NO;
-    }
-    else
-    {
-        self.candidatesForDeletionHeader.hidden = YES;
-        self.candidatesForDeletion.hidden = YES;
-    }
-    
-    [self.view layoutIfNeeded];
+    self.candidatesForDeletion = readableCandidates;
 }
 
 @end

@@ -10,7 +10,6 @@
 
 @interface InfoController : UIViewController
 
-@property (nonatomic, retain) IBOutlet UILabel* candidatesForDeletionHeader;
-@property (nonatomic, retain) IBOutlet UILabel* candidatesForDeletion;
+@property (nonatomic, retain) IBOutlet UITableView* tableView;
 
 @end
