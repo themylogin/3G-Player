@@ -569,7 +569,7 @@
             return nil;
         }
     }
-    return parts;
+    return path;
 }
 
 - (NSDictionary*)itemByPath:(NSString*)path
