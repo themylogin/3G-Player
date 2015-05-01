@@ -127,10 +127,32 @@
     }
     if (indexPath.section == 1)
     {
-        cell.textLabel.text = [self.candidatesForDeletion objectAtIndex:indexPath.row];
+        cell.textLabel.text = [[self.candidatesForDeletion objectAtIndex:indexPath.row] objectForKey:@"title"];
     }
     
     return cell;
+}
+
+#pragma mark - Gesture recognizers
+
+- (IBAction)handleLongPress:(UILongPressGestureRecognizer*)recognizer
+{
+    if (recognizer.state != UIGestureRecognizerStateBegan)
+    {
+        return;
+    }
+    
+    NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
+    if (indexPath)
+    {
+        if (indexPath.section == 1)
+        {
+            NSDictionary* item = [musicFileManager itemByPath:[[self.candidatesForDeletion objectAtIndex:indexPath.row] objectForKey:@"path"]];
+            [musicTableService showActionSheetForItem:item
+                                               inView:self.view
+                                     withExtraButtons:BlacklistExtraButton];
+        }
+    }
 }
 
 #pragma mark -
@@ -146,11 +168,13 @@
         NSArray* candidate = [musicFileManager pathForDirectory:[candidates objectAtIndex:i]];
         if (candidate)
         {
-            [readableCandidates addObject:[candidate componentsJoinedByString:@"/"]];
+            [readableCandidates addObject:@{@"path": [candidates objectAtIndex:i],
+                                            @"title": [candidate componentsJoinedByString:@"/"]}];
         }
     }
     
     self.candidatesForDeletion = readableCandidates;
+    [self.tableView reloadData];
 }
 
 @end

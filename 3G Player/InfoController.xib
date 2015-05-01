@@ -5,7 +5,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CurrentController">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="InfoController">
             <connections>
                 <outlet property="tableView" destination="12" id="48"/>
                 <outlet property="view" destination="1" id="3"/>
@@ -23,11 +23,18 @@
                     <connections>
                         <outlet property="dataSource" destination="-1" id="47"/>
                         <outlet property="delegate" destination="-1" id="TZQ-WQ-d5u"/>
+                        <outletCollection property="gestureRecognizers" destination="nI7-uy-fV1" appends="YES" id="Zuv-0c-nR4"/>
                     </connections>
                 </tableView>
             </subviews>
             <gestureRecognizers/>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
         </view>
+        <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="nI7-uy-fV1">
+            <connections>
+                <action selector="handleLongPress:" destination="-1" id="2Iy-VV-Sve"/>
+                <outlet property="delegate" destination="12" id="Yrn-1Q-W7s"/>
+            </connections>
+        </pongPressGestureRecognizer>
     </objects>
 </document>

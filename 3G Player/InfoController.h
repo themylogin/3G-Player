@@ -12,4 +12,6 @@
 
 @property (nonatomic, retain) IBOutlet UITableView* tableView;
 
+- (IBAction)handleLongPress:(UILongPressGestureRecognizer*)recognizer;
+
 @end
