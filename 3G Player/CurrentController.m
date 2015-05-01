@@ -1128,11 +1128,14 @@ static char const* const BUTTONS = "BUTTONS";
     if (self.currentIndex != -1)
     {
         NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
-        NSString* query = [NSString stringWithFormat:@"%@ - %@ lyrics",
-                           [item objectForKey:@"artist"], [item objectForKey:@"title"]];
         NSURL* url = [NSURL URLWithString:
-                      [@"http://google.com/search?q=" stringByAppendingString:
-                       [query stringByAddingPercentEncodingWithAllowedCharacters:
+                      [NSString stringWithFormat:@"%@/lyrics?artist=%@&title=%@&format=html",
+                       playerUrl,
+                       [[item objectForKey:@"artist"]
+                        stringByAddingPercentEncodingWithAllowedCharacters:
+                        [NSCharacterSet URLHostAllowedCharacterSet]],
+                       [[item objectForKey:@"title"]
+                        stringByAddingPercentEncodingWithAllowedCharacters:
                         [NSCharacterSet URLHostAllowedCharacterSet]]]];
         [[UIApplication sharedApplication] openURL:url];
         [self closeToolbar];
