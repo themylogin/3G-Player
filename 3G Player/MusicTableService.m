@@ -133,10 +133,13 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
         [buttons addObject:@"ADD_AFTER_ADDED"];
     }
     
-    if (extraButtons & BlacklistExtraButton)
+    if (!([UIScreen mainScreen].bounds.size.height == 480 && [buttons count] >= 6))
     {
-        [actionSheet addButtonWithTitle:NSLocalizedString(@"Blacklist", nil)];
-        [buttons addObject:@"BLACKLIST"];
+        if (extraButtons & BlacklistExtraButton)
+        {
+            [actionSheet addButtonWithTitle:NSLocalizedString(@"Blacklist", nil)];
+            [buttons addObject:@"BLACKLIST"];
+        }
     }
     
     [buttons addObject:@"DELETE"];
