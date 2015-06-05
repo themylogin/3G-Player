@@ -12,4 +12,7 @@
 
 - (id)initWithRoot;
 
+- (void)updateLibrary;
+- (void)updateLibraryWithSuccessCallback:(void(^)())callback;
+
 @end

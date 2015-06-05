@@ -69,7 +69,8 @@ dispatch_queue_t serverSocketQueue;
     
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     
-    self.tabBarController = [[UITabBarController alloc] init];
+    controllers.tabBar = [[UITabBarController alloc] init];
+    self.tabBarController = controllers.tabBar;
     
     controllers.current = [[CurrentController alloc] init];
     [self.tabBarController addChildViewController:controllers.current];
@@ -116,15 +117,15 @@ dispatch_queue_t serverSocketQueue;
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-    [serverSocket setDelegate:nil];
-    [serverSocket disconnect];
-    [serverSocket dealloc];
-    serverSocket = nil;
+    // [serverSocket setDelegate:nil];
+    // [serverSocket disconnect];
+    // [serverSocket dealloc];
+    // serverSocket = nil;
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-    [self initServerSocket];
+    // [self initServerSocket];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
@@ -142,6 +143,9 @@ dispatch_queue_t serverSocketQueue;
 - (void)initServerSocket
 {
     serverSocket = [[GCDAsyncSocket alloc] initWithDelegate:controllers.current delegateQueue:serverSocketQueue];
+    [serverSocket performBlock:^{
+        [serverSocket enableBackgroundingOnSocket];
+    }];
     [serverSocket acceptOnPort:20139 error:nil];
 }
 

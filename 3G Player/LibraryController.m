@@ -61,6 +61,11 @@
 
 - (void)updateLibrary
 {
+    [self updateLibraryWithSuccessCallback:^{}];
+}
+
+- (void)updateLibraryWithSuccessCallback:(void(^)())callback;
+{
     updateLibraryButton.enabled = NO;
     self.updateLibraryProgressLabel.text = @"Updating";
     self.toolbarHidden = NO;
@@ -155,6 +160,8 @@
                     break;
                 }
             }
+            
+            callback();
         });
     });
 }

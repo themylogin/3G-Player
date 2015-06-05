@@ -21,6 +21,11 @@
 
 static char const* const BUTTONS = "BUTTONS";
 
+static char const* const ALERTVIEW = "ALERTVIEW";
+static char const* const DATA = "DATA";
+static char const* const ITEMS = "ITEMS";
+static char const* const POSITION = "POSITION";
+
 @interface CurrentController ()
 
 @property (nonatomic)         bool toolbarOpen;
@@ -35,7 +40,9 @@ static char const* const BUTTONS = "BUTTONS";
 
 @property (nonatomic)         long currentIndex;
 @property (nonatomic, retain) NSDate* playerStartedAt;
-@property (nonatomic)         int seekToWhenFirstItemIsBuffered;
+@property (nonatomic)         int bufferMostNecessaryOverride;
+@property (nonatomic)         int whenItemIsBufferedPlayAtIndex;
+@property (nonatomic)         int whenItemIsBufferedPlayAtPosition;
 @property (nonatomic)         bool skipScrobblingCurrent;
 
 @property (nonatomic)         enum { RepeatDisabled, RepeatPlaylist, RepeatTrack } repeat;
@@ -73,7 +80,9 @@ static char const* const BUTTONS = "BUTTONS";
         self.currentIndex = -1;
         self.player = nil;
         
-        self.seekToWhenFirstItemIsBuffered = -1;
+        self.bufferMostNecessaryOverride = -1;
+        self.whenItemIsBufferedPlayAtIndex = -1;
+        self.whenItemIsBufferedPlayAtPosition = -1;
         
         self.repeat = RepeatDisabled;
         
@@ -865,6 +874,13 @@ static char const* const BUTTONS = "BUTTONS";
 
 - (void)bufferMostNecessary
 {
+    if (self.bufferMostNecessaryOverride != -1)
+    {
+        [musicFileManager buffer:[self.playlist objectAtIndex:self.bufferMostNecessaryOverride]];
+        self.bufferMostNecessaryOverride = -1;
+        return;
+    }
+    
     if (self.currentIndex != -1)
     {
         for (long i = self.currentIndex; i < [self.playlist count]; i++)
@@ -957,11 +973,12 @@ static char const* const BUTTONS = "BUTTONS";
 
 - (void)onMusicFileManagerBufferingCompleted
 {
-    if (self.seekToWhenFirstItemIsBuffered != -1)
+    if (self.whenItemIsBufferedPlayAtIndex != -1 && self.whenItemIsBufferedPlayAtPosition != -1)
     {
         bool oldSkipScrobblingCurrent = self.skipScrobblingCurrent;
-        [self playAtIndex:0 atPosition:self.seekToWhenFirstItemIsBuffered];
-        self.seekToWhenFirstItemIsBuffered = -1;
+        [self playAtIndex:self.whenItemIsBufferedPlayAtIndex atPosition:self.whenItemIsBufferedPlayAtPosition];
+        self.whenItemIsBufferedPlayAtIndex = -1;
+        self.whenItemIsBufferedPlayAtPosition = -1;
         self.skipScrobblingCurrent = oldSkipScrobblingCurrent;
     }
     
@@ -1193,42 +1210,137 @@ static char const* const BUTTONS = "BUTTONS";
             });
             return;
         }
-        NSArray* dataPlaylist = [data objectForKey:@"playlist"];
-        
-        NSMutableArray* items = [[NSMutableArray alloc] init];
-        for (int i = [[data objectForKey:@"position"] intValue]; i < dataPlaylist.count; i++)
-        {
-            NSString* directory = [[dataPlaylist objectAtIndex:i] stringByDeletingLastPathComponent];
-            NSString* file = [[dataPlaylist objectAtIndex:i] lastPathComponent];
-            
-            NSDictionary* index = [musicTableService loadRawIndexFor:directory];
-            NSDictionary* item = [index objectForKey:file];
-            if (item != NULL)
-            {
-                [items addObject:item];
-            }
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self clearPlaylist];
-            [self addFiles:items mode:AddToTheEnd];
-            if (items.count)
-            {
-                if ([musicFileManager getState:[items objectAtIndex:0]].state == MusicFileBuffered)
-                {
-                    [self playAtIndex:0 atPosition:[[data objectForKey:@"elapsed"] intValue]];
-                }
-                else
-                {
-                    self.seekToWhenFirstItemIsBuffered = [[data objectForKey:@"elapsed"] intValue];
-                }
-                self.skipScrobblingCurrent = [[data objectForKey:@"scrobbled"] boolValue];
-            }
-            [items release];
-
-        });
+        [self replacePlaylistWithData:data updateIfNecessary:YES];
     });
     [self closeToolbar];
+}
+
+- (void)replacePlaylistWithData:(NSDictionary*)data updateIfNecessary:(BOOL)updateIfNecessary
+{
+    NSArray* dataPlaylist = [data objectForKey:@"playlist"];
+    
+    NSMutableArray* items = [[NSMutableArray alloc] init];
+    int position = 0;
+    for (int i = 0; i < dataPlaylist.count; i++)
+    {
+        NSString* directory = [[dataPlaylist objectAtIndex:i] stringByDeletingLastPathComponent];
+        NSString* file = [[dataPlaylist objectAtIndex:i] lastPathComponent];
+        
+        NSDictionary* index = [musicTableService loadRawIndexFor:directory];
+        NSDictionary* item = [index objectForKey:file];
+        if (item == NULL)
+        {
+            if (updateIfNecessary)
+            {
+                [controllers.tabBar setSelectedViewController:controllers.library];
+                [controllers.library updateLibraryWithSuccessCallback:^{
+                    [controllers.tabBar setSelectedViewController:controllers.current];
+                    [self replacePlaylistWithData:data updateIfNecessary:FALSE];
+                }];
+                return;
+            }
+        }
+        else
+        {
+            [items addObject:item];
+            if (i < [[data objectForKey:@"position"] intValue])
+            {
+                position++;
+            }
+        }
+    }
+    
+    int unbufferedItems = 0;
+    for (int i = 0; i < items.count; i++)
+    {
+        if ([musicFileManager getState:[items objectAtIndex:i]].state != MusicFileBuffered)
+        {
+            unbufferedItems++;
+        }
+    }
+    if (unbufferedItems > 20)
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Question", nil)
+                                                         message:[NSString stringWithFormat:NSLocalizedString(@"There are %d unbuffered items in your MPD playlist. What should I add?", nil), unbufferedItems]
+                                                        delegate:self
+                                               cancelButtonTitle:NSLocalizedString(@"Entire playlist", nil)
+                                               otherButtonTitles:NSLocalizedString(@"Current album and everything after", nil), NSLocalizedString(@"Only current album", nil), nil];
+            objc_setAssociatedObject(alert, ALERTVIEW, @"SUPERSEED", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            objc_setAssociatedObject(alert, DATA, data, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            objc_setAssociatedObject(alert, ITEMS, items, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            objc_setAssociatedObject(alert, POSITION, [NSNumber numberWithInteger:position], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            [alert show];
+            [alert release];
+        });
+        return;
+    }
+    else
+    {
+        [self replacePlaylistWithData:data items:items atIndex:position];
+    }
+}
+
+- (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    NSString* view = objc_getAssociatedObject(alertView, ALERTVIEW);
+    
+    if ([view isEqualToString:@"SUPERSEED"])
+    {
+        NSDictionary* data = objc_getAssociatedObject(alertView, DATA);
+        NSArray* items = objc_getAssociatedObject(alertView, ITEMS);
+        int position = [objc_getAssociatedObject(alertView, POSITION) intValue];
+        if (buttonIndex == 1 || buttonIndex == 2)
+        {
+            int currentAlbumBeginning;
+            NSString* currentAlbum = [[items objectAtIndex:position] objectForKey:@"album"];
+            for (currentAlbumBeginning = position; currentAlbumBeginning > 0; currentAlbumBeginning--)
+            {
+                if (![[[items objectAtIndex:(currentAlbumBeginning - 1)] objectForKey:@"album"] isEqualToString:currentAlbum])
+                {
+                    break;
+                }
+            }
+            items = [items subarrayWithRange:NSMakeRange(currentAlbumBeginning, items.count - currentAlbumBeginning)];
+            position -= currentAlbumBeginning;
+            
+            if (buttonIndex == 2)
+            {
+                int currentAlbumEnd;
+                for (currentAlbumEnd = position; currentAlbumEnd < items.count - 1; currentAlbumEnd++)
+                {
+                    if (![[[items objectAtIndex:(currentAlbumEnd + 1)] objectForKey:@"album"] isEqualToString:currentAlbum])
+                    {
+                        break;
+                    }
+                }
+                currentAlbumEnd++;
+                items = [items subarrayWithRange:NSMakeRange(0, currentAlbumEnd)];
+            }
+        }
+        [self replacePlaylistWithData:data items:items atIndex:position];
+    }
+}
+
+- (void)replacePlaylistWithData:(NSDictionary*)data items:(NSArray*)items atIndex:(int)index
+{
+    if (items.count)
+    {
+        [self clearPlaylist];
+        if ([musicFileManager getState:[items objectAtIndex:index]].state == MusicFileBuffered)
+        {
+            [self addFiles:items mode:AddToTheEnd];
+            [self playAtIndex:index atPosition:[[data objectForKey:@"elapsed"] intValue]];
+        }
+        else
+        {
+            self.bufferMostNecessaryOverride = index;
+            [self addFiles:items mode:AddToTheEnd];
+            self.whenItemIsBufferedPlayAtIndex = index;
+            self.whenItemIsBufferedPlayAtPosition = [[data objectForKey:@"elapsed"] intValue];
+        }
+        self.skipScrobblingCurrent = [[data objectForKey:@"scrobbled"] boolValue];
+    }
 }
 
 - (void)storePlaylistUndoHistory

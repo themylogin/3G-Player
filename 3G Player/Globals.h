@@ -20,6 +20,7 @@
 #import "Scrobbler.h"
 
 typedef struct {
+    UITabBarController* tabBar;
     CurrentController* current;
     LibraryController* library;
     RecentsController* recents;
