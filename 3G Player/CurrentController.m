@@ -15,6 +15,7 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import <QuartzCore/QuartzCore.h>
 
+#import "ASIFormDataRequest.h"
 #import "CocoaAsyncSocket/GCDAsyncSocket.h"
 #import "JSONKit.h"
 #import "MKNumberBadgeView.h"
@@ -1147,15 +1148,14 @@ static char const* const POSITION = "POSITION";
     if (self.currentIndex != -1)
     {
         NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
+        ASIFormDataRequest* asiRequest = [[ASIFormDataRequest alloc] init];
+        [asiRequest setStringEncoding:NSUTF8StringEncoding];
         NSURL* url = [NSURL URLWithString:
                       [NSString stringWithFormat:@"%@/lyrics?artist=%@&title=%@&format=html",
                        playerUrl,
-                       [[item objectForKey:@"artist"]
-                        stringByAddingPercentEncodingWithAllowedCharacters:
-                        [NSCharacterSet URLHostAllowedCharacterSet]],
-                       [[item objectForKey:@"title"]
-                        stringByAddingPercentEncodingWithAllowedCharacters:
-                        [NSCharacterSet URLHostAllowedCharacterSet]]]];
+                       [asiRequest encodeURL:[item objectForKey:@"artist"]],
+                       [asiRequest encodeURL:[item objectForKey:@"title"]]]];
+        [asiRequest release];
         [[UIApplication sharedApplication] openURL:url];
         [self closeToolbar];
     }

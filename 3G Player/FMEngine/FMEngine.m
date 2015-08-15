@@ -10,6 +10,8 @@
 #import "FMCallback.h"
 #import "FMEngineURLConnection.h"
 
+#import "ASIFormDataRequest.h"
+
 @implementation FMEngine
 
 static NSInteger sortAlpha(NSString *n1, NSString *n2, void *context) {
@@ -119,9 +121,13 @@ static NSInteger sortAlpha(NSString *n1, NSString *n2, void *context) {
 	NSMutableArray *aMutableArray = [[NSMutableArray alloc] initWithArray:[dict allKeys]];
 	[aMutableArray sortUsingFunction:sortAlpha context:self];
 	
+    ASIFormDataRequest* asiRequest = [[ASIFormDataRequest alloc] init];
+    [asiRequest setStringEncoding:NSUTF8StringEncoding];
 	for(NSString *key in aMutableArray) {
-		[rawBody appendString:[NSString stringWithFormat:@"&%@=%@", key, [dict objectForKey:key]]];
-	}	
+        [rawBody appendString:[NSString stringWithFormat:@"&%@=%@",
+                               [asiRequest encodeURL:key], [asiRequest encodeURL:[dict objectForKey:key]]]];
+	}
+    [asiRequest release];
 	
 	
 	NSString *body = [NSString stringWithString:rawBody];
@@ -138,20 +144,23 @@ static NSInteger sortAlpha(NSString *n1, NSString *n2, void *context) {
 	[rawURL appendString:_LASTFM_BASEURL_];
 	
 	int i;
-	
+    
+    ASIFormDataRequest* asiRequest = [[ASIFormDataRequest alloc] init];
+    [asiRequest setStringEncoding:NSUTF8StringEncoding];
 	for(i = 0; i < [aMutableArray count]; i++) {
 		NSString *key = [aMutableArray objectAtIndex:i];
 		if(i == 0) {
-			[rawURL appendString:[NSString stringWithFormat:@"?%@=%@", key, [dict objectForKey:key]]];
+            [rawURL appendString:[NSString stringWithFormat:@"?%@=%@",
+                                  [asiRequest encodeURL:key], [asiRequest encodeURL:[dict objectForKey:key]]]];
 		} else {
-			[rawURL appendString:[NSString stringWithFormat:@"&%@=%@", key, [dict objectForKey:key]]];
+            [rawURL appendString:[NSString stringWithFormat:@"&%@=%@",
+                                  [asiRequest encodeURL:key], [asiRequest encodeURL:[dict objectForKey:key]]]];
 		}
 	}
+    [asiRequest release];
 	
-	NSString *encodedURL = [(NSString *)rawURL stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
-	NSURL *url = [NSURL URLWithString:encodedURL];
-	[rawURL release];
-	[aMutableArray release];
+	NSURL *url = [NSURL URLWithString:rawURL];
+    [aMutableArray release];
 	
 	return url;
 }

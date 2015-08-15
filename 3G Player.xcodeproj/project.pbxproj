@@ -18,7 +18,6 @@
 		841F38AB1A31BD5A0046CDD2 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841F38AA1A31BD5A0046CDD2 /* CoreText.framework */; };
 		841F38AD1A31BD9B0046CDD2 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841F38AC1A31BD9B0046CDD2 /* QuickLook.framework */; };
 		843106481A31C25F00CFA73E /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 843106441A31C25F00CFA73E /* HockeySDK.framework */; };
-		843106491A31C25F00CFA73E /* HockeySDK.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 843106461A31C25F00CFA73E /* HockeySDK.xcconfig */; };
 		8431064A1A31C25F00CFA73E /* HockeySDKResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 843106471A31C25F00CFA73E /* HockeySDKResources.bundle */; };
 		84838B541A33280C00D68AF2 /* google@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84838B521A33280C00D68AF2 /* google@2x.png */; };
 		84838B551A33280C00D68AF2 /* love@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84838B531A33280C00D68AF2 /* love@2x.png */; };
@@ -556,7 +555,7 @@
 		84C10BDF1782E08D004220BC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0460;
+				LastUpgradeCheck = 0640;
 				ORGANIZATIONNAME = themylogin;
 				TargetAttributes = {
 					84C10BE61782E08D004220BC = {
@@ -625,7 +624,6 @@
 				84B5D20C17CBB730007FB471 /* Icon-Small@2x.png in Resources */,
 				840177A81AC6B7A200AC3792 /* superseed@2x.png in Resources */,
 				84C836AC18F0779F00033739 /* tabbar_library@2x.png in Resources */,
-				843106491A31C25F00CFA73E /* HockeySDK.xcconfig in Resources */,
 				841F388D1A31B8E60046CDD2 /* tabbar_recents.png in Resources */,
 				84B5D20D17CBB730007FB471 /* iTunesArtwork.png in Resources */,
 				84DEA2D6191FC2A1000F9832 /* tabbar_info@2x.png in Resources */,
