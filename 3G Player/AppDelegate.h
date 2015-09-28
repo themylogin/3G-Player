@@ -6,10 +6,9 @@
 //  Copyright (c) 2013 themylogin. All rights reserved.
 //
 
-#import <HockeySDK/HockeySDK.h>
 #import <UIKit/UIKit.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, BITCrashManagerDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 

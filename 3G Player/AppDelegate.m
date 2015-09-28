@@ -27,26 +27,9 @@ dispatch_queue_t serverSocketQueue;
 {
     application.idleTimerDisabled = YES;
     
-    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"236aabdc407ab7879c409c736a33c2cb"];
-    [[BITHockeyManager sharedHockeyManager] startManager];
-    
-    if ([self didCrashInLastSessionOnStartup])
-    {
-        // show intermediate UI
-    }
-    else
-    {
-        [self setupApplication];
-    }
-    [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
+    [self setupApplication];
     
     return YES;
-}
-
-- (BOOL)didCrashInLastSessionOnStartup
-{
-    return ([[BITHockeyManager sharedHockeyManager].crashManager didCrashInLastSession] &&
-            [[BITHockeyManager sharedHockeyManager].crashManager timeintervalCrashInLastSessionOccured] < 5);
 }
 
 - (void)setupApplication
@@ -215,32 +198,6 @@ dispatch_queue_t serverSocketQueue;
     
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
     [defaultsToRegister release];
-}
-
-#pragma mark - BITCrashManagerDelegate
-
-- (void)crashManagerWillCancelSendingCrashReport:(BITCrashManager *)crashManager
-{
-    if ([self didCrashInLastSessionOnStartup])
-    {
-        [self setupApplication];
-    }
-}
-
-- (void)crashManager:(BITCrashManager *)crashManager didFailWithError:(NSError *)error
-{
-    if ([self didCrashInLastSessionOnStartup])
-    {
-        [self setupApplication];
-    }
-}
-
-- (void)crashManagerDidFinishSendingCrashReport:(BITCrashManager *)crashManager
-{
-    if ([self didCrashInLastSessionOnStartup])
-    {
-        [self setupApplication];
-    }
 }
 
 @end

@@ -17,8 +17,6 @@
 		841F38A91A31BD050046CDD2 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841F38A81A31BD050046CDD2 /* AssetsLibrary.framework */; };
 		841F38AB1A31BD5A0046CDD2 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841F38AA1A31BD5A0046CDD2 /* CoreText.framework */; };
 		841F38AD1A31BD9B0046CDD2 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 841F38AC1A31BD9B0046CDD2 /* QuickLook.framework */; };
-		843106481A31C25F00CFA73E /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 843106441A31C25F00CFA73E /* HockeySDK.framework */; };
-		8431064A1A31C25F00CFA73E /* HockeySDKResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 843106471A31C25F00CFA73E /* HockeySDKResources.bundle */; };
 		84838B541A33280C00D68AF2 /* google@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84838B521A33280C00D68AF2 /* google@2x.png */; };
 		84838B551A33280C00D68AF2 /* love@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84838B531A33280C00D68AF2 /* love@2x.png */; };
 		84838B581A33292900D68AF2 /* google.png in Resources */ = {isa = PBXBuildFile; fileRef = 84838B561A33292900D68AF2 /* google.png */; };
@@ -115,9 +113,6 @@
 		841F38A81A31BD050046CDD2 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		841F38AA1A31BD5A0046CDD2 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		841F38AC1A31BD9B0046CDD2 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
-		843106441A31C25F00CFA73E /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HockeySDK.framework; sourceTree = "<group>"; };
-		843106461A31C25F00CFA73E /* HockeySDK.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = HockeySDK.xcconfig; sourceTree = "<group>"; };
-		843106471A31C25F00CFA73E /* HockeySDKResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HockeySDKResources.bundle; sourceTree = "<group>"; };
 		84838B521A33280C00D68AF2 /* google@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "google@2x.png"; sourceTree = "<group>"; };
 		84838B531A33280C00D68AF2 /* love@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "love@2x.png"; sourceTree = "<group>"; };
 		84838B561A33292900D68AF2 /* google.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = google.png; sourceTree = "<group>"; };
@@ -249,7 +244,6 @@
 				841F38AD1A31BD9B0046CDD2 /* QuickLook.framework in Frameworks */,
 				841F38AB1A31BD5A0046CDD2 /* CoreText.framework in Frameworks */,
 				84C10BEF1782E08E004220BC /* CoreGraphics.framework in Frameworks */,
-				843106481A31C25F00CFA73E /* HockeySDK.framework in Frameworks */,
 				841F38A91A31BD050046CDD2 /* AssetsLibrary.framework in Frameworks */,
 				84C3099D188A94D20087352B /* libz.dylib in Frameworks */,
 				84C29E7D17F8562600D259F3 /* AudioToolbox.framework in Frameworks */,
@@ -267,32 +261,12 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		843106431A31C25F00CFA73E /* HockeySDK.embeddedframework */ = {
-			isa = PBXGroup;
-			children = (
-				843106441A31C25F00CFA73E /* HockeySDK.framework */,
-				843106451A31C25F00CFA73E /* Resources */,
-			);
-			name = HockeySDK.embeddedframework;
-			path = "3G Player/HockeySDK.embeddedframework";
-			sourceTree = "<group>";
-		};
-		843106451A31C25F00CFA73E /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				843106461A31C25F00CFA73E /* HockeySDK.xcconfig */,
-				843106471A31C25F00CFA73E /* HockeySDKResources.bundle */,
-			);
-			path = Resources;
-			sourceTree = "<group>";
-		};
 		84C10BDE1782E08D004220BC = {
 			isa = PBXGroup;
 			children = (
 				84C10BF01782E08E004220BC /* 3G Player */,
 				84C10BE91782E08D004220BC /* Frameworks */,
 				84C10BE81782E08D004220BC /* Products */,
-				843106431A31C25F00CFA73E /* HockeySDK.embeddedframework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -559,7 +533,7 @@
 				ORGANIZATIONNAME = themylogin;
 				TargetAttributes = {
 					84C10BE61782E08D004220BC = {
-						DevelopmentTeam = P8ZZXCNN95;
+						DevelopmentTeam = 6Q36KVUBMJ;
 					};
 				};
 			};
@@ -617,7 +591,6 @@
 				84DEA2D5191FC2A1000F9832 /* tabbar_info.png in Resources */,
 				84838B541A33280C00D68AF2 /* google@2x.png in Resources */,
 				84B5D20A17CBB730007FB471 /* Icon-Small-50@2x.png in Resources */,
-				8431064A1A31C25F00CFA73E /* HockeySDKResources.bundle in Resources */,
 				84D38D571AC1E031007564D3 /* scrobbler@2x.png in Resources */,
 				84B5D20B17CBB730007FB471 /* Icon-Small.png in Resources */,
 				84838B591A33292900D68AF2 /* love.png in Resources */,
