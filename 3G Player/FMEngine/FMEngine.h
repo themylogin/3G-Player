@@ -11,7 +11,7 @@
 
 #define _LASTFM_API_KEY_ @"188cb6eefd96e50a5a15e67a04e845d7"
 #define _LASTFM_SECRETK_ @"278a1a819cf8bcbf30edbfa1eea6ae98"
-#define _LASTFM_BASEURL_ @"http://ws.audioscrobbler.com/2.0/"
+#define _LASTFM_BASEURL_ @"https://ws.audioscrobbler.com/2.0/"
 
 // Comment the next line to use XML
 #define _USE_JSON_ 1
