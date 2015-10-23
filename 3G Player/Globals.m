@@ -23,5 +23,5 @@ int freeSpaceMb;
 NSString* lastfmUsername;
 NSString* lastfmPassword;
 
-UIBarButtonItem* updateLibraryButton;
-UIBarButtonItem* updateLibraryProgress;
+UIBarButtonItem* libraryRightBarButtonItem;
+UIBarButtonItem* libraryToolbarButtonItem;

@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface LibraryController : UINavigationController
+@interface LibraryController : UINavigationController <UISearchBarDelegate>
+
+@property (nonatomic, retain) UISearchBar* librarySearchBar;
 
 - (id)initWithRoot;
 

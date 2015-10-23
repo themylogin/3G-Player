@@ -93,8 +93,8 @@
 {
     [super viewDidLoad];
  
-    self.navigationItem.rightBarButtonItem = updateLibraryButton;
-    self.toolbarItems = [NSArray arrayWithObject:updateLibraryProgress];
+    self.navigationItem.rightBarButtonItem = libraryRightBarButtonItem;
+    self.toolbarItems = [NSArray arrayWithObject:libraryToolbarButtonItem];
 }
 
 - (void)didReceiveMemoryWarning

@@ -42,7 +42,7 @@ extern int freeSpaceMb;
 extern NSString* lastfmUsername;
 extern NSString* lastfmPassword;
 
-extern UIBarButtonItem* updateLibraryButton;
-extern UIBarButtonItem* updateLibraryProgress;
+extern UIBarButtonItem* libraryRightBarButtonItem;
+extern UIBarButtonItem* libraryToolbarButtonItem;
 
 #endif

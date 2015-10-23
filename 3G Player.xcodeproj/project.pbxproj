@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		687073361BDABA03000F6013 /* ASIHTTPRequest in Resources */ = {isa = PBXBuildFile; fileRef = 6870732D1BDABA03000F6013 /* ASIHTTPRequest */; settings = {ASSET_TAGS = (); }; };
+		687073371BDABA03000F6013 /* CocoaAsyncSocket in Resources */ = {isa = PBXBuildFile; fileRef = 6870732E1BDABA03000F6013 /* CocoaAsyncSocket */; settings = {ASSET_TAGS = (); }; };
+		687073381BDABA03000F6013 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 6870732F1BDABA03000F6013 /* en.lproj */; settings = {ASSET_TAGS = (); }; };
+		687073391BDABA03000F6013 /* FMEngine in Resources */ = {isa = PBXBuildFile; fileRef = 687073301BDABA03000F6013 /* FMEngine */; settings = {ASSET_TAGS = (); }; };
+		6870733A1BDABA03000F6013 /* HockeySDK.embeddedframework in Resources */ = {isa = PBXBuildFile; fileRef = 687073311BDABA03000F6013 /* HockeySDK.embeddedframework */; settings = {ASSET_TAGS = (); }; };
+		6870733B1BDABA03000F6013 /* JSONKit in Resources */ = {isa = PBXBuildFile; fileRef = 687073321BDABA03000F6013 /* JSONKit */; settings = {ASSET_TAGS = (); }; };
+		6870733C1BDABA03000F6013 /* SearchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 687073341BDABA03000F6013 /* SearchController.m */; settings = {ASSET_TAGS = (); }; };
+		6870733D1BDABA03000F6013 /* SearchController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 687073351BDABA03000F6013 /* SearchController.xib */; settings = {ASSET_TAGS = (); }; };
 		840177A71AC6B7A200AC3792 /* superseed.png in Resources */ = {isa = PBXBuildFile; fileRef = 840177A51AC6B7A200AC3792 /* superseed.png */; };
 		840177A81AC6B7A200AC3792 /* superseed@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 840177A61AC6B7A200AC3792 /* superseed@2x.png */; };
 		84075B661A3086A3001E395C /* RecentsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84075B641A3086A3001E395C /* RecentsController.m */; };
@@ -101,6 +109,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6870732D1BDABA03000F6013 /* ASIHTTPRequest */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ASIHTTPRequest; sourceTree = "<group>"; };
+		6870732E1BDABA03000F6013 /* CocoaAsyncSocket */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CocoaAsyncSocket; sourceTree = "<group>"; };
+		6870732F1BDABA03000F6013 /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = en.lproj; sourceTree = "<group>"; };
+		687073301BDABA03000F6013 /* FMEngine */ = {isa = PBXFileReference; lastKnownFileType = folder; path = FMEngine; sourceTree = "<group>"; };
+		687073311BDABA03000F6013 /* HockeySDK.embeddedframework */ = {isa = PBXFileReference; lastKnownFileType = folder; path = HockeySDK.embeddedframework; sourceTree = "<group>"; };
+		687073321BDABA03000F6013 /* JSONKit */ = {isa = PBXFileReference; lastKnownFileType = folder; path = JSONKit; sourceTree = "<group>"; };
+		687073331BDABA03000F6013 /* SearchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchController.h; sourceTree = "<group>"; };
+		687073341BDABA03000F6013 /* SearchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchController.m; sourceTree = "<group>"; };
+		687073351BDABA03000F6013 /* SearchController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SearchController.xib; sourceTree = "<group>"; };
 		840177A51AC6B7A200AC3792 /* superseed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = superseed.png; sourceTree = "<group>"; };
 		840177A61AC6B7A200AC3792 /* superseed@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "superseed@2x.png"; sourceTree = "<group>"; };
 		84075B631A3086A3001E395C /* RecentsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecentsController.h; sourceTree = "<group>"; };
@@ -304,6 +321,15 @@
 		84C10BF01782E08E004220BC /* 3G Player */ = {
 			isa = PBXGroup;
 			children = (
+				6870732D1BDABA03000F6013 /* ASIHTTPRequest */,
+				6870732E1BDABA03000F6013 /* CocoaAsyncSocket */,
+				6870732F1BDABA03000F6013 /* en.lproj */,
+				687073301BDABA03000F6013 /* FMEngine */,
+				687073311BDABA03000F6013 /* HockeySDK.embeddedframework */,
+				687073321BDABA03000F6013 /* JSONKit */,
+				687073331BDABA03000F6013 /* SearchController.h */,
+				687073341BDABA03000F6013 /* SearchController.m */,
+				687073351BDABA03000F6013 /* SearchController.xib */,
 				84D38D581AC1E0BB007564D3 /* MKNumberBadgeView.h */,
 				84D38D591AC1E0BB007564D3 /* MKNumberBadgeView.m */,
 				84C4CA111785ADA500A95DB9 /* Globals.h */,
@@ -565,7 +591,9 @@
 				84C10BFF1782E08E004220BC /* Default@2x.png in Resources */,
 				84C10C011782E08E004220BC /* Default-568h@2x.png in Resources */,
 				84C4CA1B1785ADA500A95DB9 /* LibraryPageController.xib in Resources */,
+				687073381BDABA03000F6013 /* en.lproj in Resources */,
 				84C4CA1D1785ADA500A95DB9 /* CurrentController.xib in Resources */,
+				687073391BDABA03000F6013 /* FMEngine in Resources */,
 				84C4CA2A1785E3ED00A95DB9 /* icons.png in Resources */,
 				84C4CA2B1785E3ED00A95DB9 /* pause_active.png in Resources */,
 				84C4CA2C1785E3ED00A95DB9 /* pause_inactive.png in Resources */,
@@ -578,7 +606,9 @@
 				840177A71AC6B7A200AC3792 /* superseed.png in Resources */,
 				84C4CA311785E3ED00A95DB9 /* repeat_track.png in Resources */,
 				84C4CA431786F4EB00A95DB9 /* Settings.bundle in Resources */,
+				6870733B1BDABA03000F6013 /* JSONKit in Resources */,
 				84943CBC17CBB33A00A1CD17 /* Icon.png in Resources */,
+				6870733A1BDABA03000F6013 /* HockeySDK.embeddedframework in Resources */,
 				84CE88841AF34C5B00F1129A /* InfoController.xib in Resources */,
 				84838B581A33292900D68AF2 /* google.png in Resources */,
 				84943CBD17CBB33A00A1CD17 /* Icon@2x.png in Resources */,
@@ -591,8 +621,11 @@
 				84DEA2D5191FC2A1000F9832 /* tabbar_info.png in Resources */,
 				84838B541A33280C00D68AF2 /* google@2x.png in Resources */,
 				84B5D20A17CBB730007FB471 /* Icon-Small-50@2x.png in Resources */,
+				687073361BDABA03000F6013 /* ASIHTTPRequest in Resources */,
+				6870733D1BDABA03000F6013 /* SearchController.xib in Resources */,
 				84D38D571AC1E031007564D3 /* scrobbler@2x.png in Resources */,
 				84B5D20B17CBB730007FB471 /* Icon-Small.png in Resources */,
+				687073371BDABA03000F6013 /* CocoaAsyncSocket in Resources */,
 				84838B591A33292900D68AF2 /* love.png in Resources */,
 				84B5D20C17CBB730007FB471 /* Icon-Small@2x.png in Resources */,
 				840177A81AC6B7A200AC3792 /* superseed@2x.png in Resources */,
@@ -633,6 +666,7 @@
 				84C91A051784255200810B88 /* unzip.c in Sources */,
 				84C91A061784255200810B88 /* zip.c in Sources */,
 				84C91A071784255200810B88 /* ZipArchive.mm in Sources */,
+				6870733C1BDABA03000F6013 /* SearchController.m in Sources */,
 				84C91A0A17856C5500810B88 /* MusicFileManager.m in Sources */,
 				84C4CA191785ADA500A95DB9 /* Globals.m in Sources */,
 				84C4CA1A1785ADA500A95DB9 /* LibraryPageController.m in Sources */,

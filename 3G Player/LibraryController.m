@@ -10,14 +10,18 @@
 
 #import "Globals.h"
 #import "LibraryPageController.h"
+#import "SearchController.h"
 
 #import "ASIFormDataRequest.h"
 #import "JSONKit.h"
 #import "ZipArchive.h"
 
-@interface LibraryController ()
+@interface LibraryController () <UINavigationControllerDelegate>
 
 @property (nonatomic, retain) UILabel* updateLibraryProgressLabel;
+@property (nonatomic, retain) NSArray* searchIndex;
+@property (nonatomic, retain) SearchController* searchController;
+@property (nonatomic, retain) UIViewController* searchStartController;
 
 @end
 
@@ -28,21 +32,31 @@
     self = [super initWithRootViewController:[[LibraryPageController alloc] initWithDirectory:@"" title:NSLocalizedString(@"Library", @"Library")]];
     if (self)
     {
-        updateLibraryButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(updateLibrary)];
+        [self loadSearchIndex];
+        self.searchController = [[SearchController alloc] init];
+        self.searchStartController = nil;
         
-        self.updateLibraryProgressLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 11.0, self.view.frame.size.width, 21.0f)];
+        libraryRightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(updateLibrary)];
+        
+        self.librarySearchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width - 24, 44)];
+        self.librarySearchBar.showsCancelButton = YES;
+        self.librarySearchBar.delegate = self;
+        
+        self.updateLibraryProgressLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 11.0, self.view.frame.size.width, 21.0)];
         self.updateLibraryProgressLabel.backgroundColor = [UIColor clearColor];
         self.updateLibraryProgressLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:12];
         self.updateLibraryProgressLabel.textColor = [UIColor whiteColor];
         self.updateLibraryProgressLabel.text = @"";
-        updateLibraryProgress = [[UIBarButtonItem alloc] initWithCustomView:self.updateLibraryProgressLabel];
-        updateLibraryProgress.enabled = NO;
+        
+        libraryToolbarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.librarySearchBar];
         
         self.tabBarItem.title = NSLocalizedString(@"Library", nil);
         self.tabBarItem.image = [UIImage imageNamed:@"tabbar_library.png"];
         
         self.toolbar.tintColor = [UIColor colorWithRed:43.0 / 255 green:43.0 / 255 blue:43.0 / 255 alpha:0.5];
-        self.toolbarHidden = YES;
+        self.toolbarHidden = NO;
+        
+        self.delegate = self;
     }
     return self;
 }
@@ -66,9 +80,12 @@
 
 - (void)updateLibraryWithSuccessCallback:(void(^)())callback;
 {
-    updateLibraryButton.enabled = NO;
+    libraryRightBarButtonItem.enabled = NO;
+    
+    libraryToolbarButtonItem.enabled = NO;
+    libraryToolbarButtonItem.customView = self.updateLibraryProgressLabel;
+    
     self.updateLibraryProgressLabel.text = @"Updating";
-    self.toolbarHidden = NO;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         NSString* libraryFile = [libraryDirectory stringByAppendingString:@"/library.zip"];
@@ -144,8 +161,12 @@
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            updateLibraryButton.enabled = YES;
-            self.toolbarHidden = YES;
+            libraryRightBarButtonItem.enabled = YES;
+            
+            libraryToolbarButtonItem.enabled = YES;
+            libraryToolbarButtonItem.customView = self.librarySearchBar;
+            
+            [self loadSearchIndex];
             
             LibraryPageController* lastValidController = nil;
             for (LibraryPageController* controller in [self viewControllers])
@@ -164,6 +185,89 @@
             callback();
         });
     });
+}
+
+- (void)loadSearchIndex
+{
+    NSString* searchJsonPath = [libraryDirectory stringByAppendingString:@"/search.json"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:searchJsonPath])
+    {
+        self.searchIndex = [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfFile:searchJsonPath]];
+    }
+    else
+    {
+        self.searchIndex = [NSArray array];
+    }
+}
+
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
+{
+    [self stopSearch];
+    
+    if (self.searchStartController)
+    {
+        if ([self.viewControllers containsObject:self.searchStartController])
+        {
+            [self popToViewController:self.searchStartController animated:YES];
+        }
+        else
+        {
+            [self popToRootViewControllerAnimated:YES];
+        }
+        self.searchStartController = nil;
+    }
+}
+
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
+    searchText = [searchText lowercaseString];
+    searchText = [searchText stringByReplacingOccurrencesOfString:@" " withString:@""];
+    
+    NSMutableArray* results = [NSMutableArray arrayWithCapacity:100];
+    if (![searchText isEqualToString:@""])
+    {
+        for (int i = 0; i < self.searchIndex.count; i++)
+        {
+            if ([self.searchIndex[i][@"key"] hasPrefix:searchText])
+            {
+                [results addObject:self.searchIndex[i][@"item"]];
+                if (results.count == 100)
+                {
+                    break;
+                }
+            }
+        }
+    }
+    [self.searchController setSearchQuery:searchText results:results];
+    
+    if ([self.viewControllers lastObject] != self.searchController)
+    {
+        self.searchStartController = [self.viewControllers lastObject];
+    }
+    
+    if ([self.viewControllers containsObject:self.searchController])
+    {
+        [self popToViewController:self.searchController animated:NO];
+    }
+    else
+    {
+        [self pushViewController:self.searchController animated:NO];
+    }
+}
+
+- (void)stopSearch
+{
+    self.librarySearchBar.text = @"";
+    [self.librarySearchBar resignFirstResponder];
+}
+
+
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    if (viewController != self.searchController)
+    {
+        [self stopSearch];
+    }
 }
 
 @end
