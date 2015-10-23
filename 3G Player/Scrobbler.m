@@ -76,6 +76,7 @@
     {
         NSMutableDictionary* queueItem = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                           [file objectForKey:@"artist"], @"artist",
+                                          [file objectForKey:@"album"], @"album",
                                           [file objectForKey:@"title"], @"title",
                                           action, @"action",
                                           nil];
@@ -154,6 +155,7 @@
         [fmEngine dataForMethod:@"track.updateNowPlaying"
                  withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
                                  [arguments objectForKey:@"artist"], @"artist",
+                                 [arguments objectForKey:@"album"], @"album",
                                  [arguments objectForKey:@"title"], @"track",
                                  self.sessionKey, @"sk",
                                  _LASTFM_API_KEY_, @"api_key",
@@ -271,6 +273,7 @@
     FMEngine* fmEngine = [[FMEngine alloc] init];
     NSData* reply = [fmEngine dataForMethod:@"track.scrobble" withParameters:[NSDictionary dictionaryWithObjectsAndKeys:
                                                                               [scrobble objectForKey:@"artist"], @"artist",
+                                                                              [scrobble objectForKey:@"album"], @"album",
                                                                               [scrobble objectForKey:@"title"], @"track",
                                                                               [scrobble objectForKey:@"timestamp"], @"timestamp",
                                                                               self.sessionKey, @"sk",
