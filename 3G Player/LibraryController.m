@@ -259,10 +259,11 @@
 {
     self.librarySearchBar.text = @"";
     [self.librarySearchBar resignFirstResponder];
+    [self.view endEditing:YES];
 }
 
 
-- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+- (void)navigationController:(UINavigationController *)navigationController didShowViewController:(nonnull UIViewController *)viewController animated:(BOOL)animated
 {
     if (viewController != self.searchController)
     {
