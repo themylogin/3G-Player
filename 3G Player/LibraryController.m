@@ -40,6 +40,7 @@
         
         self.librarySearchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width - 24, 44)];
         self.librarySearchBar.showsCancelButton = YES;
+        self.librarySearchBar.placeholder = @"Search";
         self.librarySearchBar.delegate = self;
         
         self.updateLibraryProgressLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 11.0, self.view.frame.size.width, 21.0)];
