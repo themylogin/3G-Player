@@ -90,11 +90,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSDictionary* item = [self getItemForIndexPath:indexPath];
-    
-    LibraryPageController* controller = [[LibraryPageController alloc]
-                                         initWithDirectory:[item objectForKey:@"path"]
-                                         title:[item objectForKey:@"name"]];
-    [controllers.library pushViewController:controller animated:YES];
+    [musicTableService navigateLibraryToItem:item enter:YES];
 }
 
 #pragma mark - Gesture recognizer

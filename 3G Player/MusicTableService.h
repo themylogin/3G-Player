@@ -18,6 +18,8 @@ typedef enum { BlacklistExtraButton = 1 } ExtraButtons;
 
 - (id)init;
 
+- (void)navigateLibraryToItem:(NSDictionary*)item enter:(BOOL)enter;
+
 - (UITableViewCell*)cellForMusicItem:(NSDictionary*)item tableView:(UITableView *)tableView;
 - (void)showActionSheetForItem:(NSDictionary*)item inView:(UIView*)view withExtraButtons:(int)extraButtons;
 

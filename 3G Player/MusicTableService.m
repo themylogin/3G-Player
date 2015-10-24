@@ -8,7 +8,9 @@
 
 #import "MusicTableService.h"
 
+#import "AppDelegate.h"
 #import "Globals.h"
+#import "LibraryPageController.h"
 
 #import "JSONKit.h"
 
@@ -43,6 +45,51 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     
     return self;
 }
+
+- (void)navigateLibraryToItem:(NSDictionary*)item enter:(BOOL)enter
+{
+    NSMutableArray* libraryControllers = [[NSMutableArray alloc] init];
+    NSMutableArray* scrollTargets = [[NSMutableArray alloc] init];
+    NSString* parent = [item objectForKey:@"path"];
+    NSDictionary* child = item;
+    while (![(parent = [parent stringByDeletingLastPathComponent]) isEqualToString:@""])
+    {
+        NSDictionary* parentItem = [musicFileManager itemByPath:parent];
+        if (parentItem != nil)
+        {
+            LibraryPageController* controller = [[LibraryPageController alloc]
+                                                 initWithDirectory:parent
+                                                 title:[parentItem objectForKey:@"name"]];
+            [libraryControllers insertObject:controller atIndex:0];
+            [scrollTargets insertObject:child atIndex:0];
+            child = parentItem;
+            
+        }
+    }
+    
+    [controllers.library popToRootViewControllerAnimated:NO];
+    for (int i = 0; i < [libraryControllers count]; i++)
+    {
+        [controllers.library pushViewController:[libraryControllers objectAtIndex:i] animated:NO];
+    }
+    AppDelegate* delegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+    [delegate.tabBarController setSelectedViewController:controllers.library];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (int i = 0; i < [libraryControllers count]; i++)
+        {
+            [[libraryControllers objectAtIndex:i] scrollToItem:[scrollTargets objectAtIndex:i]];
+        }
+    });
+    
+    if (enter)
+    {
+        LibraryPageController* controller = [[LibraryPageController alloc]
+                                             initWithDirectory:[item objectForKey:@"path"]
+                                             title:[item objectForKey:@"name"]];
+        [controllers.library pushViewController:controller animated:NO];
+    }
+}
+
 
 - (UITableViewCell*)cellForMusicItem:(NSDictionary*)item tableView:(UITableView *)tableView
 {
