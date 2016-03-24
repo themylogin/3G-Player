@@ -1151,7 +1151,7 @@ static char const* const POSITION = "POSITION";
         ASIFormDataRequest* asiRequest = [[ASIFormDataRequest alloc] init];
         [asiRequest setStringEncoding:NSUTF8StringEncoding];
         NSURL* url = [NSURL URLWithString:
-                      [NSString stringWithFormat:@"%@/lyrics?artist=%@&title=%@&format=html",
+                      [NSString stringWithFormat:@"%@/lyrics/%@/%@",
                        playerUrl,
                        [asiRequest encodeURL:[item objectForKey:@"artist"]],
                        [asiRequest encodeURL:[item objectForKey:@"title"]]]];

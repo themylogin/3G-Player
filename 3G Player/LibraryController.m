@@ -12,7 +12,7 @@
 #import "LibraryPageController.h"
 #import "SearchController.h"
 
-#import "ASIFormDataRequest.h"
+#import "ASIHTTPRequest.h"
 #import "JSONKit.h"
 #import "ZipArchive.h"
 
@@ -86,7 +86,7 @@
     libraryToolbarButtonItem.enabled = NO;
     libraryToolbarButtonItem.customView = self.updateLibraryProgressLabel;
     
-    self.updateLibraryProgressLabel.text = @"Updating";
+    self.updateLibraryProgressLabel.text = @"Updating library...";
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         NSString* libraryFile = [libraryDirectory stringByAppendingString:@"/library.zip"];
@@ -103,13 +103,10 @@
             revision = @"";
         }
         
-        NSURL* libraryUrl = [NSURL URLWithString:[playerUrl stringByAppendingString:[NSString stringWithFormat:@"/library?revision=%@", revision, nil]]];
-        ASIFormDataRequest* libraryRequest = [ASIFormDataRequest requestWithURL:libraryUrl];
+        NSURL* libraryUrl = [NSURL URLWithString:[playerUrl stringByAppendingString:[NSString stringWithFormat:@"/library?since-revision=%@", revision, nil]]];
+        ASIHTTPRequest* libraryRequest = [ASIHTTPRequest requestWithURL:libraryUrl];
         [libraryRequest setShouldContinueWhenAppEntersBackground:YES];
         [libraryRequest setDownloadDestinationPath:libraryFile];
-        [libraryRequest setBytesSentBlock:^(unsigned long long size, unsigned long long total) {
-            self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Sending library request: (%.0f%%)", (float)size / total * 100, nil];
-        }];
         [libraryRequest setBytesReceivedBlock:^(unsigned long long size, unsigned long long total) {
             self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Receiving library: (%.0f%%)", (float)size / total * 100, nil];
         }];
@@ -178,8 +175,11 @@
                 }
                 else
                 {
-                    [self popToViewController:lastValidController animated:YES];
-                    break;
+                    if (lastValidController)
+                    {
+                        [self popToViewController:lastValidController animated:YES];
+                        break;
+                    }
                 }
             }
             

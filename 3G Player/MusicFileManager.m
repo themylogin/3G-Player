@@ -180,8 +180,9 @@
     [self removeOldFiles];
     [self notifyFileUsage:musicFile];
     
-    NSString* url = [[playerUrl stringByAppendingString:@"/file?path="] stringByAppendingString:[musicFile objectForKey:@"url"]];
-    NSString* sizeUrl = [[playerUrl stringByAppendingString:@"/file_size?path="] stringByAppendingString:[musicFile objectForKey:@"url"]];
+    NSString* url = [[playerUrl stringByAppendingString:@"/music/"] stringByAppendingString:[musicFile objectForKey:@"url"]];
+    self.bufferingRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:url]];
+    
     NSString* incompletePath = [self incompleteFilePath:musicFile];
     NSString* destinationPath = [self filePath:musicFile];
     if ([self.fileManager fileExistsAtPath:incompletePath])
@@ -189,7 +190,7 @@
         unsigned long long fileSize = [[self.fileManager attributesOfItemAtPath:incompletePath error:nil] fileSize];
         if (fileSize > 0)
         {
-            url = [url stringByAppendingFormat:@"&content_offset=%llu", fileSize];
+            [self.bufferingRequest addRequestHeader:@"X-Content-Offset" value:[NSString stringWithFormat:@"%llu", fileSize]];
         }
     }
     else
@@ -200,7 +201,6 @@
     self.bufferingFileHandle = [NSFileHandle fileHandleForWritingAtPath:incompletePath];
     [self.bufferingFileHandle seekToEndOfFile];
     
-    self.bufferingRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:url]];
     [self.bufferingRequest setAllowCompressedResponse:NO];
     [self.bufferingRequest setShouldContinueWhenAppEntersBackground:YES];
     [self.bufferingRequest setFailedBlock:^{
@@ -227,8 +227,8 @@
     [self.bufferingRequest setCompletionBlock:^{
         unsigned long long fileSize = [[self.fileManager attributesOfItemAtPath:incompletePath error:nil] fileSize];
         
-        ASIHTTPRequest* sizeRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:sizeUrl]];
-        [sizeRequest setAllowCompressedResponse:NO];
+        ASIHTTPRequest* sizeRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:url]];
+        [sizeRequest setRequestMethod:@"HEAD"];
         [sizeRequest setShouldContinueWhenAppEntersBackground:YES];
         [sizeRequest startSynchronous];
         if (sizeRequest.error || [sizeRequest responseStatusCode] != 200)
@@ -236,7 +236,7 @@
             [self onBufferingRequestError];
             return;
         }
-        int responseSize = [[sizeRequest responseString] intValue];
+        int responseSize = [[[sizeRequest responseHeaders] objectForKey:@"X-Content-Length"] intValue];
         if (fileSize != responseSize)
         {
             if (fileSize > responseSize)
@@ -306,7 +306,7 @@
         
         NSURL* coverUrl = [NSURL URLWithString:
                            [playerUrl stringByAppendingString:
-                            [NSString stringWithFormat:@"/cover?path=%@", remoteCoverPath, nil]]];
+                            [NSString stringWithFormat:@"/cover/%@", remoteCoverPath, nil]]];
         ASIHTTPRequest* coverRequest = [ASIHTTPRequest requestWithURL:coverUrl];
         [coverRequest setShouldContinueWhenAppEntersBackground:YES];
         [coverRequest setDownloadDestinationPath:coverPath];
