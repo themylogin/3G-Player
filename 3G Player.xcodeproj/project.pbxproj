@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		681B12311CA53E30000FB01A /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 681B12301CA53E30000FB01A /* Icons.xcassets */; };
+		681B12331CA55AFD000FB01A /* silence.wav in Resources */ = {isa = PBXBuildFile; fileRef = 681B12321CA55AFD000FB01A /* silence.wav */; };
+		681B12351CA57406000FB01A /* KeepAliver.m in Sources */ = {isa = PBXBuildFile; fileRef = 681B12341CA57406000FB01A /* KeepAliver.m */; };
 		687073361BDABA03000F6013 /* ASIHTTPRequest in Resources */ = {isa = PBXBuildFile; fileRef = 6870732D1BDABA03000F6013 /* ASIHTTPRequest */; };
 		687073371BDABA03000F6013 /* CocoaAsyncSocket in Resources */ = {isa = PBXBuildFile; fileRef = 6870732E1BDABA03000F6013 /* CocoaAsyncSocket */; };
 		687073381BDABA03000F6013 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 6870732F1BDABA03000F6013 /* en.lproj */; };
@@ -86,6 +88,9 @@
 
 /* Begin PBXFileReference section */
 		681B12301CA53E30000FB01A /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
+		681B12321CA55AFD000FB01A /* silence.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = silence.wav; sourceTree = "<group>"; };
+		681B12341CA57406000FB01A /* KeepAliver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeepAliver.m; sourceTree = "<group>"; };
+		681B12361CA57B2D000FB01A /* KeepAliver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeepAliver.h; sourceTree = "<group>"; };
 		6870732D1BDABA03000F6013 /* ASIHTTPRequest */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ASIHTTPRequest; sourceTree = "<group>"; };
 		6870732E1BDABA03000F6013 /* CocoaAsyncSocket */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CocoaAsyncSocket; sourceTree = "<group>"; };
 		6870732F1BDABA03000F6013 /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = en.lproj; sourceTree = "<group>"; };
@@ -308,6 +313,8 @@
 				84075B631A3086A3001E395C /* RecentsController.h */,
 				84075B641A3086A3001E395C /* RecentsController.m */,
 				84075B651A3086A3001E395C /* RecentsController.xib */,
+				681B12361CA57B2D000FB01A /* KeepAliver.h */,
+				681B12341CA57406000FB01A /* KeepAliver.m */,
 				84C9196F17841B7C00810B88 /* ASIHTTPRequest */,
 				84C29E7E17F85A1A00D259F3 /* CocoaAsyncSocket */,
 				84C4CA321786D71D00A95DB9 /* FMEngine */,
@@ -321,6 +328,7 @@
 		84C10BF11782E08E004220BC /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				681B12321CA55AFD000FB01A /* silence.wav */,
 				84943CBA17CBB33A00A1CD17 /* Icon.png */,
 				84943CBB17CBB33A00A1CD17 /* Icon@2x.png */,
 				84B5D20017CBB730007FB471 /* Icon-72.png */,
@@ -531,6 +539,7 @@
 				84B5D20717CBB730007FB471 /* Icon-72.png in Resources */,
 				84B5D20817CBB730007FB471 /* Icon-72@2x.png in Resources */,
 				84B5D20917CBB730007FB471 /* Icon-Small-50.png in Resources */,
+				681B12331CA55AFD000FB01A /* silence.wav in Resources */,
 				84B5D20A17CBB730007FB471 /* Icon-Small-50@2x.png in Resources */,
 				687073361BDABA03000F6013 /* ASIHTTPRequest in Resources */,
 				6870733D1BDABA03000F6013 /* SearchController.xib in Resources */,
@@ -573,6 +582,7 @@
 				6870733C1BDABA03000F6013 /* SearchController.m in Sources */,
 				84C91A0A17856C5500810B88 /* MusicFileManager.m in Sources */,
 				84C4CA191785ADA500A95DB9 /* Globals.m in Sources */,
+				681B12351CA57406000FB01A /* KeepAliver.m in Sources */,
 				84C4CA1A1785ADA500A95DB9 /* LibraryPageController.m in Sources */,
 				84075B661A3086A3001E395C /* RecentsController.m in Sources */,
 				84C4CA1C1785ADA500A95DB9 /* CurrentController.m in Sources */,

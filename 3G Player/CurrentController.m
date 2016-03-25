@@ -9,6 +9,7 @@
 #import "CurrentController.h"
 
 #import "Globals.h"
+#import "KeepAliver.h"
 
 #import <objc/runtime.h>
 
@@ -53,6 +54,9 @@ static char const* const POSITION = "POSITION";
 @property (nonatomic, retain) NSTimer* periodicTimer;
 
 @property (nonatomic, retain) NSDate* bufferingProgressReportedAt;
+
+@property (nonatomic)         bool pausedByLowVolume;
+@property (nonatomic, retain) KeepAliver* pausedByLowVolumeKeepAliver;
 
 @end
 
@@ -126,6 +130,13 @@ static char const* const POSITION = "POSITION";
                 [self initAtIndex:index atPosition:position];
             }
         }
+        
+        self.pausedByLowVolume = FALSE;
+        self.pausedByLowVolumeKeepAliver = [[KeepAliver alloc] init];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                  selector:@selector(onSystemVolumeChanged:)
+                                                      name:@"AVSystemController_SystemVolumeDidChangeNotification"
+                                                    object:nil];
     }
     return self;
 }
@@ -1485,6 +1496,40 @@ static char const* const POSITION = "POSITION";
     else
     {
         return @[@"Playlist is empty :-("];
+    }
+}
+
+- (void)onSystemVolumeChanged:(NSNotification*)notification
+{
+    if (self.player)
+    {
+        if ([[notification.userInfo objectForKey:@"AVSystemController_AudioVolumeChangeReasonNotificationParameter"]
+             isEqualToString:@"ExplicitVolumeChange"])
+        {
+            float volume = [[[notification userInfo]
+                             objectForKey:@"AVSystemController_AudioVolumeNotificationParameter"]
+                            floatValue];
+            if (volume < 0.01)
+            {
+                if (self.player.playing)
+                {
+                    [self.player pause];
+                    
+                    self.pausedByLowVolume = true;
+                    [self.pausedByLowVolumeKeepAliver startWithDuration:900];
+                }
+            }
+            else
+            {
+                if (self.pausedByLowVolume)
+                {
+                    [self.player play];
+                    
+                    self.pausedByLowVolume = false;
+                    [self.pausedByLowVolumeKeepAliver stop];
+                }
+            }
+        }
     }
 }
 

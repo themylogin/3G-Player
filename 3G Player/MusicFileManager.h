@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import <AVFoundation/AVFoundation.h>
+
 typedef enum {
     MusicFileNotBuffered,
     MusicFileBuffering,

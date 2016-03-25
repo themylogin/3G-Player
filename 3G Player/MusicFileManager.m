@@ -8,7 +8,10 @@
 
 #import "MusicFileManager.h"
 
+#import <MediaPlayer/MediaPlayer.h>
+
 #import "Globals.h"
+#import "KeepAliver.h"
 
 #import "ASIHTTPRequest.h"
 #import "JSONKit.h"
@@ -24,6 +27,7 @@
 
 @property (nonatomic, retain) ASIHTTPRequest*   bufferingRequest;
 @property (nonatomic, retain) NSFileHandle*     bufferingFileHandle;
+@property (nonatomic, retain) KeepAliver*       bufferingKeepAliver;
 
 @property (nonatomic, retain) NSString*         historyFile;
 
@@ -42,6 +46,8 @@
     
     self.bufferingRequest = nil;
     self.bufferingFileHandle = nil;
+    
+    self.bufferingKeepAliver = [[KeepAliver alloc] init];
     
     self.historyFile = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingString:@"/history.json"];
     if (![self.fileManager fileExistsAtPath:self.historyFile])
@@ -201,6 +207,8 @@
     self.bufferingFileHandle = [NSFileHandle fileHandleForWritingAtPath:incompletePath];
     [self.bufferingFileHandle seekToEndOfFile];
     
+    [self.bufferingKeepAliver start];
+    
     [self.bufferingRequest setAllowCompressedResponse:NO];
     [self.bufferingRequest setShouldContinueWhenAppEntersBackground:YES];
     [self.bufferingRequest setFailedBlock:^{
@@ -289,6 +297,8 @@
         [self.bufferingFileHandle closeFile];
         self.bufferingFileHandle = nil;
     }
+    
+    [self.bufferingKeepAliver stop];
 }
 
 - (void)loadCover:(NSDictionary*)musicFile
