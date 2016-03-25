@@ -88,8 +88,8 @@
 - (void)initState
 {	
 	self.opaque = NO;
-	self.pad = 2;
-	self.font = [UIFont boldSystemFontOfSize:16];
+	self.pad = 1;
+	self.font = [UIFont boldSystemFontOfSize:11];
 	self.shadow = YES;
 	self.shadowOffset = CGSizeMake(0, 3);
 	self.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
@@ -100,7 +100,7 @@
 	self.strokeWidth = 2.0;
 	self.textColor = [UIColor whiteColor];
     self.hideWhenZero = NO;
-	self.adjustOffset = CGPointZero;
+	self.adjustOffset = CGPointMake(-0.5, -0.5);
     self.textFormat = @"%d";
     
 	self.backgroundColor = [UIColor clearColor];

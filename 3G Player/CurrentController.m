@@ -145,7 +145,7 @@ static char const* const POSITION = "POSITION";
     
     [self showScrobblerEnabled];
     
-    self.scrobblerBadge = [[MKNumberBadgeView alloc] initWithFrame:CGRectMake(38, 0, 36, 24)];
+    self.scrobblerBadge = [[MKNumberBadgeView alloc] initWithFrame:CGRectMake(27, 0, 19, 19)];
     self.scrobblerBadge.shine = NO;
     self.scrobblerBadge.shadow = NO;
     [self onScrobblerQueueChanged];
