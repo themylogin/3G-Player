@@ -1416,10 +1416,14 @@ static char const* const POSITION = "POSITION";
     if (scrobbler.enabled)
     {
         self.scrobblerButton.alpha = 1.0;
+        self.scrobblerLabel.alpha = 1.0;
+        self.scrobblerLabel.text = @"Enabled";
     }
     else
     {
         self.scrobblerButton.alpha = 0.2;
+        self.scrobblerLabel.alpha = 0.2;
+        self.scrobblerLabel.text = @"Disabled";
     }
 }
 
