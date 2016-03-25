@@ -67,7 +67,7 @@ static char const* const POSITION = "POSITION";
     if (self)
     {
         self.tabBarItem.title = NSLocalizedString(@"Current", NIL);
-        self.tabBarItem.image = [UIImage imageNamed:@"tabbar_current.png"];
+        self.tabBarItem.image = [UIImage imageNamed:@"Current"];
         
         self.toolbarOpen = NO;
         
@@ -145,7 +145,7 @@ static char const* const POSITION = "POSITION";
     
     [self showScrobblerEnabled];
     
-    self.scrobblerBadge = [[MKNumberBadgeView alloc] initWithFrame:CGRectMake(28, 0, 36, 24)];
+    self.scrobblerBadge = [[MKNumberBadgeView alloc] initWithFrame:CGRectMake(38, 0, 36, 24)];
     self.scrobblerBadge.shine = NO;
     self.scrobblerBadge.shadow = NO;
     [self onScrobblerQueueChanged];
@@ -363,11 +363,11 @@ static char const* const POSITION = "POSITION";
     {
         if (self.player.playing)
         {
-            [self.playPauseButton setImage:[UIImage imageNamed:@"pause_active.png"] forState:UIControlStateNormal];
+            [self.playPauseButton setImage:[UIImage imageNamed:@"PauseActive"] forState:UIControlStateNormal];
         }
         else
         {
-            [self.playPauseButton setImage:[UIImage imageNamed:@"play_active.png"] forState:UIControlStateNormal];
+            [self.playPauseButton setImage:[UIImage imageNamed:@"PlayActive"] forState:UIControlStateNormal];
         }
         
         self.elapsedLabel.text = [NSString stringWithFormat:@"%02d:%02d", (int)self.player.currentTime / 60, (int)self.player.currentTime % 60];
@@ -392,11 +392,11 @@ static char const* const POSITION = "POSITION";
     {
         if ([self.playlist count] > 0)
         {
-            [self.playPauseButton setImage:[UIImage imageNamed:@"play_active.png"] forState:UIControlStateNormal];
+            [self.playPauseButton setImage:[UIImage imageNamed:@"PlayActive"] forState:UIControlStateNormal];
         }
         else
         {
-            [self.playPauseButton setImage:[UIImage imageNamed:@"play_inactive.png"] forState:UIControlStateNormal];
+            [self.playPauseButton setImage:[UIImage imageNamed:@"PlayInactive"] forState:UIControlStateNormal];
         }
         
         self.elapsedLabel.text = @"00:00";
@@ -412,15 +412,15 @@ static char const* const POSITION = "POSITION";
     
     if (self.repeat == RepeatDisabled)
     {
-        [self.repeatButton setImage:[UIImage imageNamed:@"repeat_disabled.png"] forState:UIControlStateNormal];
+        [self.repeatButton setImage:[UIImage imageNamed:@"RepeatDisabled"] forState:UIControlStateNormal];
     }
     if (self.repeat == RepeatPlaylist)
     {
-        [self.repeatButton setImage:[UIImage imageNamed:@"repeat_playlist.png"] forState:UIControlStateNormal];
+        [self.repeatButton setImage:[UIImage imageNamed:@"RepeatPlaylist"] forState:UIControlStateNormal];
     }
     if (self.repeat == RepeatTrack)
     {
-        [self.repeatButton setImage:[UIImage imageNamed:@"repeat_track.png"] forState:UIControlStateNormal];
+        [self.repeatButton setImage:[UIImage imageNamed:@"RepeatTrack"] forState:UIControlStateNormal];
     }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"statisticsChanged" object:self];

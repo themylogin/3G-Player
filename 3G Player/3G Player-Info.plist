@@ -56,6 +56,17 @@
 	<string>1.0</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>ws.audioscrobbler.com</key>
+			<dict>
+				<key>NSTemporaryExceptionRequiresForwardSecrecy</key>
+				<false/>
+			</dict>
+		</dict>
+	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
@@ -74,17 +85,6 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-    </array>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSExceptionDomains</key>
-        <dict>
-            <key>ws.audioscrobbler.com</key>
-            <dict>
-                <key>NSTemporaryExceptionRequiresForwardSecrecy</key>
-                <false/>
-            </dict>
-        </dict>
-    </dict>
+	</array>
 </dict>
 </plist>

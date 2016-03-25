@@ -25,7 +25,7 @@
     if (self)
     {
         self.tabBarItem.title = NSLocalizedString(@"Recents", NIL);
-        self.tabBarItem.image = [UIImage imageNamed:@"tabbar_recents.png"];
+        self.tabBarItem.image = [UIImage imageNamed:@"Recents"];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(onMusicFileManagerStateChanged)

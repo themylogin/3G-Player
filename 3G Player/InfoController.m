@@ -27,7 +27,7 @@
     if (self)
     {
         self.tabBarItem.title = NSLocalizedString(@"Info", NIL);
-        self.tabBarItem.image = [UIImage imageNamed:@"tabbar_info.png"];
+        self.tabBarItem.image = [UIImage imageNamed:@"Info.png"];
     }
     return self;
 }

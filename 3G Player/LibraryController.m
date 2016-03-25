@@ -52,7 +52,7 @@
         libraryToolbarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.librarySearchBar];
         
         self.tabBarItem.title = NSLocalizedString(@"Library", nil);
-        self.tabBarItem.image = [UIImage imageNamed:@"tabbar_library.png"];
+        self.tabBarItem.image = [UIImage imageNamed:@"Library"];
         
         self.toolbar.tintColor = [UIColor colorWithRed:43.0 / 255 green:43.0 / 255 blue:43.0 / 255 alpha:0.5];
         self.toolbarHidden = NO;

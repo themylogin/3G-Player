@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5056" systemVersion="12F45" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
     <dependencies>
-        <deployment defaultVersion="1792" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9530"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CurrentController">
@@ -44,7 +44,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="boldSystem" size="button"/>
                             <inset key="contentEdgeInsets" minX="0.0" minY="2" maxX="0.0" maxY="0.0"/>
-                            <state key="normal" image="play_inactive.png">
+                            <state key="normal" image="PlayInactive.png">
                                 <color key="titleColor" red="0.1960784314" green="0.30980392159999998" blue="0.52156862749999999" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
@@ -81,7 +81,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                             <inset key="contentEdgeInsets" minX="0.0" minY="4" maxX="8" maxY="0.0"/>
-                            <state key="normal" image="repeat_disabled.png">
+                            <state key="normal" image="RepeatDisabled.png">
                                 <color key="titleColor" red="0.19607843459999999" green="0.30980393290000002" blue="0.52156865600000002" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
@@ -101,9 +101,9 @@
                             <rect key="frame" x="16" y="100" width="64" height="64"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <accessibility key="accessibilityConfiguration" label="">
-                                <accessibilityTraits key="traits" none="YES" button="YES"/>
+                                <accessibilityTraits key="traits" button="YES"/>
                             </accessibility>
-                            <state key="normal" backgroundImage="google.png"/>
+                            <state key="normal" backgroundImage="Lyrics"/>
                             <connections>
                                 <action selector="handleGoogleButtonTouchDown:" destination="-1" eventType="touchDown" id="kYX-WC-LSD"/>
                             </connections>
@@ -111,7 +111,7 @@
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="AUU-6r-Bio" userLabel="Love">
                             <rect key="frame" x="96" y="100" width="64" height="64"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <state key="normal" title="Button" image="love.png">
+                            <state key="normal" title="Button" image="Love">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
                             <connections>
@@ -121,7 +121,7 @@
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="oy1-bK-fmZ" userLabel="Scrobbler">
                             <rect key="frame" x="171" y="100" width="64" height="64"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <state key="normal" title="Button" image="scrobbler.png">
+                            <state key="normal" image="Scrobbler">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
                             <connections>
@@ -131,7 +131,7 @@
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="wgK-cI-pkG" userLabel="Superseed">
                             <rect key="frame" x="246" y="100" width="64" height="64"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <state key="normal" title="Button" image="superseed.png">
+                            <state key="normal" title="Button" image="Superseed">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
                             <connections>
@@ -147,7 +147,7 @@
                 </view>
             </subviews>
             <gestureRecognizers/>
-            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outletCollection property="gestureRecognizers" destination="209" appends="YES" id="v8A-sD-gpY"/>
             </connections>
@@ -179,11 +179,11 @@
         </pinchGestureRecognizer>
     </objects>
     <resources>
-        <image name="google.png" width="64" height="64"/>
-        <image name="love.png" width="64" height="64"/>
-        <image name="play_inactive.png" width="26" height="26"/>
-        <image name="repeat_disabled.png" width="26" height="26"/>
-        <image name="scrobbler.png" width="64" height="64"/>
-        <image name="superseed.png" width="64" height="64"/>
+        <image name="Love" width="157" height="157"/>
+        <image name="Lyrics" width="52" height="52"/>
+        <image name="PlayInactive.png" width="26" height="26"/>
+        <image name="RepeatDisabled.png" width="26" height="26"/>
+        <image name="Scrobbler" width="33" height="33"/>
+        <image name="Superseed" width="170" height="170"/>
     </resources>
 </document>
