@@ -42,8 +42,8 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updateRecents)
-                                                 name:@"recentsUpdated"
-                                               object:musicTableService];
+                                                 name:@"historyUpdated"
+                                               object:musicFileManager];
     [self updateRecents];
 }
 
@@ -55,7 +55,7 @@
 
 - (void)updateRecents
 {
-    self.recents = [musicTableService readRecentsFile];
+    self.recents = [musicFileManager listRecentItems];
     [self.tableView reloadData];
 }
 
@@ -89,7 +89,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSDictionary* item = [self getItemForIndexPath:indexPath];
-    [musicTableService navigateLibraryToItem:item enter:NO];
+    [controllers.library navigateToItem:item enter:NO];
 }
 
 #pragma mark - Gesture recognizer

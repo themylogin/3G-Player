@@ -12,6 +12,7 @@
 
 @interface LibraryPageController ()
 
+@property (nonatomic, retain) NSDictionary* player;
 @property (nonatomic, retain) NSString* directory;
 
 @property (nonatomic, retain) NSArray* index;
@@ -22,15 +23,16 @@
 
 @implementation LibraryPageController
 
-- (id)initWithDirectory:(NSString*)directory title:(NSString*)title
+- (id)initWithPlayer:(NSDictionary*)player directory:(NSString*)directory title:(NSString*)title
 {
     self = [super initWithNibName:@"LibraryPageController" bundle:nil];
     if (self)
     {
+        self.player = player;
         self.directory = directory;
         self.title = title;
         
-        self.index = [musicTableService loadIndexFor:self.directory];
+        self.index = [musicTableService loadIndexForPlayer:self.player directory:self.directory];
         
         self.indexLetters = [NSMutableArray array];
         self.indexRowsForLetters = [NSMutableDictionary dictionary];
@@ -63,7 +65,7 @@
 
 - (BOOL)update
 {
-    self.index = [musicTableService loadIndexFor:self.directory];
+    self.index = [musicTableService loadIndexForPlayer:self.player directory:self.directory];
     if ([self.index count] > 0)
     {
         [self.tableView reloadData];
@@ -144,7 +146,10 @@
             return;
         }
         
-        LibraryPageController* libraryPageController = [[LibraryPageController alloc] initWithDirectory:[item objectForKey:@"path"] title:[item objectForKey:@"name"]];
+        LibraryPageController* libraryPageController = [[LibraryPageController alloc]
+                                                        initWithPlayer:self.player
+                                                        directory:[item objectForKey:@"path"]
+                                                        title:[item objectForKey:@"name"]];
         [self.navigationController pushViewController:libraryPageController animated:YES];
         [libraryPageController release];
     }

@@ -127,7 +127,7 @@ static char const* const POSITION = "POSITION";
             double position = [[current objectForKey:@"position"] doubleValue];
             if (index >= 0 && index < [self.playlist count])
             {
-                [self initAtIndex:index atPosition:position];
+                [self setIndex:index position:position];
             }
         }
         
@@ -276,16 +276,16 @@ static char const* const POSITION = "POSITION";
 
 - (void)playAtIndex:(long)index atPosition:(NSTimeInterval)position
 {
-    [self initAtIndex:index atPosition:position];
+    [self setIndex:index position:position];
     [self.player play];
 }
 
-- (void)initAtIndex:(long)index atPosition:(NSTimeInterval)position
+- (void)setIndex:(long)index position:(NSTimeInterval)position
 {
-    [self initAtIndex:index atPosition:position invalidatingPlaylistUndoHistory:YES];
+    [self setIndex:index position:position invalidatingPlaylistUndoHistory:YES];
 }
 
-- (void)initAtIndex:(long)index atPosition:(NSTimeInterval)position invalidatingPlaylistUndoHistory:(BOOL)invalidatePlaylistUndoHistory
+- (void)setIndex:(long)index position:(NSTimeInterval)position invalidatingPlaylistUndoHistory:(BOOL)invalidatePlaylistUndoHistory
 {
     if (invalidatePlaylistUndoHistory)
     {
@@ -297,7 +297,7 @@ static char const* const POSITION = "POSITION";
     self.currentIndex = index;
     NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
     
-    NSString* path = [musicFileManager getPath:item];
+    NSString* path = [musicFileManager playPath:item];
     if (path)
     {
         NSURL* url = [NSURL fileURLWithPath:path];
@@ -316,7 +316,7 @@ static char const* const POSITION = "POSITION";
         [self updateCover];
         [self updatedNowPlayingInfo];
         
-        [musicFileManager notifyFileUsage:item];
+        [musicFileManager notifyItemPlay:item];
         
         self.playerStartedAt = [NSDate date];
         self.skipScrobblingCurrent = false;
@@ -669,7 +669,7 @@ static char const* const POSITION = "POSITION";
     self.lastTimeTableTouchedAt = [NSDate date];
     
     [self storePlaylistUndoHistory];
-    [self initAtIndex:[self itemIndexForIndexPath:indexPath] atPosition:0 invalidatingPlaylistUndoHistory:NO];
+    [self setIndex:[self itemIndexForIndexPath:indexPath] position:0 invalidatingPlaylistUndoHistory:NO];
     [self.player play];
 }
 
@@ -681,7 +681,7 @@ static char const* const POSITION = "POSITION";
     
     NSDictionary* item = [self itemForIndexPath:indexPath];
     
-    MusicFileState state = [musicFileManager getState:item];
+    MusicFileState state = [musicFileManager state:item];
     if (state.state == MusicFileNotBuffered)
     {
         cell.textLabel.textColor = [UIColor grayColor];
@@ -729,7 +729,7 @@ static char const* const POSITION = "POSITION";
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
 {
-    MusicFileState state = [musicFileManager getState:[self.playlist objectAtIndex:self.currentIndex]];
+    MusicFileState state = [musicFileManager state:[self.playlist objectAtIndex:self.currentIndex]];
     if (state.state == MusicFileBuffering)
     {
         [self tryToResumePlayingNowBufferingFile];
@@ -898,7 +898,7 @@ static char const* const POSITION = "POSITION";
         for (long i = self.currentIndex; i < [self.playlist count]; i++)
         {
             NSDictionary* item = [self.playlist objectAtIndex:i];
-            MusicFileState state = [musicFileManager getState:item];
+            MusicFileState state = [musicFileManager state:item];
             if (state.state != MusicFileBuffered)
             {
                 [musicFileManager buffer:item];
@@ -909,7 +909,7 @@ static char const* const POSITION = "POSITION";
     
     for (NSDictionary* item in self.playlist)
     {
-        MusicFileState state = [musicFileManager getState:item];
+        MusicFileState state = [musicFileManager state:item];
         if (state.state != MusicFileBuffered)
         {
             [musicFileManager buffer:item];
@@ -974,7 +974,7 @@ static char const* const POSITION = "POSITION";
                 UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
                 if (cell)
                 {
-                    [self setBufferingCell:cell backgroundViewForState:[musicFileManager getState:playlistItem]];
+                    [self setBufferingCell:cell backgroundViewForState:[musicFileManager state:playlistItem]];
                 }
             }
         }
@@ -1009,7 +1009,7 @@ static char const* const POSITION = "POSITION";
         return;
     }
     
-    MusicFileState state = [musicFileManager getState:[self.playlist objectAtIndex:self.currentIndex]];
+    MusicFileState state = [musicFileManager state:[self.playlist objectAtIndex:self.currentIndex]];
     if (state.state == MusicFileBuffering)
     {
         [self playAtIndex:self.currentIndex atPosition:self.player.duration];
@@ -1163,7 +1163,7 @@ static char const* const POSITION = "POSITION";
         [asiRequest setStringEncoding:NSUTF8StringEncoding];
         NSURL* url = [NSURL URLWithString:
                       [NSString stringWithFormat:@"%@/lyrics/%@/%@",
-                       playerUrl,
+                       [[item objectForKey:@"player"] objectForKey:@"url"],
                        [asiRequest encodeURL:[item objectForKey:@"artist"]],
                        [asiRequest encodeURL:[item objectForKey:@"title"]]]];
         [asiRequest release];
@@ -1192,42 +1192,56 @@ static char const* const POSITION = "POSITION";
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         NSError* error;
-        NSURL* url = [NSURL URLWithString:[playerUrl stringByAppendingString:@"/player/become_superseeded"]];
-        NSData* jsonData = [NSData dataWithContentsOfURL:url options:0 error:&error];
-        if (!jsonData)
+        NSURL* url = [NSURL URLWithString:[[[players objectAtIndex:0] objectForKey:@"url"]
+                                           stringByAppendingString:@"/player/become_superseeded"]];
+        ASIFormDataRequest* request = [ASIFormDataRequest requestWithURL:url];
+        [request startSynchronous];
+        if ([request error] || [request responseStatusCode] != 200)
         {
+            NSString* errorDescription;
+            if ([request error])
+            {
+                errorDescription = [[request error] localizedDescription];
+            }
+            else
+            {
+                errorDescription = [request responseStatusMessage];
+            }
+            
             dispatch_async(dispatch_get_main_queue(), ^{
-                UIAlertView* alert = [[UIAlertView alloc]
-                                      initWithTitle:[error localizedDescription]
-                                      message:[error localizedFailureReason]
-                                      delegate:nil
-                                      cancelButtonTitle:@"Dismiss"
-                                      otherButtonTitles:nil];
+                UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Superseeding error", nil)
+                                                                message:errorDescription
+                                                               delegate:nil
+                                                      cancelButtonTitle:NSLocalizedString(@"Dismiss", nil)
+                                                      otherButtonTitles:nil];
                 [alert show];
             });
-            return;
         }
-        NSDictionary* data = [[JSONDecoder decoder] objectWithData:jsonData error:&error];
-        if (!data)
+        else
         {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                UIAlertView* alert = [[UIAlertView alloc]
-                                      initWithTitle:[error localizedDescription]
-                                      message:[error localizedFailureReason]
-                                      delegate:nil
-                                      cancelButtonTitle:@"Dismiss"
-                                      otherButtonTitles:nil];
-                [alert show];
-            });
-            return;
+            NSDictionary* data = [[JSONDecoder decoder] objectWithData:[request responseData] error:&error];
+            if (!data)
+            {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    UIAlertView* alert = [[UIAlertView alloc]
+                                          initWithTitle:[error localizedDescription]
+                                          message:[error localizedFailureReason]
+                                          delegate:nil
+                                          cancelButtonTitle:NSLocalizedString(@"Dismiss", nil)
+                                          otherButtonTitles:nil];
+                    [alert show];
+                });
+                return;
+            }
+            [self replacePlaylistWithData:data updateIfNecessary:YES];
         }
-        [self replacePlaylistWithData:data updateIfNecessary:YES];
     });
     [self closeToolbar];
 }
 
 - (void)replacePlaylistWithData:(NSDictionary*)data updateIfNecessary:(BOOL)updateIfNecessary
 {
+    NSDictionary* player = [players objectAtIndex:0];
     NSArray* dataPlaylist = [data objectForKey:@"playlist"];
     
     NSMutableArray* items = [[NSMutableArray alloc] init];
@@ -1237,7 +1251,7 @@ static char const* const POSITION = "POSITION";
         NSString* directory = [[dataPlaylist objectAtIndex:i] stringByDeletingLastPathComponent];
         NSString* file = [[dataPlaylist objectAtIndex:i] lastPathComponent];
         
-        NSDictionary* index = [musicTableService loadRawIndexFor:directory];
+        NSDictionary* index = [musicTableService loadRawIndexForPlayer:player directory:directory];
         NSDictionary* item = [index objectForKey:file];
         if (item == NULL)
         {
@@ -1253,7 +1267,9 @@ static char const* const POSITION = "POSITION";
         }
         else
         {
-            [items addObject:item];
+            NSMutableDictionary* itemWithPlayer = [item mutableCopy];
+            itemWithPlayer[@"player"] = player;
+            [items addObject:itemWithPlayer];
             if (i < [[data objectForKey:@"position"] intValue])
             {
                 position++;
@@ -1264,7 +1280,7 @@ static char const* const POSITION = "POSITION";
     int unbufferedItems = 0;
     for (int i = 0; i < items.count; i++)
     {
-        if ([musicFileManager getState:[items objectAtIndex:i]].state != MusicFileBuffered)
+        if ([musicFileManager state:[items objectAtIndex:i]].state != MusicFileBuffered)
         {
             unbufferedItems++;
         }
@@ -1338,7 +1354,7 @@ static char const* const POSITION = "POSITION";
     if (items.count)
     {
         [self clearPlaylist];
-        if ([musicFileManager getState:[items objectAtIndex:index]].state == MusicFileBuffered)
+        if ([musicFileManager state:[items objectAtIndex:index]].state == MusicFileBuffered)
         {
             [self addFiles:items mode:AddToTheEnd];
             [self playAtIndex:index atPosition:[[data objectForKey:@"elapsed"] intValue]];
@@ -1407,7 +1423,7 @@ static char const* const POSITION = "POSITION";
         {
             if (undoIndex != -1)
             {
-                [self initAtIndex:undoIndex atPosition:undoPosition invalidatingPlaylistUndoHistory:NO];
+                [self setIndex:undoIndex position:undoPosition invalidatingPlaylistUndoHistory:NO];
                 if (undoWasPlaying)
                 {
                     [self.player play];
@@ -1487,15 +1503,33 @@ static char const* const POSITION = "POSITION";
     
     if (playlistDuration > 0)
     {
+        NSString* durationInfo = [NSString stringWithFormat:@"You have %dh %dm of music, ",
+                                  playlistDuration / 3600, playlistDuration / 60 % 60];
+        
+        if (!self.player.playing)
+        {
+            durationInfo = [durationInfo stringByAppendingString:@"if you turn it on now, "];
+        }
+        
         NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        if (playlistDuration < 86400)
+        {
+            dateFormatter.dateStyle = NSDateFormatterNoStyle;
+        }
+        else
+        {
+            dateFormatter.dateStyle = NSDateIntervalFormatterShortStyle;
+        }
         dateFormatter.timeStyle = NSDateFormatterShortStyle;
-        dateFormatter.dateStyle = NSDateFormatterNoStyle;
         NSDate* end = [NSDate dateWithTimeIntervalSinceNow:playlistDuration];
-        return @[[NSString stringWithFormat:@"Music will end at %@", [dateFormatter stringFromDate:end], nil]];
+        durationInfo = [durationInfo stringByAppendingString:
+                        [NSString stringWithFormat:@"it will end at %@", [dateFormatter stringFromDate:end]]];
+                        
+        return @[durationInfo];
     }
     else
     {
-        return @[@"Playlist is empty :-("];
+        return @[@"Playlist is empty"];
     }
 }
 

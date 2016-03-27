@@ -10,7 +10,8 @@
 
 @interface LibraryPageController : UITableViewController
 
-- (id)initWithDirectory:(NSString*)directory title:(NSString*)title;
+- (id)initWithPlayer:(NSDictionary*)player directory:(NSString*)directory title:(NSString*)title;
+
 - (BOOL)update;
 - (void)scrollToItem:(NSDictionary*)item;
 

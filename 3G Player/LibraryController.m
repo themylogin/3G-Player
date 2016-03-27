@@ -8,6 +8,7 @@
 
 #import "LibraryController.h"
 
+#import "AppDelegate.h"
 #import "Globals.h"
 #import "LibraryPageController.h"
 #import "SearchController.h"
@@ -18,7 +19,11 @@
 
 @interface LibraryController () <UINavigationControllerDelegate>
 
+@property (nonatomic, retain) NSDictionary* player;
+@property (nonatomic, retain) NSString* libraryDirectory;
+
 @property (nonatomic, retain) UILabel* updateLibraryProgressLabel;
+
 @property (nonatomic, retain) NSArray* searchIndex;
 @property (nonatomic, retain) SearchController* searchController;
 @property (nonatomic, retain) UIViewController* searchStartController;
@@ -27,29 +32,43 @@
 
 @implementation LibraryController
 
-- (id)initWithRoot
+- (id)initWithPlayer:(NSDictionary*)player;
 {
-    self = [super initWithRootViewController:[[LibraryPageController alloc] initWithDirectory:@"" title:NSLocalizedString(@"Library", @"Library")]];
+    self = [super initWithRootViewController:[[LibraryPageController alloc]
+                                              initWithPlayer:player
+                                              directory:@""
+                                              title:[player objectForKey:@"name"]]];
     if (self)
     {
+        self.player = player;
+        self.libraryDirectory = [librariesPath stringByAppendingString:
+                                 [NSString stringWithFormat:@"/%@", [player objectForKey:@"name"]]];
+        
+        libraryRightBarButtonItem = [[UIBarButtonItem alloc]
+                                     initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+                                     target:self
+                                     action:@selector(updateLibrary)];
+        
+        UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc]
+                                                   initWithTarget:self
+                                                   action:@selector(longPress:)];
+        [self.navigationBar addGestureRecognizer:longPress];
+        
         [self loadSearchIndex];
         self.searchController = [[SearchController alloc] init];
         self.searchStartController = nil;
-        
-        libraryRightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(updateLibrary)];
         
         self.librarySearchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width - 24, 44)];
         self.librarySearchBar.showsCancelButton = YES;
         self.librarySearchBar.placeholder = @"Search";
         self.librarySearchBar.delegate = self;
+        libraryToolbarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.librarySearchBar];
         
-        self.updateLibraryProgressLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 11.0, self.view.frame.size.width, 21.0)];
+        self.updateLibraryProgressLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 11, self.view.frame.size.width, 21)];
         self.updateLibraryProgressLabel.backgroundColor = [UIColor clearColor];
         self.updateLibraryProgressLabel.font = [UIFont fontWithName:@"Helvetica-Bold" size:12];
         self.updateLibraryProgressLabel.textColor = [UIColor whiteColor];
         self.updateLibraryProgressLabel.text = @"";
-        
-        libraryToolbarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self.librarySearchBar];
         
         self.tabBarItem.title = NSLocalizedString(@"Library", nil);
         self.tabBarItem.image = [UIImage imageNamed:@"Library"];
@@ -74,6 +93,72 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)longPress:(UILongPressGestureRecognizer *)sender
+{
+    if (sender.state == UIGestureRecognizerStateBegan)
+    {
+        CGPoint longPressPoint = [sender locationInView:self.navigationController.navigationBar];
+        
+        CGRect titleRect = CGRectMake(0, 0, 0, 0);
+        for (UIView* subview in self.navigationBar.subviews)
+        {
+            if ([NSStringFromClass(subview.class) isEqualToString:@"UINavigationItemView"])
+            {
+                titleRect = subview.frame;
+                titleRect.size.height = 100;
+            }
+        }
+        
+        CGRect backButtonRect = CGRectMake(0, titleRect.origin.y, titleRect.origin.x, titleRect.size.height);
+        
+        if (CGRectContainsPoint(titleRect, longPressPoint))
+        {
+            [self showChangePlayerActionSheet];
+        }
+        
+        if (CGRectContainsPoint(backButtonRect, longPressPoint))
+        {
+            [self popToRootViewControllerAnimated:YES];
+        }
+    }
+}
+
+#pragma mark - Change player
+
+- (void)showChangePlayerActionSheet
+{
+    UIActionSheet* actionSheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Change server", nil)
+                                                             delegate:self
+                                                    cancelButtonTitle:NSLocalizedString(@"Cancel", nil)
+                                               destructiveButtonTitle:nil
+                                                    otherButtonTitles:nil];
+
+    for (int i = 0; i < players.count; i++)
+    {
+        [actionSheet addButtonWithTitle:[[players objectAtIndex:i] objectForKey:@"name"]];
+    }
+    
+    actionSheet.cancelButtonIndex = 0;
+    
+    [actionSheet showInView:[self.view window]];
+    [actionSheet release];
+}
+
+- (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    [self changePlayer:[players objectAtIndex:buttonIndex - 1]];
+}
+
+- (void)changePlayer:(NSDictionary*)player
+{
+    NSMutableArray* c = [NSMutableArray arrayWithArray:controllers.tabBar.viewControllers];
+    controllers.library = [[LibraryController alloc] initWithPlayer:player];
+    [c replaceObjectAtIndex:1 withObject:controllers.library];
+    controllers.tabBar.viewControllers = c;
+}
+
+#pragma mark - Update library
+
 - (void)updateLibrary
 {
     [self updateLibraryWithSuccessCallback:^{}];
@@ -89,11 +174,11 @@
     self.updateLibraryProgressLabel.text = @"Updating library...";
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        NSString* libraryFile = [libraryDirectory stringByAppendingString:@"/library.zip"];
+        NSString* libraryFile = [self.libraryDirectory stringByAppendingString:@"/library.zip"];
         [[NSFileManager defaultManager] removeItemAtPath:libraryFile error:nil];
         
         NSString* revision;
-        NSString* revisionFile = [libraryDirectory stringByAppendingString:@"/revision.txt"];
+        NSString* revisionFile = [self.libraryDirectory stringByAppendingString:@"/revision.txt"];
         if ([[NSFileManager defaultManager] isReadableFileAtPath:revisionFile])
         {
             revision = [NSString stringWithContentsOfFile:revisionFile encoding:NSUTF8StringEncoding error:nil];
@@ -103,12 +188,16 @@
             revision = @"";
         }
         
-        NSURL* libraryUrl = [NSURL URLWithString:[playerUrl stringByAppendingString:[NSString stringWithFormat:@"/library?since-revision=%@", revision, nil]]];
+        NSURL* libraryUrl = [NSURL URLWithString:[[self.player objectForKey:@"url"] stringByAppendingString:
+                                                  [NSString stringWithFormat:@"/library?since-revision=%@", revision, nil]]];
         ASIHTTPRequest* libraryRequest = [ASIHTTPRequest requestWithURL:libraryUrl];
         [libraryRequest setShouldContinueWhenAppEntersBackground:YES];
         [libraryRequest setDownloadDestinationPath:libraryFile];
+        __block unsigned long long totalBytesReceived = 0;
         [libraryRequest setBytesReceivedBlock:^(unsigned long long size, unsigned long long total) {
-            self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Receiving library: (%.0f%%)", (float)size / total * 100, nil];
+            totalBytesReceived += size;
+            self.updateLibraryProgressLabel.text = [NSString stringWithFormat:@"Receiving library: (%.0f%%)",
+                                                    (float)totalBytesReceived / total * 100, nil];
         }];
         [libraryRequest setTimeOutSeconds:120];
         [libraryRequest startSynchronous];
@@ -140,19 +229,22 @@
             });
             ZipArchive* zipArchive = [[ZipArchive alloc] init];
             [zipArchive UnzipOpenFile:libraryFile];
-            [zipArchive UnzipFileTo:libraryDirectory overWrite:YES];
+            [zipArchive UnzipFileTo:self.libraryDirectory overWrite:YES];
             [zipArchive UnzipCloseFile];
             [zipArchive release];
                         
             [[NSFileManager defaultManager] removeItemAtPath:libraryFile error:nil];            
             
-            NSString* deleteDirectoriesFile = [libraryDirectory stringByAppendingString:@"/delete_directories.txt"];
+            NSString* deleteDirectoriesFile = [self.libraryDirectory stringByAppendingString:@"/delete_directories.txt"];
             NSArray* deleteDirectories = [[NSString stringWithContentsOfFile:deleteDirectoriesFile encoding:NSASCIIStringEncoding error:nil] componentsSeparatedByString:@"\n"];
             for (NSString* directory in deleteDirectories)
             {
                 if (![directory isEqualToString:@""])
                 {
-                    [[NSFileManager defaultManager] removeItemAtPath:[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:directory] error:nil];                    
+                    [[NSFileManager defaultManager]
+                     removeItemAtPath:[self.libraryDirectory stringByAppendingString:
+                                       [NSString stringWithFormat:@"/%@", directory]]
+                     error:nil];
                 }
             }
             [[NSFileManager defaultManager] removeItemAtPath:deleteDirectoriesFile error:nil];
@@ -188,9 +280,69 @@
     });
 }
 
+#pragma mark - Navigate to item
+
+- (void)navigateToItem:(NSDictionary*)item enter:(BOOL)enter
+{
+    if (![[[item objectForKey:@"player"] objectForKey:@"libraryPath"]
+          isEqualToString:[self.player objectForKey:@"libraryPath"]])
+    {
+        [self changePlayer:[item objectForKey:@"player"]];
+        [controllers.library navigateToItem:item enter:enter];
+        return;
+    }
+    
+    NSMutableArray* libraryControllers = [[NSMutableArray alloc] init];
+    NSMutableArray* scrollTargets = [[NSMutableArray alloc] init];
+    
+    NSString* basePath = [librariesPath stringByAppendingString:
+                          [[item objectForKey:@"player"] objectForKey:@"libraryPath"]];
+    NSString* parent = [musicFileManager absolutePath:item];
+    NSDictionary* scrollTarget = item;
+    while (![(parent = [parent stringByDeletingLastPathComponent]) isEqualToString:basePath])
+    {
+        NSDictionary* parentItem = [musicFileManager itemForAbsolutePath:parent];
+        if (parentItem != nil)
+        {
+            LibraryPageController* controller = [[LibraryPageController alloc]
+                                                 initWithPlayer:[parentItem objectForKey:@"player"]
+                                                 directory:[parentItem objectForKey:@"path"]
+                                                 title:[parentItem objectForKey:@"name"]];
+            [libraryControllers insertObject:controller atIndex:0];
+            [scrollTargets insertObject:scrollTarget atIndex:0];
+            scrollTarget = parentItem;
+        }
+    }
+    
+    [controllers.library popToRootViewControllerAnimated:NO];
+    for (int i = 0; i < [libraryControllers count]; i++)
+    {
+        [controllers.library pushViewController:[libraryControllers objectAtIndex:i] animated:NO];
+    }
+    AppDelegate* delegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
+    [delegate.tabBarController setSelectedViewController:controllers.library];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (int i = 0; i < [libraryControllers count]; i++)
+        {
+            [[libraryControllers objectAtIndex:i] scrollToItem:[scrollTargets objectAtIndex:i]];
+        }
+    });
+    
+    if (enter)
+    {
+        LibraryPageController* controller = [[LibraryPageController alloc]
+                                             initWithPlayer:[item objectForKey:@"player"]
+                                             directory:[item objectForKey:@"path"]
+                                             title:[item objectForKey:@"name"]];
+        [controllers.library pushViewController:controller animated:NO];
+    }
+}
+
+#pragma mark - Search
+
 - (void)loadSearchIndex
 {
-    NSString* searchJsonPath = [libraryDirectory stringByAppendingString:@"/search.json"];
+    NSString* searchJsonPath = [self.libraryDirectory stringByAppendingString:@"/search.json"];
     if ([[NSFileManager defaultManager] fileExistsAtPath:searchJsonPath])
     {
         self.searchIndex = [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfFile:searchJsonPath]];
@@ -231,7 +383,9 @@
         {
             if ([self.searchIndex[i][@"key"] hasPrefix:searchText])
             {
-                [results addObject:self.searchIndex[i][@"item"]];
+                NSMutableDictionary* item = [self.searchIndex[i][@"item"] mutableCopy];
+                item[@"player"] = self.player;
+                [results addObject:item];
                 if (results.count == 100)
                 {
                     break;

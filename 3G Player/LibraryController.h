@@ -8,13 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
-@interface LibraryController : UINavigationController <UISearchBarDelegate>
+@interface LibraryController : UINavigationController <UIActionSheetDelegate, UISearchBarDelegate>
 
 @property (nonatomic, retain) UISearchBar* librarySearchBar;
 
-- (id)initWithRoot;
+- (id)initWithPlayer:(NSDictionary*)player;
+
+- (void)changePlayer:(NSDictionary*)player;
 
 - (void)updateLibrary;
 - (void)updateLibraryWithSuccessCallback:(void(^)())callback;
+
+- (void)navigateToItem:(NSDictionary*)item enter:(BOOL)enter;
 
 @end

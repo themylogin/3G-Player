@@ -10,12 +10,15 @@
 
 @interface Scrobbler : NSObject
 
+@property BOOL enabled;
+
 - (id)init;
+
+- (int)queueSize;
+
+- (void)love:(NSDictionary*)file;
 - (void)sendNowPlaying:(NSDictionary*)file;
 - (void)scrobble:(NSDictionary*)file startedAt:(NSDate*)date;
-- (void)love:(NSDictionary*)file;
 
-@property BOOL enabled;
-- (int)queueSize;
 
 @end

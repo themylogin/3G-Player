@@ -90,7 +90,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSDictionary* item = [self getItemForIndexPath:indexPath];
-    [musicTableService navigateLibraryToItem:item enter:YES];
+    [controllers.library navigateToItem:item enter:YES];
 }
 
 #pragma mark - Gesture recognizer

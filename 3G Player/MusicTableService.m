@@ -8,7 +8,6 @@
 
 #import "MusicTableService.h"
 
-#import "AppDelegate.h"
 #import "Globals.h"
 #import "LibraryPageController.h"
 
@@ -27,8 +26,6 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
 
 @property (nonatomic, retain) NSFileManager* fileManager;
 
-@property (nonatomic, retain) NSString* recentsFile;
-
 @end
 
 @implementation MusicTableService
@@ -37,59 +34,67 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
 {
     self.fileManager = [NSFileManager defaultManager];
     
-    self.recentsFile = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingString:@"/recents.json"];
-    if (![[NSFileManager defaultManager] fileExistsAtPath:self.recentsFile])
-    {
-        [self writeRecentsFile:[[NSArray alloc] init]];
-    }
-    
     return self;
 }
 
-- (void)navigateLibraryToItem:(NSDictionary*)item enter:(BOOL)enter
+#pragma mark - Index
+
+- (NSDictionary*)loadRawIndexForPlayer:(NSDictionary*)player directory:(NSString*)directory
 {
-    NSMutableArray* libraryControllers = [[NSMutableArray alloc] init];
-    NSMutableArray* scrollTargets = [[NSMutableArray alloc] init];
-    NSString* parent = [item objectForKey:@"path"];
-    NSDictionary* child = item;
-    while (![(parent = [parent stringByDeletingLastPathComponent]) isEqualToString:@""])
+    NSString* indexJsonPath = [librariesPath stringByAppendingString:
+                               [[player objectForKey:@"libraryPath"] stringByAppendingString:
+                                [NSString stringWithFormat:@"/%@/index.json", directory]]];
+    if ([self.fileManager fileExistsAtPath:indexJsonPath])
     {
-        NSDictionary* parentItem = [musicFileManager itemByPath:parent];
-        if (parentItem != nil)
-        {
-            LibraryPageController* controller = [[LibraryPageController alloc]
-                                                 initWithDirectory:parent
-                                                 title:[parentItem objectForKey:@"name"]];
-            [libraryControllers insertObject:controller atIndex:0];
-            [scrollTargets insertObject:child atIndex:0];
-            child = parentItem;
-            
-        }
+        return [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfFile:indexJsonPath]];
     }
-    
-    [controllers.library popToRootViewControllerAnimated:NO];
-    for (int i = 0; i < [libraryControllers count]; i++)
+    else
     {
-        [controllers.library pushViewController:[libraryControllers objectAtIndex:i] animated:NO];
-    }
-    AppDelegate* delegate = (AppDelegate*)[[UIApplication sharedApplication] delegate];
-    [delegate.tabBarController setSelectedViewController:controllers.library];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        for (int i = 0; i < [libraryControllers count]; i++)
-        {
-            [[libraryControllers objectAtIndex:i] scrollToItem:[scrollTargets objectAtIndex:i]];
-        }
-    });
-    
-    if (enter)
-    {
-        LibraryPageController* controller = [[LibraryPageController alloc]
-                                             initWithDirectory:[item objectForKey:@"path"]
-                                             title:[item objectForKey:@"name"]];
-        [controllers.library pushViewController:controller animated:NO];
+        return [NSDictionary dictionary];
     }
 }
 
+- (NSArray*)loadIndexForPlayer:(NSDictionary*)player directory:(NSString*)directory
+{
+    NSDictionary* index = [self loadRawIndexForPlayer:player directory:directory];
+    
+    NSArray* values = [index allValues];
+    NSMutableArray* valuesWithPlayer = [[NSMutableArray alloc] initWithCapacity:values.count];
+    for (int i = 0; i < values.count; i++)
+    {
+        NSMutableDictionary* value = [[values objectAtIndex:i] mutableCopy];
+        [value setObject:player forKey:@"player"];
+        [valuesWithPlayer addObject:value];
+    }
+    
+    return [valuesWithPlayer sortedArrayUsingComparator: ^(id _a, id _b)
+            {
+                NSDictionary* a = (NSDictionary*) _a;
+                NSDictionary* b = (NSDictionary*) _b;
+                
+                if ([[a objectForKey:@"type"] isEqualToString:@"directory"] && [[b objectForKey:@"type"] isEqualToString:@"file"])
+                {
+                    return (NSComparisonResult)NSOrderedAscending;
+                }
+                if ([[a objectForKey:@"type"] isEqualToString:@"file"] && [[b objectForKey:@"type"] isEqualToString:@"directory"])
+                {
+                    return (NSComparisonResult)NSOrderedDescending;
+                }
+                if ([[a objectForKey:@"type"] isEqualToString:@"file"] && [[b objectForKey:@"type"] isEqualToString:@"file"] &&
+                    ![[a objectForKey:@"disc"] isEqual:[b objectForKey:@"disc"]])
+                {
+                    return [[a objectForKey:@"disc"] compare:[b objectForKey:@"disc"]];
+                }
+                return [[a objectForKey:@"name"] compare:[b objectForKey:@"name"] options:NSCaseInsensitiveSearch];
+            }];
+}
+
+- (NSArray*)loadIndexForItem:(NSDictionary*)item
+{
+    return [self loadIndexForPlayer:[item objectForKey:@"player"] directory:[item objectForKey:@"path"]];
+}
+
+#pragma mark - Any music controller
 
 - (UITableViewCell*)cellForMusicItem:(NSDictionary*)item tableView:(UITableView *)tableView
 {
@@ -200,7 +205,37 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     [actionSheet release];
 }
 
-#pragma mark - Action sheet delegate
+- (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    NSString* view = objc_getAssociatedObject(alertView, ALERTVIEW);
+    
+    if ([view isEqualToString:@"ADD"])
+    {
+        if (buttonIndex == 1)
+        {
+            [self addDirectoryToPlaylist:objc_getAssociatedObject(alertView, DIRECTORY)
+                                    mode:[objc_getAssociatedObject(alertView, ADD_MODE) intValue]
+                         askConfirmation:NO
+                               playAfter:[objc_getAssociatedObject(alertView, PLAY_AFTER) boolValue]];
+        }
+    }
+    
+    if ([view isEqualToString:@"DELETE"])
+    {
+        if (buttonIndex == 1)
+        {
+            [musicFileManager remove:objc_getAssociatedObject(alertView, ITEM)];
+        }
+    }
+    
+    if ([view isEqualToString:@"REMOVE_FROM_BLACKLIST"])
+    {
+        if (buttonIndex == 1)
+        {
+            [self unblacklistItem:objc_getAssociatedObject(alertView, ITEM)];
+        }
+    }
+}
 
 - (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
@@ -256,11 +291,13 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     [self addItemToPlaylist:item mode:addMode playAfter:[button isEqualToString:@"REPLACE_AND_PLAY"]];
 }
 
+#pragma mark - Add to playlist
+
 - (void)addItemToPlaylist:(NSDictionary*)item mode:(AddMode)addMode playAfter:(BOOL)playAfter
 {
     if ([self isDirectory:item])
     {
-        [self addDirectoryToPlaylist:[item objectForKey:@"path"] mode:addMode askConfirmation:YES playAfter:playAfter];
+        [self addDirectoryToPlaylist:item mode:addMode askConfirmation:YES playAfter:playAfter];
     }
     else
     {
@@ -271,81 +308,10 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
         }
     }
     
-    [musicTableService notifyItemUsage:item];
+    [musicFileManager notifyItemAdd:item];
 }
 
-#pragma mark - Alert view delegage
-
-- (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    NSString* view = objc_getAssociatedObject(alertView, ALERTVIEW);
-    
-    if ([view isEqualToString:@"ADD"])
-    {
-        if (buttonIndex == 1)
-        {
-            [self addDirectoryToPlaylist:objc_getAssociatedObject(alertView, DIRECTORY) mode:[objc_getAssociatedObject(alertView, ADD_MODE) intValue] askConfirmation:NO playAfter:[objc_getAssociatedObject(alertView, PLAY_AFTER) boolValue]];
-        }
-    }
-    
-    if ([view isEqualToString:@"DELETE"])
-    {
-        if (buttonIndex == 1)
-        {
-            [musicFileManager deleteFileOrdirectory:objc_getAssociatedObject(alertView, ITEM)];
-        }
-    }
-    
-    if ([view isEqualToString:@"REMOVE_FROM_BLACKLIST"])
-    {
-        if (buttonIndex == 1)
-        {
-            [self unblacklistItem:objc_getAssociatedObject(alertView, ITEM)];
-        }
-    }
-}
-
-#pragma mark - Internals
-
-- (NSDictionary*)loadRawIndexFor:(NSString *)path
-{
-    NSString* indexJsonPath = [[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:path] stringByAppendingString:@"/index.json"];
-    if ([self.fileManager fileExistsAtPath:indexJsonPath])
-    {
-        return [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfFile:indexJsonPath]];
-    }
-    else
-    {
-        return [NSDictionary dictionary];
-    }
-}
-
-- (NSArray*)loadIndexFor:(NSString*)path
-{
-    NSDictionary* index = [self loadRawIndexFor:path];
-    return [[index allValues] sortedArrayUsingComparator: ^(id _a, id _b)
-            {
-                NSDictionary* a = (NSDictionary*) _a;
-                NSDictionary* b = (NSDictionary*) _b;
-                
-                if ([[a objectForKey:@"type"] isEqualToString:@"directory"] && [[b objectForKey:@"type"] isEqualToString:@"file"])
-                {
-                    return (NSComparisonResult)NSOrderedAscending;
-                }
-                if ([[a objectForKey:@"type"] isEqualToString:@"file"] && [[b objectForKey:@"type"] isEqualToString:@"directory"])
-                {
-                    return (NSComparisonResult)NSOrderedDescending;
-                }
-                if ([[a objectForKey:@"type"] isEqualToString:@"file"] && [[b objectForKey:@"type"] isEqualToString:@"file"] &&
-                    ![[a objectForKey:@"disc"] isEqual:[b objectForKey:@"disc"]])
-                {
-                    return [[a objectForKey:@"disc"] compare:[b objectForKey:@"disc"]];
-                }
-                return [[a objectForKey:@"name"] compare:[b objectForKey:@"name"] options:NSCaseInsensitiveSearch];
-            }];
-}
-
-- (void)addDirectoryToPlaylist:(NSString*)directory mode:(AddMode)addMode askConfirmation:(BOOL)ask playAfter:(BOOL)play
+- (void)addDirectoryToPlaylist:(NSDictionary*)directory mode:(AddMode)addMode askConfirmation:(BOOL)ask playAfter:(BOOL)play
 {
     NSMutableArray* filesToAdd = [[NSMutableArray alloc] init];
     
@@ -360,7 +326,7 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     else
     {
         UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Question", nil)
-                                                        message:[NSString stringWithFormat:NSLocalizedString(@"Directory «%@» contains lots of music. Add it anyway?", nil), directory]
+                                                        message:[NSString stringWithFormat:NSLocalizedString(@"Directory «%@» contains lots of music. Add it anyway?", nil), [directory objectForKey:@"name"]]
                                                        delegate:self
                                               cancelButtonTitle:NSLocalizedString(@"No", nil)
                                               otherButtonTitles:NSLocalizedString(@"Yes", nil), nil];
@@ -375,11 +341,11 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     [filesToAdd release];
 }
 
-- (BOOL)addDirectory:(NSString*)directory to:(NSMutableArray*)playlist askConfirmation:(BOOL)ask
+- (BOOL)addDirectory:(NSDictionary*)directory to:(NSMutableArray*)playlist askConfirmation:(BOOL)ask
 {
     @autoreleasepool
     {
-        for (NSDictionary* item in [self loadIndexFor:directory])
+        for (NSDictionary* item in [self loadIndexForItem:directory])
         {
             if ([self isBlacklisted:item])
             {
@@ -388,7 +354,7 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
             
             if ([self isDirectory:item])
             {
-                if (![self addDirectory:[item objectForKey:@"path"] to:playlist askConfirmation:ask])
+                if (![self addDirectory:item to:playlist askConfirmation:ask])
                 {
                     return FALSE;
                 }
@@ -408,21 +374,11 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     }
 }
 
+#pragma mark - Helpers
+
 - (BOOL)isDirectory:(NSDictionary*)item
 {
     return [[item objectForKey:@"type"] isEqualToString:@"directory"];
-}
-
-- (NSString*)blacklistFilePath:(NSDictionary*)item
-{
-    if ([self isDirectory:item])
-    {
-        return [[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[item objectForKey:@"path"]] stringByAppendingString:@"/blacklisted"];
-    }
-    else
-    {
-        return [[[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[item objectForKey:@"path"]] stringByAppendingString:@".blacklisted"];
-    }
 }
 
 - (BOOL)isBlacklisted:(NSDictionary*)item
@@ -442,6 +398,18 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     [[NSNotificationCenter defaultCenter] postNotificationName:@"stateChanged" object:musicFileManager];
 }
 
+- (NSString*)blacklistFilePath:(NSDictionary*)item
+{
+    if ([self isDirectory:item])
+    {
+        return [[musicFileManager absolutePath:item] stringByAppendingString:@"/blacklisted"];
+    }
+    else
+    {
+        return [[musicFileManager absolutePath:item] stringByAppendingString:@".blacklisted"];
+    }
+}
+
 - (BOOL)isBuffered:(NSDictionary*)item
 {
     if ([self isDirectory:item])
@@ -458,7 +426,7 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
 {
     @autoreleasepool
     {
-        for (NSDictionary* childItem in [self loadIndexFor:[item objectForKey:@"path"]])
+        for (NSDictionary* childItem in [self loadIndexForItem:item])
         {
             if ([self isBlacklisted:childItem])
             {
@@ -487,43 +455,7 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
 
 - (BOOL)fileIsBuffered:(NSDictionary*)item
 {
-    return [musicFileManager getState:item].state == MusicFileBuffered;
-}
-
-- (NSMutableArray*)readRecentsFile
-{
-    return [[JSONDecoder decoder] mutableObjectWithData:[NSData dataWithContentsOfFile:self.recentsFile]];
-}
-
-- (void)writeRecentsFile:(NSArray*)recents
-{
-    [[recents JSONData] writeToFile:self.recentsFile atomically:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"recentsUpdated" object:self userInfo:nil];
-}
-
-- (void)notifyItemUsage:(NSDictionary*)item
-{
-    NSString* path = [item objectForKey:@"path"];
-    NSMutableArray* recents = [self readRecentsFile];
-    BOOL found = false;
-    for (int i = 0; i < [recents count]; i++)
-    {
-        if ([[[recents objectAtIndex:i] objectForKey:@"path"] isEqualToString:path])
-        {
-            [recents removeObjectAtIndex:i];
-            found = true;
-            break;
-        }
-    }
-    if (!found)
-    {
-        for (int i = 50; i < [recents count]; i++)
-        {
-            [recents removeLastObject];
-        }
-    }
-    [recents insertObject:item atIndex:0];
-    [self writeRecentsFile:recents];
+    return [musicFileManager state:item].state == MusicFileBuffered;
 }
 
 @end

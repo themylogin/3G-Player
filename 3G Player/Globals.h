@@ -19,6 +19,17 @@
 #import "MusicFileManager.h"
 #import "Scrobbler.h"
 
+extern NSString* librariesPath;
+
+extern NSArray* players;
+extern int leaveFreeSpace;
+extern NSString* lastFmUsername;
+extern NSString* lastFmPassword;
+
+extern MusicTableService* musicTableService;
+extern MusicFileManager* musicFileManager;
+extern Scrobbler* scrobbler;
+
 typedef struct {
     UITabBarController* tabBar;
     CurrentController* current;
@@ -28,19 +39,6 @@ typedef struct {
 } _controllers;
 
 extern _controllers controllers;
-
-extern MusicTableService* musicTableService;
-
-extern MusicFileManager* musicFileManager;
-extern Scrobbler* scrobbler;
-
-extern NSString* libraryDirectory;
-extern NSString* playerUrl;
-
-extern int freeSpaceMb;
-
-extern NSString* lastfmUsername;
-extern NSString* lastfmPassword;
 
 extern UIBarButtonItem* libraryRightBarButtonItem;
 extern UIBarButtonItem* libraryToolbarButtonItem;

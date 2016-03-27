@@ -29,7 +29,8 @@
 @property (nonatomic, retain) NSFileHandle*     bufferingFileHandle;
 @property (nonatomic, retain) KeepAliver*       bufferingKeepAliver;
 
-@property (nonatomic, retain) NSString*         historyFile;
+@property (nonatomic, retain) NSString*         addHistoryFile;
+@property (nonatomic, retain) NSString*         playHistoryFile;
 
 @end
 
@@ -49,53 +50,72 @@
     
     self.bufferingKeepAliver = [[KeepAliver alloc] init];
     
-    self.historyFile = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingString:@"/history.json"];
-    if (![self.fileManager fileExistsAtPath:self.historyFile])
+    self.addHistoryFile = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
+                           stringByAppendingString:@"/add_history.json"];
+    self.playHistoryFile = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
+                            stringByAppendingString:@"/play_history.json"];
+    if (![self.fileManager fileExistsAtPath:self.addHistoryFile])
     {
-        NSMutableDictionary* history = [NSMutableDictionary dictionary];
-        NSDirectoryEnumerator* de = [[NSFileManager defaultManager] enumeratorAtPath:libraryDirectory];
-        while (true)
-        {
-            @autoreleasepool
-            {
-                NSString* file = [de nextObject];
-                if (!file)
-                {
-                    break;
-                }
-                
-                NSString* filePath = [[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:file];
-                
-                BOOL isDirectory;
-                if ([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDirectory] && !isDirectory)
-                {
-                    NSString* fileName = [[file pathComponents] lastObject];
-                    if ([self isMusicFile:fileName])
-                    {
-                        NSDictionary* attributes = [self.fileManager attributesOfItemAtPath:filePath error:nil];
-                        [history setValue:[NSNumber numberWithInt:[[attributes objectForKey:NSFileCreationDate] timeIntervalSince1970]] forKey:[self musicHistoryKey:file]];
-                    }
-                }
-            }
-        }
-        [self writeHistoryFile:history];
+        [self writeHistoryFile:self.addHistoryFile history:[NSArray array]];
+    }
+    
+    if (![self.fileManager fileExistsAtPath:self.playHistoryFile])
+    {
+        [self writeHistoryFile:self.playHistoryFile history:[NSArray array]];
     }
     
     return self;
 }
 
-- (MusicFileState)getState:(NSDictionary*)musicFile
+- (bool)item:(NSDictionary*)item1 isEqualToItem:(NSDictionary*)item2
+{
+    return [[self absolutePath:item1] isEqualToString:[self absolutePath:item2]];
+}
+
+#pragma mark - Paths
+
+- (NSString*)absolutePath:(NSDictionary*)item
+{
+    return [[librariesPath stringByAppendingString:[[item objectForKey:@"player"] objectForKey:@"libraryPath"]]
+            stringByAppendingString:[NSString stringWithFormat:@"/%@", [item objectForKey:@"path"]]];
+}
+
+- (NSString*)incompleteFileAbsolutePath:(NSDictionary*)musicFile
+{
+    return [[self absolutePath:musicFile] stringByAppendingString:@".incomplete"];
+}
+
+- (NSString*)playPath:(NSDictionary*)musicFile
+{
+    NSString* path = [self absolutePath:musicFile];
+    if ([self.fileManager fileExistsAtPath:path])
+    {
+        return path;
+    }
+    
+    NSString* incompletePath = [self incompleteFileAbsolutePath:musicFile];
+    if ([self.fileManager fileExistsAtPath:incompletePath])
+    {
+        return incompletePath;
+    }
+    
+    return nil;
+}
+
+#pragma mark - State
+
+- (MusicFileState)state:(NSDictionary *)musicFile
 {
     MusicFileState state;
-    if ([self.fileManager fileExistsAtPath:[self filePath:musicFile]])
+    if ([self.fileManager fileExistsAtPath:[self absolutePath:musicFile]])
     {
         state.state = MusicFileBuffered;
     }
-    else if (self.bufferingFile && [[self.bufferingFile objectForKey:@"path"] isEqualToString:[musicFile objectForKey:@"path"]])
+    else if (self.bufferingFile && [self item:self.bufferingFile isEqualToItem:musicFile])
     {
         state.state = MusicFileBuffering;
         
-        NSString* incompletePath = [self incompleteFilePath:musicFile];
+        NSString* incompletePath = [self incompleteFileAbsolutePath:musicFile];
         unsigned long long fileSize = 0;
         if ([self.fileManager fileExistsAtPath:incompletePath])
         {
@@ -119,22 +139,7 @@
     return state;
 }
 
-- (NSString*)getPath:(NSDictionary*)musicFile
-{
-    NSString* path = [self filePath:musicFile];
-    if ([self.fileManager fileExistsAtPath:path])
-    {
-        return path;
-    }
-    
-    NSString* incompletePath = [self incompleteFilePath:musicFile];
-    if ([self.fileManager fileExistsAtPath:incompletePath])
-    {
-        return incompletePath;
-    }
-    
-    return nil;
-}
+#pragma mark - Buffering
 
 - (void)buffer:(NSDictionary*)musicFile
 {    
@@ -154,6 +159,7 @@
     self.bufferingIsError = false;
     self.bufferingExpectedLength = 0;
     
+    //[musicFileManager notifyItemPlay:musicFile];
     [self startBufferingRequest:musicFile];
     [self loadCover:musicFile];
     
@@ -182,15 +188,16 @@
         return;
     }
     
-    [self notifyFileUsage:musicFile];
+    [self notifyItemPlay:musicFile];
     [self removeOldFiles];
-    [self notifyFileUsage:musicFile];
+    [self notifyItemPlay:musicFile]; // Again, because previous call can remove our file
     
-    NSString* url = [[playerUrl stringByAppendingString:@"/music/"] stringByAppendingString:[musicFile objectForKey:@"url"]];
+    NSString* url = [[[musicFile objectForKey:@"player"] objectForKey:@"url"]
+                     stringByAppendingString:[NSString stringWithFormat:@"/music/%@", [musicFile objectForKey:@"url"]]];
     self.bufferingRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:url]];
     
-    NSString* incompletePath = [self incompleteFilePath:musicFile];
-    NSString* destinationPath = [self filePath:musicFile];
+    NSString* incompletePath = [self incompleteFileAbsolutePath:musicFile];
+    NSString* destinationPath = [self absolutePath:musicFile];
     if ([self.fileManager fileExistsAtPath:incompletePath])
     {
         unsigned long long fileSize = [[self.fileManager attributesOfItemAtPath:incompletePath error:nil] fileSize];
@@ -301,6 +308,8 @@
     [self.bufferingKeepAliver stop];
 }
 
+#pragma mark - Cover
+
 - (void)loadCover:(NSDictionary*)musicFile
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
@@ -310,13 +319,14 @@
             return;
         }
         
-        NSDictionary* album = [self itemByPath:[[musicFile objectForKey:@"path"]
-                                                stringByDeletingLastPathComponent]];
+        NSDictionary* album = [self itemForAbsolutePath:[[musicFile objectForKey:@"path"]
+                                                         stringByDeletingLastPathComponent]];
         NSString* remoteCoverPath = [album objectForKey:@"cover"];
         
+        
         NSURL* coverUrl = [NSURL URLWithString:
-                           [playerUrl stringByAppendingString:
-                            [NSString stringWithFormat:@"/cover/%@", remoteCoverPath, nil]]];
+                           [[[musicFile objectForKey:@"player"] objectForKey:@"url"]
+                            stringByAppendingString:[NSString stringWithFormat:@"/cover/%@", remoteCoverPath]]];
         ASIHTTPRequest* coverRequest = [ASIHTTPRequest requestWithURL:coverUrl];
         [coverRequest setShouldContinueWhenAppEntersBackground:YES];
         [coverRequest setDownloadDestinationPath:coverPath];
@@ -337,15 +347,17 @@
 
 - (NSString*)coverPath:(NSDictionary *)musicFile
 {
-    return [[[self filePath:musicFile]
+    return [[[self absolutePath:musicFile]
              stringByDeletingLastPathComponent]
             stringByAppendingString:@"/cover.jpg"];
 }
 
-- (void)deleteFileOrdirectory:(NSDictionary*)fileOrDirectory
+#pragma mark - Removal
+
+- (void)remove:(NSDictionary*)fileOrDirectory
 {
     NSString* removeHistoryWithPrefix = nil;
-    NSString* path = [[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[fileOrDirectory objectForKey:@"path"]];
+    NSString* path = [self absolutePath:fileOrDirectory];
     if ([[fileOrDirectory objectForKey:@"type"] isEqualToString:@"directory"])
     {
         NSDirectoryEnumerator* de = [[NSFileManager defaultManager] enumeratorAtPath:path];
@@ -365,7 +377,7 @@
                 if ([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDirectory] && !isDirectory)
                 {
                     NSString* fileName = [[file pathComponents] lastObject];
-                    if ([self isMusicFile:fileName])
+                    if ([self canRemoveFile:fileName])
                     {
                         [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
                     }
@@ -373,7 +385,7 @@
             }
         }
         
-        removeHistoryWithPrefix = [fileOrDirectory objectForKey:@"path"];
+        removeHistoryWithPrefix = [self absolutePath:fileOrDirectory];
     }
     else
     {
@@ -399,7 +411,7 @@
                 if ([[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDirectory] && !isDirectory)
                 {
                     NSString* fileName = [[file pathComponents] lastObject];
-                    if ([self isMusicFile:fileName])
+                    if ([self canRemoveFile:fileName])
                     {
                         hasAliveSiblingsOrChildren = YES;
                         break;
@@ -409,39 +421,37 @@
         }
         if (!hasAliveSiblingsOrChildren)
         {
-            removeHistoryWithPrefix = [[fileOrDirectory objectForKey:@"path"] stringByDeletingLastPathComponent];
+            removeHistoryWithPrefix = [[self absolutePath:fileOrDirectory] stringByDeletingLastPathComponent];
         }
     }
     
     if (removeHistoryWithPrefix)
     {
-        NSMutableDictionary* history = [self readHistoryFile];
-        NSMutableArray* historyKeysToDelete = [NSMutableArray array];
-        for (NSString* key in [history keyEnumerator])
+        NSMutableArray* playHistory = [self readHistoryFile:self.playHistoryFile];
+        NSMutableIndexSet* playHistoryKeysToDelete = [NSMutableIndexSet indexSet];
+        for (int i = 0; i < playHistory.count; i++)
         {
-            if ([key hasPrefix:removeHistoryWithPrefix])
+            if ([[self absolutePath:[playHistory objectAtIndex:i]] hasPrefix:removeHistoryWithPrefix])
             {
-                [historyKeysToDelete addObject:key];
+                [playHistoryKeysToDelete addIndex:i];
             }
         }
-        [history removeObjectsForKeys:historyKeysToDelete];
-        [self writeHistoryFile:history];
+        [playHistory removeObjectsAtIndexes:playHistoryKeysToDelete];
+        [self writeHistoryFile:self.playHistoryFile history:playHistory];
     }
     
     [self notifyStateChanged];
 }
 
-#pragma mark - Internals
-
-- (NSString*)filePath:(NSDictionary*)musicFile
+- (BOOL)canRemoveFile:(NSString*)fileName
 {
-    return [[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[musicFile objectForKey:@"path"]];
+    return !([fileName isEqualToString:@"index.json"] ||
+             [fileName isEqualToString:@"index.json.checksum"] ||
+             [fileName isEqualToString:@"revision.txt"] ||
+             [fileName hasSuffix:@"blacklisted"]);
 }
 
-- (NSString*)incompleteFilePath:(NSDictionary*)musicFile
-{
-    return [[self filePath:musicFile] stringByAppendingString:@".incomplete"];
-}
+#pragma mark - Internal notifiers
 
 - (void)notifyStateChanged
 {
@@ -460,70 +470,98 @@
 
 #pragma mark - Disk space managment
 
-- (BOOL)isMusicFile:(NSString*)fileName
+- (NSMutableArray*)readHistoryFile:(NSString*)path
 {
-    return !([fileName isEqualToString:@"index.json"] ||
-             [fileName isEqualToString:@"index.json.checksum"] ||
-             [fileName isEqualToString:@"revision.txt"] ||
-             [fileName hasSuffix:@"blacklisted"]);
+    return [[JSONDecoder decoder] mutableObjectWithData:[NSData dataWithContentsOfFile:path]];
 }
 
-- (NSString*)musicHistoryKey:(NSString*)path
+- (void)writeHistoryFile:(NSString*)path history:(NSArray*)history
 {
-    NSMutableArray* pathComponents = [[path pathComponents] mutableCopy];
-    [pathComponents removeLastObject];
-    return [pathComponents componentsJoinedByString:@"/"];
-}
-
-- (NSMutableDictionary*)readHistoryFile
-{
-    return [[JSONDecoder decoder] mutableObjectWithData:[NSData dataWithContentsOfFile:self.historyFile]];
-}
-
-- (void)writeHistoryFile:(NSMutableDictionary*)history
-{
-    [[history JSONData] writeToFile:self.historyFile atomically:YES];
+    [[history JSONData] writeToFile:path atomically:YES];
     [self.notificationCenter postNotificationName:@"historyUpdated" object:self userInfo:nil];
 }
 
-- (void)notifyFileUsage:(NSDictionary*)musicFile
+- (void)notifyItemAdd:(NSDictionary*)item
 {
-    NSMutableDictionary* history = [self readHistoryFile];
-    [history setValue:[NSNumber numberWithInt:(int)time(NULL)] forKey:[self musicHistoryKey:[musicFile objectForKey:@"path"]]];
-    [self writeHistoryFile:history];
+    [self notifyItem:item historyFile:self.addHistoryFile];
+}
+
+- (void)notifyItemPlay:(NSDictionary*)item
+{
+    if (![musicTableService isDirectory:item])
+    {
+        item = [musicFileManager itemForAbsolutePath:
+                [[musicFileManager absolutePath:item] stringByDeletingLastPathComponent]];
+    }
+    
+    [self notifyItem:item historyFile:self.playHistoryFile];
+}
+
+- (void)notifyItem:(NSDictionary*)item historyFile:(NSString*)historyFile
+{
+    NSMutableArray* history = [self readHistoryFile:historyFile];
+    
+    bool changed = true;
+    while (changed)
+    {
+        changed = false;
+        for (int i = 0; i < history.count; i++)
+        {
+            NSDictionary* historyItem = [history objectAtIndex:i];
+            if (![[NSFileManager defaultManager] fileExistsAtPath:[musicFileManager absolutePath:historyItem]])
+            {
+                [history removeObjectAtIndex:i];
+                changed = true;
+                break;
+            }
+            if ([self item:historyItem isEqualToItem:item])
+            {
+                [history removeObjectAtIndex:i];
+                changed = true;
+                break;
+            }
+        }
+    }
+    
+    [history addObject:item];
+    
+    [self writeHistoryFile:historyFile history:history];
+}
+
+- (NSArray*)listRecentItems
+{
+    return [[[self readHistoryFile:self.addHistoryFile] reverseObjectEnumerator] allObjects];
 }
 
 - (NSArray*)listOldDirectories
 {
-    return [[self readHistoryFile] keysSortedByValueUsingComparator:^NSComparisonResult(id obj1, id obj2){
-        return [obj1 compare:obj2];
-    }];
+    return [self readHistoryFile:self.playHistoryFile];
 }
 
 - (void)removeOldFiles
 {
     while (![self hasFreeSpace])
     {
-        NSArray* oldDirectories = [self listOldDirectories];
+        NSMutableArray* oldDirectories = [self readHistoryFile:self.playHistoryFile];
         if ([oldDirectories count] > 0)
         {
-            NSString* directoryToRemove = [[libraryDirectory stringByAppendingString:@"/"] stringByAppendingString:[oldDirectories objectAtIndex:0]];
+            NSString* pathToRemove = [self absolutePath:[oldDirectories objectAtIndex:0]];
             
-            NSArray* files = [self.fileManager contentsOfDirectoryAtPath:directoryToRemove error:nil];
+            NSArray* files = [self.fileManager contentsOfDirectoryAtPath:pathToRemove error:nil];
             for (int i = 0; i < [files count]; i++)
             {
-                NSString* objectToRemove = [[directoryToRemove stringByAppendingString:@"/"] stringByAppendingString:[files objectAtIndex:i]];
+                NSString* objectToRemove = [[pathToRemove stringByAppendingString:@"/"]
+                                            stringByAppendingString:[files objectAtIndex:i]];
                 BOOL isDirectory;
                 if ([self.fileManager fileExistsAtPath:objectToRemove isDirectory:&isDirectory] && !isDirectory &&
-                    [self isMusicFile:[files objectAtIndex:i]])
+                    [self canRemoveFile:[files objectAtIndex:i]])
                 {
                     [self.fileManager removeItemAtPath:objectToRemove error:nil];
                 }
             }
             
-            NSMutableDictionary* history = [self readHistoryFile];
-            [history removeObjectForKey:[oldDirectories objectAtIndex:0]];
-            [self writeHistoryFile:history];
+            [oldDirectories removeObjectAtIndex:0];
+            [self writeHistoryFile:self.playHistoryFile history:oldDirectories];
         }
         else
         {
@@ -539,7 +577,7 @@
     if (sys)
     {
         unsigned long long totalFreeSpace = [[sys objectForKey:NSFileSystemFreeSize] unsignedLongLongValue];
-        if (totalFreeSpace < (200 + freeSpaceMb) * 1024 * 1024)
+        if (totalFreeSpace < leaveFreeSpace + 200 * 1024 * 1024)
         {
             return NO;
         }
@@ -548,49 +586,61 @@
     return YES;
 }
 
-- (NSArray*)pathForDirectory:(NSString*)directory
+#pragma mark - Reversing
+
+- (NSString*)navigationPathForItem:(NSDictionary*)item
 {
-    NSArray* parts = [directory componentsSeparatedByString:@"/"];
-    NSMutableArray* path = [NSMutableArray array];
-    for (int j = 0; j < [parts count]; j++)
+    NSMutableArray* navigationPath = [NSMutableArray array];
+    [navigationPath addObject:[item objectForKey:@"name"]];
+    
+    NSString* basePath = [librariesPath stringByAppendingString:
+                          [[item objectForKey:@"player"] objectForKey:@"libraryPath"]];
+    NSString* parent = [musicFileManager absolutePath:item];
+    while (![(parent = [parent stringByDeletingLastPathComponent]) isEqualToString:basePath])
     {
-        NSString* indexJsonPath = [[[libraryDirectory stringByAppendingString:@"/"]
-                                    stringByAppendingString:[[parts subarrayWithRange:NSMakeRange(0, j)]
-                                                             componentsJoinedByString:@"/"]]
-                                   stringByAppendingString:@"/index.json"];
-        NSDictionary* index = [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfFile:indexJsonPath]];
-        NSDictionary* pathPart = nil;
-        NSString* pathPartPath = [[parts subarrayWithRange:NSMakeRange(0, j + 1)]
-                                  componentsJoinedByString:@"/"];
-        for (NSString* key in index)
+        NSDictionary* parentItem = [musicFileManager itemForAbsolutePath:parent];
+        if (parentItem != nil)
         {
-            NSDictionary* probablePathPart = [index objectForKey:key];
-            if ([[probablePathPart objectForKey:@"path"] isEqualToString:pathPartPath])
-            {
-                pathPart = probablePathPart;
-            }
-        }
-        if (pathPart)
-        {
-            [path addObject:[pathPart objectForKey:@"name"]];
-        }
-        else
-        {
-            return nil;
+            [navigationPath addObject:[parentItem objectForKey:@"name"]];
         }
     }
-    return path;
+    
+    return [[[navigationPath reverseObjectEnumerator] allObjects] componentsJoinedByString:@"/"];
 }
 
-- (NSDictionary*)itemByPath:(NSString*)path
+- (NSDictionary*)itemForAbsolutePath:(NSString*)absolutePath
 {
-    if ([path isEqualToString:@""])
+    if ([absolutePath isEqualToString:@""])
     {
         return nil;
     }
     
+    if (![absolutePath hasPrefix:librariesPath])
+    {
+        return nil;
+    }
+    
+    NSString* path = [absolutePath substringWithRange:NSMakeRange(librariesPath.length,
+                                                                  absolutePath.length - librariesPath.length)];
+    
+    NSDictionary* player = nil;
+    for (int i = 0; i < players.count; i++)
+    {
+        if ([path hasPrefix:[[[players objectAtIndex:i] objectForKey:@"libraryPath"] stringByAppendingString:@"/"]])
+        {
+            player = [players objectAtIndex:i];
+            break;
+        }
+    }
+    if (!player)
+    {
+        return nil;
+    }
+    path = [path substringWithRange:NSMakeRange([[player objectForKey:@"libraryPath"] length] + 1,
+                                                path.length - ([[player objectForKey:@"libraryPath"] length] + 1))];
+
     NSString* parentPath = [path stringByDeletingLastPathComponent];
-    NSArray* parentIndex = [musicTableService loadIndexFor:parentPath];
+    NSArray* parentIndex = [musicTableService loadIndexForPlayer:player directory:parentPath];
     for (int i = 0; i < [parentIndex count]; i++)
     {
         NSDictionary* item = [parentIndex objectAtIndex:i];

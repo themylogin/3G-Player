@@ -8,20 +8,20 @@
 
 #import "Globals.h"
 
-_controllers controllers;
+
+NSString* librariesPath;
+NSArray* players;
+
+int leaveFreeSpace;
+
+NSString* lastFmUsername;
+NSString* lastFmPassword;
 
 MusicTableService* musicTableService;
-
 MusicFileManager* musicFileManager;
 Scrobbler* scrobbler;
 
-NSString* libraryDirectory;
-NSString* playerUrl;
-
-int freeSpaceMb;
-
-NSString* lastfmUsername;
-NSString* lastfmPassword;
+_controllers controllers;
 
 UIBarButtonItem* libraryRightBarButtonItem;
 UIBarButtonItem* libraryToolbarButtonItem;

@@ -40,10 +40,16 @@
     tableViewRect.size.height = [UIScreen mainScreen].bounds.size.height - 68;
     self.tableView.frame = tableViewRect;
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateStatistics) name:@"statisticsChanged" object:controllers.current];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateStatistics)
+                                                 name:@"statisticsChanged"
+                                               object:controllers.current];
     [self updateStatistics];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateCandidatesForDeletion) name:@"historyUpdated" object:musicFileManager];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateCandidatesForDeletion)
+                                                 name:@"historyUpdated"
+                                               object:musicFileManager];
     [self updateCandidatesForDeletion];
 }
 
@@ -124,10 +130,25 @@
     }
     if (indexPath.section == 1)
     {
-        cell.textLabel.text = [[self.candidatesForDeletion objectAtIndex:indexPath.row] objectForKey:@"title"];
+        cell.textLabel.text = [musicFileManager navigationPathForItem:
+                               [self.candidatesForDeletion objectAtIndex:indexPath.row]];
     }
     
     return cell;
+}
+
+#pragma mark - Table view delegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath)
+    {
+        if (indexPath.section == 1)
+        {
+            NSDictionary* item = [self.candidatesForDeletion objectAtIndex:indexPath.row];
+            [controllers.library navigateToItem:item enter:NO];
+        }
+    }
 }
 
 #pragma mark - Gesture recognizers
@@ -144,8 +165,7 @@
     {
         if (indexPath.section == 1)
         {
-            NSDictionary* item = [musicFileManager itemByPath:[[self.candidatesForDeletion objectAtIndex:indexPath.row] objectForKey:@"path"]];
-            [musicTableService showActionSheetForItem:item
+            [musicTableService showActionSheetForItem:[self.candidatesForDeletion objectAtIndex:indexPath.row]
                                                inView:self.view
                                      withExtraButtons:BlacklistExtraButton];
         }
@@ -162,21 +182,7 @@
 
 - (void)updateCandidatesForDeletion
 {
-    NSArray* old = [musicFileManager listOldDirectories];
-    NSArray* candidates = [old subarrayWithRange:NSMakeRange(0, MIN([old count], 20))];
-    
-    NSMutableArray* readableCandidates = [NSMutableArray array];
-    for (int i = 0; i < [candidates count]; i++)
-    {
-        NSArray* candidate = [musicFileManager pathForDirectory:[candidates objectAtIndex:i]];
-        if (candidate)
-        {
-            [readableCandidates addObject:@{@"path": [candidates objectAtIndex:i],
-                                            @"title": [candidate componentsJoinedByString:@"/"]}];
-        }
-    }
-    
-    self.candidatesForDeletion = readableCandidates;
+    self.candidatesForDeletion = [musicFileManager listOldDirectories];
     [self.tableView reloadData];
 }
 

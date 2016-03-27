@@ -30,21 +30,28 @@ typedef union {
 
 - (id)init;
 
-- (MusicFileState)getState:(NSDictionary*)musicFile;
-- (NSString*)getPath:(NSDictionary*)musicFile;
+- (bool)item:(NSDictionary*)item1 isEqualToItem:(NSDictionary*)item2;
+
+- (NSString*)absolutePath:(NSDictionary*)item;
+- (NSString*)playPath:(NSDictionary*)musicFile;
+
+- (MusicFileState)state:(NSDictionary*)musicFile;
+
 - (void)buffer:(NSDictionary*)musicFile;
 - (void)stopBuffering;
 
 - (void)loadCover:(NSDictionary*)musicFile;
 - (NSString*)coverPath:(NSDictionary*)musicFile;
 
-- (void)deleteFileOrdirectory:(NSDictionary*)fileOrDirectory;
+- (void)remove:(NSDictionary*)fileOrDirectory;
 
-- (void)notifyFileUsage:(NSDictionary*)musicFile;
+- (void)notifyItemAdd:(NSDictionary*)item;
+- (void)notifyItemPlay:(NSDictionary*)item;
+- (NSArray*)listRecentItems;
 - (NSArray*)listOldDirectories;
 - (void)removeOldFiles;
-- (NSArray*)pathForDirectory:(NSString*)directory;
 
-- (NSDictionary*)itemByPath:(NSString*)path;
+- (NSString*)navigationPathForItem:(NSDictionary*)item;
+- (NSDictionary*)itemForAbsolutePath:(NSString*)absolutePath;
 
 @end

@@ -6,21 +6,17 @@
 	<array>
 		<dict>
 			<key>Title</key>
-			<string>player.thelogin.ru</string>
+			<string>Players</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
 		<dict>
-			<key>DefaultValue</key>
-			<string>http://player.thelogin.ru</string>
-			<key>Key</key>
-			<string>player_url</string>
-			<key>KeyboardType</key>
-			<string>URL</string>
+			<key>File</key>
+			<string>Players</string>
 			<key>Title</key>
-			<string>URL</string>
+			<string>Players</string>
 			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
+			<string>PSChildPaneSpecifier</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -48,7 +44,7 @@
 			<key>Title</key>
 			<string>Leave free space</string>
 			<key>Key</key>
-			<string>free_space_mb</string>
+			<string>LeaveFreeSpaceMB</string>
 			<key>DefaultValue</key>
 			<string>100</string>
 		</dict>
@@ -56,7 +52,7 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
-			<string>last.fm</string>
+			<string>Last.FM</string>
 		</dict>
 		<dict>
 			<key>DefaultValue</key>
@@ -64,9 +60,9 @@
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 			<key>Title</key>
-			<string>Login</string>
+			<string>Username</string>
 			<key>Key</key>
-			<string>lastfm_username</string>
+			<string>LastFM_Username</string>
 		</dict>
 		<dict>
 			<key>DefaultValue</key>
@@ -78,7 +74,7 @@
 			<key>Title</key>
 			<string>Password</string>
 			<key>Key</key>
-			<string>lastfm_password</string>
+			<string>LastFM_Password</string>
 		</dict>
 	</array>
 	<key>StringsTable</key>

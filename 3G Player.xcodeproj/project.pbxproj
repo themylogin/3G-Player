@@ -284,37 +284,37 @@
 				687073301BDABA03000F6013 /* FMEngine */,
 				687073321BDABA03000F6013 /* JSONKit */,
 				681B12301CA53E30000FB01A /* Icons.xcassets */,
-				687073331BDABA03000F6013 /* SearchController.h */,
-				687073341BDABA03000F6013 /* SearchController.m */,
-				687073351BDABA03000F6013 /* SearchController.xib */,
-				84D38D581AC1E0BB007564D3 /* MKNumberBadgeView.h */,
-				84D38D591AC1E0BB007564D3 /* MKNumberBadgeView.m */,
 				84C4CA111785ADA500A95DB9 /* Globals.h */,
 				84C4CA121785ADA500A95DB9 /* Globals.m */,
 				84C10BF91782E08E004220BC /* AppDelegate.h */,
 				84C10BFA1782E08E004220BC /* AppDelegate.m */,
-				84C4CA161785ADA500A95DB9 /* CurrentController.h */,
-				84C4CA171785ADA500A95DB9 /* CurrentController.m */,
-				84C4CA181785ADA500A95DB9 /* CurrentController.xib */,
-				84DEA2D9191FC314000F9832 /* InfoController.h */,
-				84DEA2DA191FC314000F9832 /* InfoController.m */,
-				84CE88831AF34C5B00F1129A /* InfoController.xib */,
+				84075B681A3094AF001E395C /* MusicTableService.h */,
+				84075B691A3094AF001E395C /* MusicTableService.m */,
 				84C91A0817856C5500810B88 /* MusicFileManager.h */,
 				84C91A0917856C5500810B88 /* MusicFileManager.m */,
 				84C4CA3F1786D7FA00A95DB9 /* Scrobbler.h */,
 				84C4CA401786D7FB00A95DB9 /* Scrobbler.m */,
+				84C4CA161785ADA500A95DB9 /* CurrentController.h */,
+				84C4CA171785ADA500A95DB9 /* CurrentController.m */,
+				84C4CA181785ADA500A95DB9 /* CurrentController.xib */,
+				687073331BDABA03000F6013 /* SearchController.h */,
+				687073341BDABA03000F6013 /* SearchController.m */,
+				687073351BDABA03000F6013 /* SearchController.xib */,
 				84C10C071782E20A004220BC /* LibraryController.h */,
 				84C10C081782E20A004220BC /* LibraryController.m */,
-				84075B681A3094AF001E395C /* MusicTableService.h */,
-				84075B691A3094AF001E395C /* MusicTableService.m */,
 				84C4CA131785ADA500A95DB9 /* LibraryPageController.h */,
 				84C4CA141785ADA500A95DB9 /* LibraryPageController.m */,
 				84C4CA151785ADA500A95DB9 /* LibraryPageController.xib */,
 				84075B631A3086A3001E395C /* RecentsController.h */,
 				84075B641A3086A3001E395C /* RecentsController.m */,
 				84075B651A3086A3001E395C /* RecentsController.xib */,
+				84DEA2D9191FC314000F9832 /* InfoController.h */,
+				84DEA2DA191FC314000F9832 /* InfoController.m */,
+				84CE88831AF34C5B00F1129A /* InfoController.xib */,
 				681B12361CA57B2D000FB01A /* KeepAliver.h */,
 				681B12341CA57406000FB01A /* KeepAliver.m */,
+				84D38D581AC1E0BB007564D3 /* MKNumberBadgeView.h */,
+				84D38D591AC1E0BB007564D3 /* MKNumberBadgeView.m */,
 				84C9196F17841B7C00810B88 /* ASIHTTPRequest */,
 				84C29E7E17F85A1A00D259F3 /* CocoaAsyncSocket */,
 				84C4CA321786D71D00A95DB9 /* FMEngine */,
@@ -491,7 +491,7 @@
 		84C10BDF1782E08D004220BC /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0640;
+				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = themylogin;
 				TargetAttributes = {
 					84C10BE61782E08D004220BC = {
@@ -623,6 +623,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -681,6 +682,7 @@
 				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
 				INFOPLIST_FILE = "3G Player/3G Player-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.themylogin.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -702,6 +704,7 @@
 				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
 				INFOPLIST_FILE = "3G Player/3G Player-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.themylogin.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;

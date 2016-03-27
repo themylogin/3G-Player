@@ -37,16 +37,18 @@ dispatch_queue_t serverSocketQueue;
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     [[AVAudioSession sharedInstance] setActive:YES error:nil];
     
-    [self registerDefaultsFromSettingsBundle];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(readDefaults) name:NSUserDefaultsDidChangeNotification object:nil];
-    [self readDefaults];
+    librariesPath = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
+                     stringByAppendingString:@"/Libraries"];
+    [librariesPath retain];
     
-    libraryDirectory = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingString:@"/Library"];
-    [[NSFileManager defaultManager] createDirectoryAtPath:libraryDirectory withIntermediateDirectories:YES attributes:nil error:nil];
-    [libraryDirectory retain];
+    [self registerDefaultsFromSettingsBundle];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(readSettings)
+                                                 name:NSUserDefaultsDidChangeNotification
+                                               object:nil];
+    [self readSettings];
     
     musicTableService = [[MusicTableService alloc] init];
-    
     musicFileManager = [[MusicFileManager alloc] init];
     scrobbler = [[Scrobbler alloc] init];
     
@@ -58,7 +60,7 @@ dispatch_queue_t serverSocketQueue;
     controllers.current = [[CurrentController alloc] init];
     [self.tabBarController addChildViewController:controllers.current];
     
-    controllers.library = [[LibraryController alloc] initWithRoot];
+    controllers.library = [[LibraryController alloc] initWithPlayer:[players objectAtIndex:0]];
     [self.tabBarController addChildViewController:controllers.library];
     
     controllers.recents = [[RecentsController alloc] init];
@@ -85,20 +87,6 @@ dispatch_queue_t serverSocketQueue;
     self.window.backgroundColor = [UIColor whiteColor];
     self.window.rootViewController = self.tabBarController;
     [self.window makeKeyAndVisible];
-}
-
-- (void)readDefaults
-{   
-    playerUrl = [[NSUserDefaults standardUserDefaults] stringForKey:@"player_url"];
-    [playerUrl retain];
-    
-    freeSpaceMb = [[NSUserDefaults standardUserDefaults] integerForKey:@"free_space_mb"];
-    
-    lastfmUsername = [[NSUserDefaults standardUserDefaults] stringForKey:@"lastfm_username"];
-    [lastfmUsername retain];
-    
-    lastfmPassword = [[NSUserDefaults standardUserDefaults] stringForKey:@"lastfm_password"];
-    [lastfmPassword retain];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
@@ -130,15 +118,6 @@ dispatch_queue_t serverSocketQueue;
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-}
-
-- (void)initServerSocket
-{
-    serverSocket = [[GCDAsyncSocket alloc] initWithDelegate:controllers.current delegateQueue:serverSocketQueue];
-    [serverSocket performBlock:^{
-        [serverSocket enableBackgroundingOnSocket];
-    }];
-    [serverSocket acceptOnPort:20139 error:nil];
 }
 
 #pragma mark - Remote Control Buttons delegate
@@ -183,6 +162,8 @@ dispatch_queue_t serverSocketQueue;
     }
 }
 
+#pragma mark - Settings
+
 // Why am I supposed to do this?
 - (void)registerDefaultsFromSettingsBundle
 {
@@ -208,6 +189,54 @@ dispatch_queue_t serverSocketQueue;
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaultsToRegister];
     [defaultsToRegister release];
 }
+
+- (void)readSettings
+{
+    NSMutableArray* mutablePlayers = [[NSMutableArray alloc] init];
+    for (int i = 1; i <= 5; i++)
+    {
+        NSString* stringUrl = [[NSUserDefaults standardUserDefaults] stringForKey:
+                               [NSString stringWithFormat:@"Player%d_URL", i]];
+        NSURL* url = [NSURL URLWithString:stringUrl];
+        if (url)
+        {
+            NSString* libraryPath = [NSString stringWithFormat:@"/%@", [url host]];
+            
+            [[NSFileManager defaultManager]
+             createDirectoryAtPath:[librariesPath stringByAppendingString:libraryPath]
+             withIntermediateDirectories:YES
+             attributes:nil
+             error:nil];
+            
+            [mutablePlayers addObject:@{@"libraryPath": libraryPath,
+                                        @"name": [url host],
+                                        @"url": stringUrl}];
+        }
+    }
+    players = [NSArray arrayWithArray:mutablePlayers];
+    [players retain];
+    
+    leaveFreeSpace = [[NSUserDefaults standardUserDefaults] integerForKey:@"LeaveFreeSpaceMb"] * 1024 * 1024;
+    
+    lastFmUsername = [[NSUserDefaults standardUserDefaults] stringForKey:@"LastFM_Username"];
+    [lastFmUsername retain];
+    
+    lastFmPassword = [[NSUserDefaults standardUserDefaults] stringForKey:@"LastFM_Password"];
+    [lastFmPassword retain];
+}
+
+#pragma mark - Remote control
+
+- (void)initServerSocket
+{
+    serverSocket = [[GCDAsyncSocket alloc] initWithDelegate:controllers.current delegateQueue:serverSocketQueue];
+    [serverSocket performBlock:^{
+        [serverSocket enableBackgroundingOnSocket];
+    }];
+    [serverSocket acceptOnPort:20139 error:nil];
+}
+
+#pragma mark - Keyboard
 
 - (void)keyboardWillShow:(NSNotification *)note
 {

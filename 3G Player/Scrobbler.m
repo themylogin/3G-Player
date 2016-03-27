@@ -31,7 +31,11 @@
     self.sessionKeyUsername = nil;
     self.sessionKeyPassword = nil;
         
-    self.flushTimer = [NSTimer scheduledTimerWithTimeInterval:60.0 target:self selector:@selector(flushQueue) userInfo:nil repeats:YES];
+    self.flushTimer = [NSTimer scheduledTimerWithTimeInterval:60.0
+                                                       target:self
+                                                     selector:@selector(flushQueue)
+                                                     userInfo:nil
+                                                      repeats:YES];
     
     if ([[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"] == nil)
     {
@@ -40,6 +44,42 @@
     }
     
     return self;
+}
+
+- (BOOL)enabled
+{
+    return [[NSUserDefaults standardUserDefaults] objectForKey:@"scrobblingDisabled"] == NULL;
+}
+
+- (void)setEnabled:(BOOL)enabled
+{
+    @synchronized([NSUserDefaults standardUserDefaults])
+    {
+        if (enabled)
+        {
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"scrobblingDisabled"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            
+            [self flushQueue];
+        }
+        else
+        {
+            [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:true] forKey:@"scrobblingDisabled"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+    }
+}
+
+- (int)queueSize
+{
+    return [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"] count];
+}
+
+- (void)love:(NSDictionary*)file
+{
+    [self _queueAction:@"love"
+              withFile:file
+             arguments:[NSDictionary dictionary]];
 }
 
 - (void)sendNowPlaying:(NSDictionary*)file
@@ -61,13 +101,6 @@
              arguments:[NSDictionary dictionaryWithObject:
                         [NSString stringWithFormat:@"%d", (int)[date timeIntervalSince1970]]
                                                    forKey:@"timestamp"]];
-}
-
-- (void)love:(NSDictionary*)file
-{
-    [self _queueAction:@"love"
-              withFile:file
-             arguments:[NSDictionary dictionary]];
 }
 
 - (void) _queueAction:(NSString*)action withFile:(NSDictionary*)file arguments:(NSDictionary*)arguments
@@ -225,14 +258,18 @@
 
 - (void)beAuthorized
 {
-    if (self.sessionKey && self.sessionKeyUsername && self.sessionKeyPassword && [self.sessionKeyUsername isEqualToString:lastfmUsername] && [self.sessionKeyPassword isEqualToString:lastfmPassword])
+    if (self.sessionKey &&
+        self.sessionKeyUsername &&
+        self.sessionKeyPassword &&
+        [self.sessionKeyUsername isEqualToString:lastFmUsername] &&
+        [self.sessionKeyPassword isEqualToString:lastFmPassword])
     {
         return;
     }
     
     self.sessionKey = nil;
-    self.sessionKeyUsername = [lastfmUsername copy];
-    self.sessionKeyPassword = [lastfmPassword copy];
+    self.sessionKeyUsername = [lastFmUsername copy];
+    self.sessionKeyPassword = [lastFmPassword copy];
     
     FMEngine* fmEngine = [[FMEngine alloc] init];
     NSString* authToken = [fmEngine generateAuthTokenFromUsername:self.sessionKeyUsername password:self.sessionKeyPassword];
@@ -290,35 +327,6 @@
     }
     
     return NO;
-}
-
-- (BOOL)enabled
-{
-    return [[NSUserDefaults standardUserDefaults] objectForKey:@"scrobblingDisabled"] == NULL;
-}
-
-- (void)setEnabled:(BOOL)enabled
-{
-    @synchronized([NSUserDefaults standardUserDefaults])
-    {
-        if (enabled)
-        {
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"scrobblingDisabled"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            
-            [self flushQueue];
-        }
-        else
-        {
-            [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:true] forKey:@"scrobblingDisabled"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        }
-    }
-}
-
-- (int)queueSize
-{
-    return [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"] count];
 }
 
 @end
