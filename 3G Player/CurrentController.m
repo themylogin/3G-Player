@@ -21,6 +21,7 @@
 #import "JSONKit.h"
 #import "MKNumberBadgeView.h"
 
+static char const* const ACTIONSHEET = "ACTIONSHEET";
 static char const* const BUTTONS = "BUTTONS";
 
 static char const* const ALERTVIEW = "ALERTVIEW";
@@ -587,14 +588,15 @@ static char const* const POSITION = "POSITION";
     if ([self.playlistUndoHistory count] > 0)
     {
         [actionSheet addButtonWithTitle:NSLocalizedString(@"Undo", nil)];
-        [buttons addObject:@"UNDO"];
+        [buttons addObject:@"Undo"];
     }
     
-    [buttons addObject:@"CLEAR"];
+    [buttons addObject:@"Clear"];
     actionSheet.destructiveButtonIndex = [actionSheet addButtonWithTitle:NSLocalizedString(@"Clear", nil)];
     
     actionSheet.cancelButtonIndex = [actionSheet addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
     
+    objc_setAssociatedObject(actionSheet, ACTIONSHEET, @"Current playlist", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     objc_setAssociatedObject(actionSheet, BUTTONS, buttons, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     [actionSheet showInView:[self.view window]];
     [actionSheet release];
@@ -602,6 +604,8 @@ static char const* const POSITION = "POSITION";
 
 - (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
+    NSString* sheet = objc_getAssociatedObject(actionSheet, ACTIONSHEET);
+    
     NSArray* buttons = objc_getAssociatedObject(actionSheet, BUTTONS);
     if (buttonIndex >= [buttons count])
     {
@@ -610,14 +614,17 @@ static char const* const POSITION = "POSITION";
     
     NSString* button = [buttons objectAtIndex:buttonIndex];
     
-    if ([button isEqualToString:@"UNDO"])
+    if ([sheet isEqualToString:@"Current playlist"])
     {
-        [self undoLastAction];
-    }
-    
-    if ([button isEqualToString:@"CLEAR"])
-    {
-        [self clearPlaylist];
+        if ([button isEqualToString:@"Undo"])
+        {
+            [self undoLastAction];
+        }
+        
+        if ([button isEqualToString:@"Clear"])
+        {
+            [self clearPlaylist];
+        }
     }
 }
 
