@@ -2,15 +2,17 @@
   "images" : [
     {
       "idiom" : "universal",
+      "filename" : "Superseed.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
+      "filename" : "Superseed@2x.png",
       "scale" : "2x"
     },
     {
       "idiom" : "universal",
-      "filename" : "cloakroom-512.png",
+      "filename" : "Superseed@3x.png",
       "scale" : "3x"
     }
   ],
