@@ -30,6 +30,7 @@ typedef union {
 
 - (id)init;
 
+- (NSDictionary*)itemParent:(NSDictionary*)item;
 - (bool)item:(NSDictionary*)item1 isEqualToItem:(NSDictionary*)item2;
 
 - (NSString*)absolutePath:(NSDictionary*)item;

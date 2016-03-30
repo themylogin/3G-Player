@@ -67,6 +67,13 @@
     return self;
 }
 
+- (NSDictionary*)itemParent:(NSDictionary*)item
+{
+    return [musicFileManager itemForAbsolutePath:
+            [[musicFileManager absolutePath:item] stringByDeletingLastPathComponent]];
+}
+
+
 - (bool)item:(NSDictionary*)item1 isEqualToItem:(NSDictionary*)item2
 {
     return [[self absolutePath:item1] isEqualToString:[self absolutePath:item2]];
@@ -319,10 +326,8 @@
             return;
         }
         
-        NSDictionary* album = [self itemForAbsolutePath:[[musicFile objectForKey:@"path"]
-                                                         stringByDeletingLastPathComponent]];
+        NSDictionary* album = [self itemParent:musicFile];
         NSString* remoteCoverPath = [album objectForKey:@"cover"];
-        
         
         NSURL* coverUrl = [NSURL URLWithString:
                            [[[musicFile objectForKey:@"player"] objectForKey:@"url"]
@@ -347,9 +352,8 @@
 
 - (NSString*)coverPath:(NSDictionary *)musicFile
 {
-    return [[[self absolutePath:musicFile]
-             stringByDeletingLastPathComponent]
-            stringByAppendingString:@"/cover.jpg"];
+    return [[self absolutePath:[self itemParent:musicFile]]
+             stringByAppendingString:@"/cover.jpg"];
 }
 
 #pragma mark - Removal
@@ -490,8 +494,7 @@
 {
     if (![musicTableService isDirectory:item])
     {
-        item = [musicFileManager itemForAbsolutePath:
-                [[musicFileManager absolutePath:item] stringByDeletingLastPathComponent]];
+        item = [self itemParent:item];
     }
     
     [self notifyItem:item historyFile:self.playHistoryFile];
