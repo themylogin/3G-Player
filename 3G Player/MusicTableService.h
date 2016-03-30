@@ -24,7 +24,7 @@ typedef enum { BlacklistExtraButton = 1 } ExtraButtons;
 - (NSDictionary*)annotateItem:(NSDictionary*)item withPlayer:(NSDictionary*)player;
 
 - (UITableViewCell*)cellForMusicItem:(NSDictionary*)item tableView:(UITableView *)tableView;
-- (UITableViewCell*)cellForMusicItem:(NSDictionary*)item tableView:(UITableView *)tableView showFullPath:(BOOL)showFullPath;
+- (UITableViewCell*)cellForMusicItem:(NSDictionary*)item tableView:(UITableView *)tableView showFullPath:(bool)showFullPath;
 - (void)showActionSheetForItem:(NSDictionary*)item inView:(UIView*)view withExtraButtons:(int)extraButtons;
 
 - (void)addItemToPlaylist:(NSDictionary*)item mode:(AddMode)addMode playAfter:(BOOL)playAfter;
