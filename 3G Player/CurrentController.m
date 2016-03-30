@@ -20,6 +20,7 @@
 #import "CocoaAsyncSocket/GCDAsyncSocket.h"
 #import "JSONKit.h"
 #import "MKNumberBadgeView.h"
+#import "RecommendationsForFromController.h"
 
 static char const* const ACTIONSHEET = "ACTIONSHEET";
 static char const* const BUTTONS = "BUTTONS";
@@ -119,7 +120,7 @@ static char const* const POSITION = "POSITION";
         if (current)
         {
             [self.playlist addObjectsFromArray:[current objectForKey:@"playlist"]];
-            [self _playlistChanged];
+            [self playlistChanged];
             
             self.repeat = [[current objectForKey:@"repeat"] intValue];
             [self updateUI];
@@ -202,6 +203,13 @@ static char const* const POSITION = "POSITION";
     // Dispose of any resources that can be recreated.
 }
 
+- (void)periodic
+{
+    [self updateUI];
+}
+
+#pragma mark - Manage playlist
+
 - (BOOL)canAddAfterAdded
 {
     return self.lastAddedIndex != -1;
@@ -252,7 +260,7 @@ static char const* const POSITION = "POSITION";
     self.lastAddedIndex = index;
     [self invalidatePlaylistUndoHistory];
     
-    [self _playlistChanged];
+    [self playlistChanged];
 }
 
 - (void)clear
@@ -263,12 +271,14 @@ static char const* const POSITION = "POSITION";
     
     self.lastAddedIndex = -1;
     [self.playlist removeAllObjects];
-    [self _playlistChanged];
+    [self playlistChanged];
     
     self.currentIndex = -1;
     
     [self updateUI];
 }
+
+#pragma mark - Play
 
 - (void)playAtIndex:(long)index
 {
@@ -341,11 +351,7 @@ static char const* const POSITION = "POSITION";
     [musicFileManager loadCover:item];
 }
 
-- (void)pause
-{
-    [self saveState];
-    [self.player pause];
-}
+#pragma mark - Stop
 
 - (void)stop
 {
@@ -364,10 +370,147 @@ static char const* const POSITION = "POSITION";
     }
 }
 
-- (void)periodic
+- (void)pause
 {
+    [self saveState];
+    [self.player pause];
+}
+
+- (IBAction)handlePlayPauseButtonTouchDown:(id)sender
+{
+    if (self.player)
+    {
+        if (self.player.playing)
+        {
+            [self pause];
+        }
+        else
+        {
+            [self.player play];
+        }
+    }
+    else
+    {
+        if ([self.playlist count] > 0)
+        {
+            [self playAtIndex:0];
+        }
+    }
+    
     [self updateUI];
 }
+
+#pragma mark - Prev/Next
+
+- (void)playNextTrack:(BOOL)respectRepeatTrack
+{
+    [self scrobbleIfNecessary];
+    
+    if (respectRepeatTrack && self.repeat == RepeatTrack)
+    {
+    }
+    else
+    {
+        self.currentIndex++;
+        if (self.currentIndex >= [self.playlist count])
+        {
+            if (self.repeat == RepeatPlaylist)
+            {
+                self.currentIndex = 0;
+            }
+            else
+            {
+                self.currentIndex = -1;
+                self.player = nil;
+                
+                [self.tableView reloadData];
+                [self updateUI];
+                
+                [self bufferMostNecessary];
+                
+                return;
+            }
+        }
+    }
+    
+    [self playAtIndex:self.currentIndex];
+}
+
+- (void)playPrevTrack:(BOOL)respectRepeatTrack
+{
+    [self scrobbleIfNecessary];
+    
+    if (respectRepeatTrack && self.repeat == RepeatTrack)
+    {
+    }
+    else
+    {
+        self.currentIndex--;
+        if (self.currentIndex < 0)
+        {
+            if (self.repeat == RepeatPlaylist)
+            {
+                self.currentIndex = [self.playlist count] - 1;
+            }
+            else
+            {
+                self.currentIndex = -1;
+                self.player = nil;
+                
+                [self.tableView reloadData];
+                [self updateUI];
+                
+                [self bufferMostNecessary];
+                
+                return;
+            }
+        }
+    }
+    
+    [self playAtIndex:self.currentIndex];
+}
+
+#pragma mark - Seeking
+
+- (void)handleSeeking:(UIEventSubtype)event
+{
+    switch (event)
+    {
+        case UIEventSubtypeRemoteControlBeginSeekingBackward:
+            [self.player setEnableRate:YES];
+            [self.player setRate:-10.0];
+            break;
+            
+        case UIEventSubtypeRemoteControlBeginSeekingForward:
+            [self.player setEnableRate:YES];
+            [self.player setRate:10.0];
+            break;
+            
+        case UIEventSubtypeRemoteControlEndSeekingBackward:
+        case UIEventSubtypeRemoteControlEndSeekingForward:
+            [self.player setEnableRate:NO];
+            [self.player setRate:1.0];
+            break;
+            
+        default:
+            break;
+    }
+}
+- (IBAction)handlePositionSliderTouchUpInside:(id)sender
+{
+    self.player.currentTime = self.positionSlider.value;
+    [self updateUI];
+}
+
+#pragma mark - Repeat
+
+- (IBAction)handleRepeatButtonTouchDown:(id)sender
+{
+    self.repeat = (self.repeat + 1) % 3;
+    [self updateUI];
+}
+
+#pragma mark - UI
 
 - (void)updateUI
 {
@@ -438,41 +581,7 @@ static char const* const POSITION = "POSITION";
     [[NSNotificationCenter defaultCenter] postNotificationName:@"statisticsChanged" object:self];
 }
 
-- (IBAction)handlePlayPauseButtonTouchDown:(id)sender
-{
-    if (self.player)
-    {
-        if (self.player.playing)
-        {
-            [self pause];
-        }
-        else
-        {
-            [self.player play];
-        }
-    }
-    else
-    {
-        if ([self.playlist count] > 0)
-        {
-            [self playAtIndex:0];
-        }
-    }
-    
-    [self updateUI];
-}
-
-- (IBAction)handlePositionSliderTouchUpInside:(id)sender
-{
-    self.player.currentTime = self.positionSlider.value;
-    [self updateUI];
-}
-
-- (IBAction)handleRepeatButtonTouchDown:(id)sender
-{
-    self.repeat = (self.repeat + 1) % 3;
-    [self updateUI];
-}
+#pragma mark - Playlist gestures
 
 - (IBAction)handlePlaylistLeftSwipe:(UISwipeGestureRecognizer*)recognizer
 {
@@ -499,7 +608,7 @@ static char const* const POSITION = "POSITION";
         }
         self.lastAddedIndex = -1;
         [self.playlist removeObjectAtIndex:index];
-        [self _playlistChanged];
+        [self playlistChanged];
     }
 }
 
@@ -540,36 +649,11 @@ static char const* const POSITION = "POSITION";
         }
         self.lastAddedIndex = -1;
         [self.playlist removeObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(firstFile, lastFile - firstFile + 1)]];
-        [self _playlistChanged];
+        [self playlistChanged];
     }
 }
 
-- (IBAction)handleToolbarSwipeUp:(UISwipeGestureRecognizer*)recognizer
-{
-    if (!self.toolbarOpen)
-    {
-        self.toolbarOpen = YES;
-        [UIView animateWithDuration:0.5f animations:^{
-            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, -80);
-        }];
-    }
-}
-
-- (IBAction)handleToolbarSwipeDown:(UISwipeGestureRecognizer*)recognizer
-{
-    [self closeToolbar];
-}
-
-- (void)closeToolbar
-{
-    if (self.toolbarOpen)
-    {
-        self.toolbarOpen = NO;
-        [UIView animateWithDuration:0.5f animations:^{
-            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, 80);
-        }];
-    }
-}
+#pragma mark - Playlist actions
 
 - (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer
 {
@@ -602,36 +686,47 @@ static char const* const POSITION = "POSITION";
     [actionSheet release];
 }
 
-- (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+- (void)handlePlaylistAction:(NSString*)action
 {
-    NSString* sheet = objc_getAssociatedObject(actionSheet, ACTIONSHEET);
-    
-    NSArray* buttons = objc_getAssociatedObject(actionSheet, BUTTONS);
-    if (buttonIndex >= [buttons count])
+    if ([action isEqualToString:@"Undo"])
     {
-        return;
+        [self undoLastAction];
     }
     
-    NSString* button = [buttons objectAtIndex:buttonIndex];
-    
-    if ([sheet isEqualToString:@"Current playlist"])
+    if ([action isEqualToString:@"Clear"])
     {
-        if ([button isEqualToString:@"Undo"])
-        {
-            [self undoLastAction];
-        }
-        
-        if ([button isEqualToString:@"Clear"])
-        {
-            [self clearPlaylist];
-        }
+        [self storePlaylistUndoHistory];
+        [self clear];
     }
 }
 
-- (void)clearPlaylist
+#pragma mark - Toolbar
+
+- (IBAction)handleToolbarSwipeUp:(UISwipeGestureRecognizer*)recognizer
 {
-    [self storePlaylistUndoHistory];
-    [self clear];
+    if (!self.toolbarOpen)
+    {
+        self.toolbarOpen = YES;
+        [UIView animateWithDuration:0.5f animations:^{
+            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, -80);
+        }];
+    }
+}
+
+- (IBAction)handleToolbarSwipeDown:(UISwipeGestureRecognizer*)recognizer
+{
+    [self closeToolbar];
+}
+
+- (void)closeToolbar
+{
+    if (self.toolbarOpen)
+    {
+        self.toolbarOpen = NO;
+        [UIView animateWithDuration:0.5f animations:^{
+            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, 80);
+        }];
+    }
 }
 
 #pragma mark - Table view data source
@@ -814,9 +909,46 @@ static char const* const POSITION = "POSITION";
 	[sock disconnect];
 }
 
+#pragma mark - Action sheet delegate
+
+- (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    NSString* sheet = objc_getAssociatedObject(actionSheet, ACTIONSHEET);
+    
+    NSArray* buttons = objc_getAssociatedObject(actionSheet, BUTTONS);
+    if (buttonIndex >= [buttons count])
+    {
+        return;
+    }
+    
+    NSObject* button = [buttons objectAtIndex:buttonIndex];
+    
+    if ([sheet isEqualToString:@"Current playlist"])
+    {
+        [self handlePlaylistAction:(NSString*)button];
+    }
+    
+    if ([sheet isEqualToString:@"Recommendations"])
+    {
+        [self handleRecommendationsAction:(NSDictionary*)button];
+    }
+}
+
+#pragma mark - Alert view delegate
+
+- (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    NSString* view = objc_getAssociatedObject(alertView, ALERTVIEW);
+    
+    if ([view isEqualToString:@"SUPERSEED"])
+    {
+        [self handleSuperseedAlertView:alertView buttonIndex:buttonIndex];
+    }
+}
+
 #pragma mark - Internals
 
-- (void)_playlistChanged
+- (void)playlistChanged
 {
     [self.sections removeAllObjects];
 
@@ -876,6 +1008,8 @@ static char const* const POSITION = "POSITION";
     [self saveState];
 }
 
+#pragma mark - State
+
 - (void)saveState
 {
     @synchronized([NSUserDefaults standardUserDefaults])
@@ -890,6 +1024,8 @@ static char const* const POSITION = "POSITION";
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
+
+#pragma mark - Buffering
 
 - (void)bufferMostNecessary
 {
@@ -927,6 +1063,27 @@ static char const* const POSITION = "POSITION";
     [musicFileManager stopBuffering];
 }
 
+- (void)tryToResumePlayingNowBufferingFile
+{
+    if (self.currentIndex == -1)
+    {
+        return;
+    }
+    
+    if (self.player.playing)
+    {
+        return;
+    }
+    
+    MusicFileState state = [musicFileManager state:[self.playlist objectAtIndex:self.currentIndex]];
+    if (state.state == MusicFileBuffering)
+    {
+        [self playAtIndex:self.currentIndex atPosition:self.player.duration];
+    }
+}
+
+#pragma mark - Addressing
+
 - (long)itemIndexForIndexPath:(NSIndexPath*)indexPath
 {
     return [[[[self.sections objectAtIndex:indexPath.section] objectForKey:@"files"] objectAtIndex:indexPath.row] longValue];
@@ -954,6 +1111,8 @@ static char const* const POSITION = "POSITION";
     
     return nil;
 }
+
+#pragma mark - MusicFileManager delegate
 
 - (void)onMusicFileManagerStateChanged
 {
@@ -1004,91 +1163,22 @@ static char const* const POSITION = "POSITION";
     [self bufferMostNecessary];
 }
 
-- (void)tryToResumePlayingNowBufferingFile
+#pragma mark - Scrobbling
+
+- (void)handleLoveButtonTouchDown:(id)sender
 {
-    if (self.currentIndex == -1)
+    if (self.currentIndex != -1)
     {
-        return;
-    }
-    
-    if (self.player.playing)
-    {
-        return;
-    }
-    
-    MusicFileState state = [musicFileManager state:[self.playlist objectAtIndex:self.currentIndex]];
-    if (state.state == MusicFileBuffering)
-    {
-        [self playAtIndex:self.currentIndex atPosition:self.player.duration];
+        NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
+        [scrobbler love:item];
+        [self closeToolbar];
     }
 }
 
-- (void)playNextTrack:(BOOL)respectRepeatTrack
+- (void)handleScrobblerButtonTouchDown:(id)sender
 {
-    [self scrobbleIfNecessary];
-    
-    if (respectRepeatTrack && self.repeat == RepeatTrack)
-    {
-    }
-    else
-    {
-        self.currentIndex++;
-        if (self.currentIndex >= [self.playlist count])
-        {
-            if (self.repeat == RepeatPlaylist)
-            {
-                self.currentIndex = 0;
-            }
-            else
-            {
-                self.currentIndex = -1;
-                self.player = nil;
-            
-                [self.tableView reloadData];
-                [self updateUI];
-                
-                [self bufferMostNecessary];
-            
-                return;
-            }
-        }
-    }
-    
-    [self playAtIndex:self.currentIndex];
-}
-
-- (void)playPrevTrack:(BOOL)respectRepeatTrack
-{
-    [self scrobbleIfNecessary];
-    
-    if (respectRepeatTrack && self.repeat == RepeatTrack)
-    {
-    }
-    else
-    {
-        self.currentIndex--;
-        if (self.currentIndex < 0)
-        {
-            if (self.repeat == RepeatPlaylist)
-            {
-                self.currentIndex = [self.playlist count] - 1;
-            }
-            else
-            {
-                self.currentIndex = -1;
-                self.player = nil;
-                
-                [self.tableView reloadData];
-                [self updateUI];
-                
-                [self bufferMostNecessary];
-                
-                return;
-            }
-        }
-    }
-    
-    [self playAtIndex:self.currentIndex];
+    scrobbler.enabled = !scrobbler.enabled;
+    [self showScrobblerEnabled];
 }
 
 - (void)scrobbleIfNecessary
@@ -1110,30 +1200,43 @@ static char const* const POSITION = "POSITION";
     }
 }
 
-- (void)handleSeeking:(UIEventSubtype)event
+- (void)showScrobblerEnabled
 {
-    switch (event)
+    if (scrobbler.enabled)
     {
-        case UIEventSubtypeRemoteControlBeginSeekingBackward:
-            [self.player setEnableRate:YES];
-            [self.player setRate:-10.0];
-            break;
-
-        case UIEventSubtypeRemoteControlBeginSeekingForward:
-            [self.player setEnableRate:YES];
-            [self.player setRate:10.0];
-            break;
-            
-        case UIEventSubtypeRemoteControlEndSeekingBackward:
-        case UIEventSubtypeRemoteControlEndSeekingForward:
-            [self.player setEnableRate:NO];
-            [self.player setRate:1.0];
-            break;
-            
-        default:
-            break;
+        self.scrobblerButton.alpha = 1.0;
+        self.scrobblerLabel.alpha = 1.0;
+        self.scrobblerLabel.text = @"Enabled";
+    }
+    else
+    {
+        self.scrobblerButton.alpha = 0.2;
+        self.scrobblerLabel.alpha = 0.2;
+        self.scrobblerLabel.text = @"Disabled";
     }
 }
+
+- (void)onScrobblerQueueChanged
+{
+    int count = [scrobbler queueSize];
+    if (count > 0)
+    {
+        self.scrobblerBadge.value = count;
+        if ([self.scrobblerBadge superview] == NULL)
+        {
+            [self.scrobblerButton addSubview:self.scrobblerBadge];
+        }
+    }
+    else
+    {
+        if ([self.scrobblerBadge superview] != NULL)
+        {
+            [self.scrobblerBadge removeFromSuperview];
+        }
+    }
+}
+
+#pragma mark - Cover
 
 - (void)updateCover
 {
@@ -1161,6 +1264,8 @@ static char const* const POSITION = "POSITION";
     [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = self.nowPlayingInfo;
 }
 
+#pragma mark - Lyrics
+
 - (void)handleGoogleButtonTouchDown:(id)sender
 {
     if (self.currentIndex != -1)
@@ -1179,21 +1284,7 @@ static char const* const POSITION = "POSITION";
     }
 }
 
-- (void)handleLoveButtonTouchDown:(id)sender
-{
-    if (self.currentIndex != -1)
-    {
-        NSDictionary* item = [self.playlist objectAtIndex:self.currentIndex];
-        [scrobbler love:item];
-        [self closeToolbar];
-    }
-}
-
-- (void)handleScrobblerButtonTouchDown:(id)sender
-{
-    scrobbler.enabled = !scrobbler.enabled;
-    [self showScrobblerEnabled];
-}
+#pragma mark - Superseeding
 
 - (void)handleSuperseedButtonTouchDown:(id)sender
 {
@@ -1315,52 +1406,13 @@ static char const* const POSITION = "POSITION";
     }
 }
 
-- (void)alertView:(UIAlertView*)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    NSString* view = objc_getAssociatedObject(alertView, ALERTVIEW);
-    
-    if ([view isEqualToString:@"SUPERSEED"])
-    {
-        NSDictionary* data = objc_getAssociatedObject(alertView, DATA);
-        NSArray* items = objc_getAssociatedObject(alertView, ITEMS);
-        int position = [objc_getAssociatedObject(alertView, POSITION) intValue];
-        if (buttonIndex == 1 || buttonIndex == 2)
-        {
-            int currentAlbumBeginning;
-            NSString* currentAlbum = [[items objectAtIndex:position] objectForKey:@"album"];
-            for (currentAlbumBeginning = position; currentAlbumBeginning > 0; currentAlbumBeginning--)
-            {
-                if (![[[items objectAtIndex:(currentAlbumBeginning - 1)] objectForKey:@"album"] isEqualToString:currentAlbum])
-                {
-                    break;
-                }
-            }
-            items = [items subarrayWithRange:NSMakeRange(currentAlbumBeginning, items.count - currentAlbumBeginning)];
-            position -= currentAlbumBeginning;
-            
-            if (buttonIndex == 2)
-            {
-                int currentAlbumEnd;
-                for (currentAlbumEnd = position; currentAlbumEnd < items.count - 1; currentAlbumEnd++)
-                {
-                    if (![[[items objectAtIndex:(currentAlbumEnd + 1)] objectForKey:@"album"] isEqualToString:currentAlbum])
-                    {
-                        break;
-                    }
-                }
-                currentAlbumEnd++;
-                items = [items subarrayWithRange:NSMakeRange(0, currentAlbumEnd)];
-            }
-        }
-        [self replacePlaylistWithData:data items:items atIndex:position];
-    }
-}
-
 - (void)replacePlaylistWithData:(NSDictionary*)data items:(NSArray*)items atIndex:(int)index
 {
     if (items.count)
     {
-        [self clearPlaylist];
+        [self storePlaylistUndoHistory];
+        [self clear];
+        
         if ([musicFileManager state:[items objectAtIndex:index]].state == MusicFileBuffered)
         {
             [self addFiles:items mode:AddToTheEnd];
@@ -1376,6 +1428,116 @@ static char const* const POSITION = "POSITION";
         self.skipScrobblingCurrent = [[data objectForKey:@"scrobbled"] boolValue];
     }
 }
+
+- (void)handleSuperseedAlertView:(UIAlertView*)alertView buttonIndex:(NSInteger)buttonIndex
+{
+    NSDictionary* data = objc_getAssociatedObject(alertView, DATA);
+    NSArray* items = objc_getAssociatedObject(alertView, ITEMS);
+    int position = [objc_getAssociatedObject(alertView, POSITION) intValue];
+    if (buttonIndex == 1 || buttonIndex == 2)
+    {
+        int currentAlbumBeginning;
+        NSString* currentAlbum = [[items objectAtIndex:position] objectForKey:@"album"];
+        for (currentAlbumBeginning = position; currentAlbumBeginning > 0; currentAlbumBeginning--)
+        {
+            if (![[[items objectAtIndex:(currentAlbumBeginning - 1)] objectForKey:@"album"] isEqualToString:currentAlbum])
+            {
+                break;
+            }
+        }
+        items = [items subarrayWithRange:NSMakeRange(currentAlbumBeginning, items.count - currentAlbumBeginning)];
+        position -= currentAlbumBeginning;
+        
+        if (buttonIndex == 2)
+        {
+            int currentAlbumEnd;
+            for (currentAlbumEnd = position; currentAlbumEnd < items.count - 1; currentAlbumEnd++)
+            {
+                if (![[[items objectAtIndex:(currentAlbumEnd + 1)] objectForKey:@"album"] isEqualToString:currentAlbum])
+                {
+                    break;
+                }
+            }
+            currentAlbumEnd++;
+            items = [items subarrayWithRange:NSMakeRange(0, currentAlbumEnd)];
+        }
+    }
+    [self replacePlaylistWithData:data items:items atIndex:position];
+}
+
+#pragma mark - Recommendations
+
+- (IBAction)handleRecommendationsButtonTouchDown:(id)sender
+{
+    UIActionSheet* actionSheet = [[UIActionSheet alloc] initWithTitle:@"Recommendations"
+                                                             delegate:self
+                                                    cancelButtonTitle:nil
+                                               destructiveButtonTitle:nil
+                                                    otherButtonTitles:nil];
+    NSMutableArray* buttons = [[NSMutableArray alloc] init];
+    
+    
+    ASIFormDataRequest* asiRequest = [[ASIFormDataRequest alloc] init];
+    [asiRequest setStringEncoding:NSUTF8StringEncoding];
+    
+    [actionSheet addButtonWithTitle:NSLocalizedString(@"New unheard albums", nil)];
+    [buttons addObject:@{@"class": @"ShowURL",
+                         @"player": [players objectAtIndex:0],
+                         @"title": @"New unheard albums",
+                         @"url": [NSString stringWithFormat:@"%@/recommendations/unheard/%@?sort=recent&limit=100",
+                                  [[players objectAtIndex:0] objectForKey:@"url"],
+                                  [asiRequest encodeURL:lastFmUsername]]}];
+    
+    [actionSheet addButtonWithTitle:NSLocalizedString(@"Old unheard albums", nil)];
+    [buttons addObject:@{@"class": @"ShowURL",
+                         @"player": [players objectAtIndex:0],
+                         @"title": @"Old unheard albums",
+                         @"url": [NSString stringWithFormat:@"%@/recommendations/unheard/%@?sort=random&limit=100",
+                                  [[players objectAtIndex:0] objectForKey:@"url"],
+                                  [asiRequest encodeURL:lastFmUsername]]}];
+    
+    [actionSheet addButtonWithTitle:NSLocalizedString(@"Friends", nil)];
+    [buttons addObject:@{@"class": @"ShowRecommendationsForFromController"}];
+    
+    [asiRequest release];
+    
+    actionSheet.cancelButtonIndex = [actionSheet addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
+    
+    objc_setAssociatedObject(actionSheet, ACTIONSHEET, @"Recommendations", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(actionSheet, BUTTONS, buttons, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [actionSheet showInView:[self.view window]];
+    [actionSheet release];
+    
+    [self closeToolbar];
+}
+
+- (void)handleRecommendationsAction:(NSDictionary*)action
+{
+    [self performRecommendationsAction:action];
+}
+
+- (void)performRecommendationsAction:(NSDictionary*)action
+{
+    if ([[action objectForKey:@"class"] isEqualToString:@"ShowURL"])
+    {
+        [recommendationsUtils
+         processRecommendationsUrl:[NSURL URLWithString:[action objectForKey:@"url"]]
+         withPlayer:[action objectForKey:@"player"]
+         title:[action objectForKey:@"title"]
+         action:RecommendationsShowInController];
+    }
+        
+    if ([[action objectForKey:@"class"] isEqualToString:@"ShowRecommendationsForFromController"])
+    {
+        RecommendationsForFromController* recommendations = [[RecommendationsForFromController alloc] init];
+        UINavigationController* navigation = [[UINavigationController alloc] initWithRootViewController:recommendations];
+        [self presentViewController:navigation animated:YES completion:^{
+        }];
+        [recommendations release];
+    }
+}
+
+#pragma mark - Undo
 
 - (void)storePlaylistUndoHistory
 {
@@ -1418,7 +1580,7 @@ static char const* const POSITION = "POSITION";
         }
         
         self.playlist = undoPlaylist;
-        [self _playlistChanged];
+        [self playlistChanged];
         
         [self.playlistUndoHistory removeLastObject];
         
@@ -1445,41 +1607,7 @@ static char const* const POSITION = "POSITION";
     }
 }
 
-- (void)showScrobblerEnabled
-{
-    if (scrobbler.enabled)
-    {
-        self.scrobblerButton.alpha = 1.0;
-        self.scrobblerLabel.alpha = 1.0;
-        self.scrobblerLabel.text = @"Enabled";
-    }
-    else
-    {
-        self.scrobblerButton.alpha = 0.2;
-        self.scrobblerLabel.alpha = 0.2;
-        self.scrobblerLabel.text = @"Disabled";
-    }
-}
-
-- (void)onScrobblerQueueChanged
-{
-    int count = [scrobbler queueSize];
-    if (count > 0)
-    {
-        self.scrobblerBadge.value = count;
-        if ([self.scrobblerBadge superview] == NULL)
-        {
-            [self.scrobblerButton addSubview:self.scrobblerBadge];
-        }
-    }
-    else
-    {
-        if ([self.scrobblerBadge superview] != NULL)
-        {
-            [self.scrobblerBadge removeFromSuperview];
-        }    
-    }
-}
+#pragma mark - Statistics
 
 - (NSArray*)getStatistics
 {
@@ -1539,6 +1667,8 @@ static char const* const POSITION = "POSITION";
         return @[@"Playlist is empty"];
     }
 }
+
+#pragma mark - System volume
 
 - (void)onSystemVolumeChanged:(NSNotification*)notification
 {

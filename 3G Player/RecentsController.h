@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 themylogin. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "ItemsListController.h"
 
-@interface RecentsController : UIViewController
+@interface RecentsController : ItemsListController
 
 @end

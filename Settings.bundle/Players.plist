@@ -3,63 +3,167 @@
 <plist version="1.0">
 <dict>
 	<key>PreferenceSpecifiers</key>
-	<array>
-		<dict>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-			<key>Title</key>
-			<string>URL</string>
-		</dict>
-		<dict>
-			<key>Key</key>
-			<string>Player1_URL</string>
-			<key>KeyboardType</key>
-			<string>URL</string>
-			<key>Title</key>
-			<string>Player #1</string>
-			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
-		</dict>
-		<dict>
-			<key>Key</key>
-			<string>Player2_URL</string>
-			<key>KeyboardType</key>
-			<string>URL</string>
-			<key>Title</key>
-			<string>Player #2</string>
-			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
-		</dict>
-		<dict>
-			<key>Key</key>
-			<string>Player3_URL</string>
-			<key>KeyboardType</key>
-			<string>URL</string>
-			<key>Title</key>
-			<string>Player #3</string>
-			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
-		</dict>
-		<dict>
-			<key>Key</key>
-			<string>Player4_URL</string>
-			<key>KeyboardType</key>
-			<string>URL</string>
-			<key>Title</key>
-			<string>Player #4</string>
-			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
-		</dict>
-		<dict>
-			<key>Key</key>
-			<string>Player5_URL</string>
-			<key>KeyboardType</key>
-			<string>URL</string>
-			<key>Title</key>
-			<string>Player #5</string>
-			<key>Type</key>
-			<string>PSTextFieldSpecifier</string>
-		</dict>
+    <array>
+        <dict>
+            <key>Type</key>
+            <string>PSGroupSpecifier</string>
+            <key>Title</key>
+            <string>Player #1</string>
+        </dict>
+        <dict>
+            <key>Key</key>
+            <string>Player1_URL</string>
+            <key>KeyboardType</key>
+            <string>URL</string>
+            <key>Title</key>
+            <string>URL</string>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>Last.FM User #1</string>
+            <key>Key</key>
+            <string>Player1_LastFM_Username1</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>Last.FM User #2</string>
+            <key>Key</key>
+            <string>Player1_LastFM_Username2</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSGroupSpecifier</string>
+            <key>Title</key>
+            <string>Player #2</string>
+        </dict>
+        <dict>
+            <key>Key</key>
+            <string>Player2_URL</string>
+            <key>KeyboardType</key>
+            <string>URL</string>
+            <key>Title</key>
+            <string>URL</string>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>Last.FM User #1</string>
+            <key>Key</key>
+            <string>Player2_LastFM_Username1</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>Last.FM User #2</string>
+            <key>Key</key>
+            <string>Player2_LastFM_Username2</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSGroupSpecifier</string>
+            <key>Title</key>
+            <string>Player #3</string>
+        </dict>
+        <dict>
+            <key>Key</key>
+            <string>Player3_URL</string>
+            <key>KeyboardType</key>
+            <string>URL</string>
+            <key>Title</key>
+            <string>URL</string>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>Last.FM User #1</string>
+            <key>Key</key>
+            <string>Player3_LastFM_Username1</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>Last.FM User #2</string>
+            <key>Key</key>
+            <string>Player3_LastFM_Username2</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSGroupSpecifier</string>
+            <key>Title</key>
+            <string>Player #4</string>
+        </dict>
+        <dict>
+            <key>Key</key>
+            <string>Player4_URL</string>
+            <key>KeyboardType</key>
+            <string>URL</string>
+            <key>Title</key>
+            <string>URL</string>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>Last.FM User #1</string>
+            <key>Key</key>
+            <string>Player4_LastFM_Username1</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>Last.FM User #2</string>
+            <key>Key</key>
+            <string>Player4_LastFM_Username2</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSGroupSpecifier</string>
+            <key>Title</key>
+            <string>Player #5</string>
+        </dict>
+        <dict>
+            <key>Key</key>
+            <string>Player5_URL</string>
+            <key>KeyboardType</key>
+            <string>URL</string>
+            <key>Title</key>
+            <string>URL</string>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>Last.FM User #1</string>
+            <key>Key</key>
+            <string>Player5_LastFM_Username1</string>
+        </dict>
+        <dict>
+            <key>Type</key>
+            <string>PSTextFieldSpecifier</string>
+            <key>Title</key>
+            <string>Last.FM User #2</string>
+            <key>Key</key>
+            <string>Player5_LastFM_Username2</string>
+        </dict>
 	</array>
 	<key>StringsTable</key>
 	<string>Players</string>

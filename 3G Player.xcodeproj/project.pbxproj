@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		680CC26A1CAA9CCD006D4A61 /* RecommendationsForFromController.m in Sources */ = {isa = PBXBuildFile; fileRef = 680CC2691CAA9CCD006D4A61 /* RecommendationsForFromController.m */; };
+		680CC2761CAB7AEA006D4A61 /* ItemsListController.m in Sources */ = {isa = PBXBuildFile; fileRef = 680CC2751CAB7AEA006D4A61 /* ItemsListController.m */; };
+		680CC27D1CAB826C006D4A61 /* RecommendationsForFromResultController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 680CC27C1CAB826C006D4A61 /* RecommendationsForFromResultController.xib */; };
+		680CC27F1CAB828A006D4A61 /* RecommendationsForFromResultController.m in Sources */ = {isa = PBXBuildFile; fileRef = 680CC27E1CAB828A006D4A61 /* RecommendationsForFromResultController.m */; };
+		680CC2821CAB914B006D4A61 /* RecommendationsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 680CC2811CAB914B006D4A61 /* RecommendationsUtils.m */; };
 		681B12311CA53E30000FB01A /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 681B12301CA53E30000FB01A /* Icons.xcassets */; };
 		681B12331CA55AFD000FB01A /* silence.wav in Resources */ = {isa = PBXBuildFile; fileRef = 681B12321CA55AFD000FB01A /* silence.wav */; };
 		681B12351CA57406000FB01A /* KeepAliver.m in Sources */ = {isa = PBXBuildFile; fileRef = 681B12341CA57406000FB01A /* KeepAliver.m */; };
@@ -84,9 +89,39 @@
 		84CE88841AF34C5B00F1129A /* InfoController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 84CE88831AF34C5B00F1129A /* InfoController.xib */; };
 		84D38D5A1AC1E0BB007564D3 /* MKNumberBadgeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D38D591AC1E0BB007564D3 /* MKNumberBadgeView.m */; };
 		84DEA2DC191FC314000F9832 /* InfoController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84DEA2DA191FC314000F9832 /* InfoController.m */; };
+		D778B386E0E9FE6B9E6D3204 /* libPods-3G Player.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BE9F3D7700BCECBC719C81 /* libPods-3G Player.a */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		680CC2701CAA9F65006D4A61 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 680CC26B1CAA9F65006D4A61 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 892D1574279D2D96A0920A55432DCF44;
+			remoteInfo = "Pods-3G Player";
+		};
+		680CC2721CAA9F65006D4A61 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 680CC26B1CAA9F65006D4A61 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DECD1716D51EC244BEC9702E0E3C962A;
+			remoteInfo = XLForm;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		07BE9F3D7700BCECBC719C81 /* libPods-3G Player.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-3G Player.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5141AA64DF5664187307807A /* Pods-3G Player.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-3G Player.debug.xcconfig"; path = "Pods/Target Support Files/Pods-3G Player/Pods-3G Player.debug.xcconfig"; sourceTree = "<group>"; };
+		680CC2681CAA9CCD006D4A61 /* RecommendationsForFromController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecommendationsForFromController.h; sourceTree = "<group>"; };
+		680CC2691CAA9CCD006D4A61 /* RecommendationsForFromController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecommendationsForFromController.m; sourceTree = "<group>"; };
+		680CC26B1CAA9F65006D4A61 /* Pods.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Pods.xcodeproj; path = Pods/Pods.xcodeproj; sourceTree = "<group>"; };
+		680CC2741CAB7AEA006D4A61 /* ItemsListController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItemsListController.h; sourceTree = "<group>"; };
+		680CC2751CAB7AEA006D4A61 /* ItemsListController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItemsListController.m; sourceTree = "<group>"; };
+		680CC2771CAB81B1006D4A61 /* RecommendationsForFromResultController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RecommendationsForFromResultController.h; sourceTree = "<group>"; };
+		680CC27C1CAB826C006D4A61 /* RecommendationsForFromResultController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = RecommendationsForFromResultController.xib; path = ../RecommendationsForFromResultController.xib; sourceTree = "<group>"; };
+		680CC27E1CAB828A006D4A61 /* RecommendationsForFromResultController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RecommendationsForFromResultController.m; path = ../RecommendationsForFromResultController.m; sourceTree = "<group>"; };
+		680CC2811CAB914B006D4A61 /* RecommendationsUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecommendationsUtils.m; sourceTree = "<group>"; };
+		680CC2851CAB915F006D4A61 /* RecommendationsUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RecommendationsUtils.h; sourceTree = "<group>"; };
 		681B12301CA53E30000FB01A /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
 		681B12321CA55AFD000FB01A /* silence.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = silence.wav; sourceTree = "<group>"; };
 		681B12341CA57406000FB01A /* KeepAliver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeepAliver.m; sourceTree = "<group>"; };
@@ -207,6 +242,7 @@
 		84D38D591AC1E0BB007564D3 /* MKNumberBadgeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MKNumberBadgeView.m; sourceTree = "<group>"; };
 		84DEA2D9191FC314000F9832 /* InfoController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InfoController.h; sourceTree = "<group>"; };
 		84DEA2DA191FC314000F9832 /* InfoController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InfoController.m; sourceTree = "<group>"; };
+		D4ABA411916D45A0D7D0174E /* Pods-3G Player.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-3G Player.release.xcconfig"; path = "Pods/Target Support Files/Pods-3G Player/Pods-3G Player.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -229,18 +265,29 @@
 				84C919F117841BC600810B88 /* CFNetwork.framework in Frameworks */,
 				84C10BEB1782E08E004220BC /* UIKit.framework in Frameworks */,
 				84C10BED1782E08E004220BC /* Foundation.framework in Frameworks */,
+				D778B386E0E9FE6B9E6D3204 /* libPods-3G Player.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		680CC26C1CAA9F65006D4A61 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				680CC2711CAA9F65006D4A61 /* libPods-3G Player.a */,
+				680CC2731CAA9F65006D4A61 /* libXLForm.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		84C10BDE1782E08D004220BC = {
 			isa = PBXGroup;
 			children = (
 				84C10BF01782E08E004220BC /* 3G Player */,
 				84C10BE91782E08D004220BC /* Frameworks */,
 				84C10BE81782E08D004220BC /* Products */,
+				B95EF7A301CE5B9811D68DA3 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -271,6 +318,7 @@
 				84C10BEA1782E08D004220BC /* UIKit.framework */,
 				84C10BEC1782E08E004220BC /* Foundation.framework */,
 				84C10BEE1782E08E004220BC /* CoreGraphics.framework */,
+				07BE9F3D7700BCECBC719C81 /* libPods-3G Player.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -297,6 +345,15 @@
 				84C4CA161785ADA500A95DB9 /* CurrentController.h */,
 				84C4CA171785ADA500A95DB9 /* CurrentController.m */,
 				84C4CA181785ADA500A95DB9 /* CurrentController.xib */,
+				680CC2681CAA9CCD006D4A61 /* RecommendationsForFromController.h */,
+				680CC2691CAA9CCD006D4A61 /* RecommendationsForFromController.m */,
+				680CC2771CAB81B1006D4A61 /* RecommendationsForFromResultController.h */,
+				680CC27E1CAB828A006D4A61 /* RecommendationsForFromResultController.m */,
+				680CC27C1CAB826C006D4A61 /* RecommendationsForFromResultController.xib */,
+				680CC2851CAB915F006D4A61 /* RecommendationsUtils.h */,
+				680CC2811CAB914B006D4A61 /* RecommendationsUtils.m */,
+				680CC2741CAB7AEA006D4A61 /* ItemsListController.h */,
+				680CC2751CAB7AEA006D4A61 /* ItemsListController.m */,
 				687073331BDABA03000F6013 /* SearchController.h */,
 				687073341BDABA03000F6013 /* SearchController.m */,
 				687073351BDABA03000F6013 /* SearchController.xib */,
@@ -465,6 +522,16 @@
 			path = minizip;
 			sourceTree = "<group>";
 		};
+		B95EF7A301CE5B9811D68DA3 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				680CC26B1CAA9F65006D4A61 /* Pods.xcodeproj */,
+				5141AA64DF5664187307807A /* Pods-3G Player.debug.xcconfig */,
+				D4ABA411916D45A0D7D0174E /* Pods-3G Player.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -472,9 +539,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 84C10C041782E08E004220BC /* Build configuration list for PBXNativeTarget "3G Player" */;
 			buildPhases = (
+				EDF5D4EB71C47D70ABA01785 /* Check Pods Manifest.lock */,
 				84C10BE31782E08D004220BC /* Sources */,
 				84C10BE41782E08D004220BC /* Frameworks */,
 				84C10BE51782E08D004220BC /* Resources */,
+				B0E45C637E4323D01A1B0E86 /* Embed Pods Frameworks */,
+				B367377008263E7454B8F03E /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -509,12 +579,35 @@
 			mainGroup = 84C10BDE1782E08D004220BC;
 			productRefGroup = 84C10BE81782E08D004220BC /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 680CC26C1CAA9F65006D4A61 /* Products */;
+					ProjectRef = 680CC26B1CAA9F65006D4A61 /* Pods.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				84C10BE61782E08D004220BC /* 3G Player */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		680CC2711CAA9F65006D4A61 /* libPods-3G Player.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libPods-3G Player.a";
+			remoteRef = 680CC2701CAA9F65006D4A61 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		680CC2731CAA9F65006D4A61 /* libXLForm.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libXLForm.a;
+			remoteRef = 680CC2721CAA9F65006D4A61 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		84C10BE51782E08D004220BC /* Resources */ = {
@@ -533,6 +626,7 @@
 				681B12311CA53E30000FB01A /* Icons.xcassets in Resources */,
 				6870733B1BDABA03000F6013 /* JSONKit in Resources */,
 				84943CBC17CBB33A00A1CD17 /* Icon.png in Resources */,
+				680CC27D1CAB826C006D4A61 /* RecommendationsForFromResultController.xib in Resources */,
 				84CE88841AF34C5B00F1129A /* InfoController.xib in Resources */,
 				84943CBD17CBB33A00A1CD17 /* Icon@2x.png in Resources */,
 				84075B671A3086A3001E395C /* RecentsController.xib in Resources */,
@@ -553,6 +647,54 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		B0E45C637E4323D01A1B0E86 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-3G Player/Pods-3G Player-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B367377008263E7454B8F03E /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-3G Player/Pods-3G Player-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EDF5D4EB71C47D70ABA01785 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		84C10BE31782E08D004220BC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -565,8 +707,10 @@
 				84C10C171782E72F004220BC /* JSONKit.m in Sources */,
 				84C919C917841B7C00810B88 /* ASIAuthenticationDialog.m in Sources */,
 				84DEA2DC191FC314000F9832 /* InfoController.m in Sources */,
+				680CC27F1CAB828A006D4A61 /* RecommendationsForFromResultController.m in Sources */,
 				84C919CA17841B7C00810B88 /* ASIDataCompressor.m in Sources */,
 				84C919CB17841B7C00810B88 /* ASIDataDecompressor.m in Sources */,
+				680CC26A1CAA9CCD006D4A61 /* RecommendationsForFromController.m in Sources */,
 				84075B6A1A3094AF001E395C /* MusicTableService.m in Sources */,
 				84C919CC17841B7C00810B88 /* ASIDownloadCache.m in Sources */,
 				84C919CD17841B7C00810B88 /* ASIFormDataRequest.m in Sources */,
@@ -579,6 +723,7 @@
 				84C91A051784255200810B88 /* unzip.c in Sources */,
 				84C91A061784255200810B88 /* zip.c in Sources */,
 				84C91A071784255200810B88 /* ZipArchive.mm in Sources */,
+				680CC2821CAB914B006D4A61 /* RecommendationsUtils.m in Sources */,
 				6870733C1BDABA03000F6013 /* SearchController.m in Sources */,
 				84C91A0A17856C5500810B88 /* MusicFileManager.m in Sources */,
 				84C4CA191785ADA500A95DB9 /* Globals.m in Sources */,
@@ -589,6 +734,7 @@
 				84C4CA3B1786D71E00A95DB9 /* FMCallback.m in Sources */,
 				84C4CA3C1786D71E00A95DB9 /* FMEngine.m in Sources */,
 				84C4CA3D1786D71E00A95DB9 /* FMEngineURLConnection.m in Sources */,
+				680CC2761CAB7AEA006D4A61 /* ItemsListController.m in Sources */,
 				84C4CA3E1786D71E00A95DB9 /* NSString+FMEngine.m in Sources */,
 				84C4CA411786D7FB00A95DB9 /* Scrobbler.m in Sources */,
 				84C29E8317F85A1A00D259F3 /* GCDAsyncSocket.m in Sources */,
@@ -669,6 +815,7 @@
 		};
 		84C10C051782E08E004220BC /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5141AA64DF5664187307807A /* Pods-3G Player.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -691,6 +838,7 @@
 		};
 		84C10C061782E08E004220BC /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D4ABA411916D45A0D7D0174E /* Pods-3G Player.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";

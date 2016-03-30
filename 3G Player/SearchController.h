@@ -1,14 +1,14 @@
 //
-//  RecentsController.h
+//  SearchController.h
 //  3G Player
 //
-//  Created by Admin on 12/4/14.
-//  Copyright (c) 2014 themylogin. All rights reserved.
+//  Created by Admin on 10/24/15.
+//  Copyright (c) 2015 themylogin. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "ItemsListController.h"
 
-@interface SearchController : UIViewController
+@interface SearchController : ItemsListController
 
 - (void)setSearchQuery:(NSString*)query results:(NSArray*)results;
 

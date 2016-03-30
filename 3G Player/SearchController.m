@@ -1,9 +1,9 @@
 //
-//  RecentsController.m
+//  SearchController.m
 //  3G Player
 //
-//  Created by Admin on 12/4/14.
-//  Copyright (c) 2014 themylogin. All rights reserved.
+//  Created by Admin on 10/24/15.
+//  Copyright (c) 2015 themylogin. All rights reserved.
 //
 
 #import "SearchController.h"
@@ -14,22 +14,9 @@
 
 @interface SearchController () <UIBarPositioningDelegate>
 
-@property (nonatomic, retain) NSArray* results;
-@property (nonatomic, retain) IBOutlet UITableView *tableView;
-
 @end
 
 @implementation SearchController
-
-- (id)init
-{
-    self = [super init];
-    if (self)
-    {
-        self.results = [NSArray array];
-    }
-    return self;
-}
 
 - (void)viewDidLoad
 {
@@ -56,75 +43,14 @@
 - (void)setSearchQuery:(NSString*)query results:(NSArray*)results;
 {
     self.title = query;
-    self.results = results;
-    [self.tableView reloadData];
+    [self setItems:results];
 }
 
-#pragma mark — navbar positioning
+#pragma mark — Navbar positioning
 
 - (UIBarPosition)positionForBar:(id<UIBarPositioning>)bar
 {
     return UIBarPositionTopAttached;
-}
-
-#pragma mark - Table view data source
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    return [self.results count];
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    NSDictionary* item = [self getItemForIndexPath:indexPath];
-    return [musicTableService cellForMusicItem:item tableView:tableView];
-}
-
-#pragma mark - Table view delegate
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    NSDictionary* item = [self getItemForIndexPath:indexPath];
-    [controllers.library navigateToItem:item enter:YES];
-}
-
-#pragma mark - Gesture recognizer
-
-- (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer
-{
-    NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
-    if (indexPath)
-    {
-        NSDictionary* item = [self getItemForIndexPath:indexPath];
-        [musicTableService addItemToPlaylist:item mode:AddToTheEnd playAfter:NO];
-    }
-}
-
-- (IBAction)handleLongPress:(UILongPressGestureRecognizer*)recognizer
-{
-    if (recognizer.state != UIGestureRecognizerStateBegan)
-    {
-        return;
-    }
-    
-    NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
-    if (indexPath)
-    {
-        NSDictionary* item = [self getItemForIndexPath:indexPath];        
-        [musicTableService showActionSheetForItem:item
-                                           inView:self.view
-                                 withExtraButtons:BlacklistExtraButton];
-    }
-}
-
-- (NSDictionary*)getItemForIndexPath:(NSIndexPath*)indexPath
-{
-    return [self.results objectAtIndex:indexPath.row];
 }
 
 @end

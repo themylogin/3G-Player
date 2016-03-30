@@ -19,6 +19,8 @@
 #import "MusicFileManager.h"
 #import "Scrobbler.h"
 
+#import "RecommendationsUtils.h"
+
 extern NSString* librariesPath;
 
 extern NSArray* players;
@@ -29,6 +31,7 @@ extern NSString* lastFmPassword;
 extern MusicTableService* musicTableService;
 extern MusicFileManager* musicFileManager;
 extern Scrobbler* scrobbler;
+extern RecommendationsUtils* recommendationsUtils;
 
 typedef struct {
     UITabBarController* tabBar;

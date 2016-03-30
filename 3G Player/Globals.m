@@ -20,6 +20,7 @@ NSString* lastFmPassword;
 MusicTableService* musicTableService;
 MusicFileManager* musicFileManager;
 Scrobbler* scrobbler;
+RecommendationsUtils* recommendationsUtils;
 
 _controllers controllers;
 

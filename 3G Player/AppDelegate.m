@@ -51,6 +51,7 @@ dispatch_queue_t serverSocketQueue;
     musicTableService = [[MusicTableService alloc] init];
     musicFileManager = [[MusicFileManager alloc] init];
     scrobbler = [[Scrobbler alloc] init];
+    recommendationsUtils = [[RecommendationsUtils alloc] init];
     
     self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     
@@ -208,7 +209,23 @@ dispatch_queue_t serverSocketQueue;
              attributes:nil
              error:nil];
             
-            [mutablePlayers addObject:@{@"libraryPath": libraryPath,
+            NSMutableArray* lastFmUsernames = [NSMutableArray array];
+            for (int j = 1; j <= 2; j++)
+            {
+                NSString* _lastFmUsername = [[NSUserDefaults standardUserDefaults] stringForKey:
+                                             [NSString stringWithFormat:@"Player%d_LastFM_Username%d", i, j]];
+                if (_lastFmUsername)
+                {
+                    _lastFmUsername = [_lastFmUsername stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+                    if (![_lastFmUsername isEqualToString:@""])
+                    {
+                        [lastFmUsernames addObject:_lastFmUsername];
+                    }
+                }
+            }
+            
+            [mutablePlayers addObject:@{@"lastFmUsernames": lastFmUsernames,
+                                        @"libraryPath": libraryPath,
                                         @"name": [url host],
                                         @"url": stringUrl}];
         }

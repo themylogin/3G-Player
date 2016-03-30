@@ -12,9 +12,6 @@
 
 @interface RecentsController () <UIBarPositioningDelegate>
 
-@property (nonatomic, retain) NSArray* recents;
-@property (nonatomic, retain) IBOutlet UITableView *tableView;
-
 @end
 
 @implementation RecentsController
@@ -55,76 +52,17 @@
 
 - (void)updateRecents
 {
-    self.recents = [musicFileManager listRecentItems];
-    [self.tableView reloadData];
+    [self setItems:[musicFileManager listRecentItems]];
 }
 
-#pragma mark — navbar positioning
+#pragma mark — Navbar positioning
 
 - (UIBarPosition)positionForBar:(id<UIBarPositioning>)bar
 {
     return UIBarPositionTopAttached;
 }
 
-#pragma mark - Table view data source
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    return [self.recents count];
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    NSDictionary* item = [self getItemForIndexPath:indexPath];
-    return [musicTableService cellForMusicItem:item tableView:tableView];
-}
-
-#pragma mark - Table view delegate
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    NSDictionary* item = [self getItemForIndexPath:indexPath];
-    [controllers.library navigateToItem:item enter:NO];
-}
-
-#pragma mark - Gesture recognizer
-
-- (IBAction)handleSwipe:(UISwipeGestureRecognizer*)recognizer
-{
-    NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
-    if (indexPath)
-    {
-        NSDictionary* item = [self getItemForIndexPath:indexPath];
-        [musicTableService addItemToPlaylist:item mode:AddToTheEnd playAfter:NO];
-    }
-}
-
-- (IBAction)handleLongPress:(UILongPressGestureRecognizer*)recognizer
-{
-    if (recognizer.state != UIGestureRecognizerStateBegan)
-    {
-        return;
-    }
-    
-    NSIndexPath* indexPath = [self.tableView indexPathForRowAtPoint:[recognizer locationInView:self.tableView]];
-    if (indexPath)
-    {
-        NSDictionary* item = [self getItemForIndexPath:indexPath];        
-        [musicTableService showActionSheetForItem:item
-                                           inView:self.view
-                                 withExtraButtons:BlacklistExtraButton];
-    }
-}
-
-- (NSDictionary*)getItemForIndexPath:(NSIndexPath*)indexPath
-{
-    return [self.recents objectAtIndex:indexPath.row];
-}
+#pragma mark - Internals
 
 - (void)onMusicFileManagerStateChanged
 {

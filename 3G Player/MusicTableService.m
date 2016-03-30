@@ -62,9 +62,7 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     NSMutableArray* valuesWithPlayer = [[NSMutableArray alloc] initWithCapacity:values.count];
     for (int i = 0; i < values.count; i++)
     {
-        NSMutableDictionary* value = [[values objectAtIndex:i] mutableCopy];
-        [value setObject:player forKey:@"player"];
-        [valuesWithPlayer addObject:value];
+        [valuesWithPlayer addObject:[self annotateItem:[values objectAtIndex:i] withPlayer:player]];
     }
     
     return [valuesWithPlayer sortedArrayUsingComparator: ^(id _a, id _b)
@@ -94,9 +92,21 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     return [self loadIndexForPlayer:[item objectForKey:@"player"] directory:[item objectForKey:@"path"]];
 }
 
+- (NSDictionary*)annotateItem:(NSDictionary*)item withPlayer:(NSDictionary*)player
+{
+    NSMutableDictionary* value = [item mutableCopy];
+    [value setObject:player forKey:@"player"];
+    return value;
+}
+
 #pragma mark - Any music controller
 
 - (UITableViewCell*)cellForMusicItem:(NSDictionary*)item tableView:(UITableView *)tableView
+{
+    return [self cellForMusicItem:item tableView:tableView showFullPath:false];
+}
+
+- (UITableViewCell*)cellForMusicItem:(NSDictionary*)item tableView:(UITableView *)tableView showFullPath:(bool)showFullPath
 {
     static NSString* cellIdentifier = @"Cell";
     
@@ -136,7 +146,14 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     {
         cell.textLabel.textColor = [UIColor grayColor];
     }
-    cell.textLabel.text = [item objectForKey:@"name"];
+    if (showFullPath)
+    {
+        cell.textLabel.text = [musicFileManager navigationPathForItem:item];
+    }
+    else
+    {
+        cell.textLabel.text = [item objectForKey:@"name"];
+    }
     
     return cell;
 }
