@@ -328,7 +328,7 @@
         }
     });
     
-    if (enter)
+    if (enter && [musicTableService isDirectory:item])
     {
         LibraryPageController* controller = [[LibraryPageController alloc]
                                              initWithPlayer:[item objectForKey:@"player"]
