@@ -11,6 +11,7 @@
 #import "Globals.h"
 
 #import "ASIFormDataRequest.h"
+#import "JSONKit.h"
 
 @interface RecommendationsForFromController ()
 
@@ -76,6 +77,7 @@
     
     form = [XLFormDescriptor formDescriptor];
     [form setDelegate:self];
+    self.form = form;
     
     section = [XLFormSectionDescriptor formSection];
     section.title = NSLocalizedString(@"Recommend", nil);
@@ -110,6 +112,26 @@
     [section addFormRow:row];
     
     section = [XLFormSectionDescriptor formSection];
+    section.title = NSLocalizedString(@"Genres", nil);
+    [form addFormSection:section];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"includeGenres"
+                                                rowType:@"multipleSelector"
+                                                  title:NSLocalizedString(@"Include", nil)];
+    row.selectorOptions = @[];
+    row.value = @[];
+    [section addFormRow:row];
+    
+    row = [XLFormRowDescriptor formRowDescriptorWithTag:@"excludeGenres"
+                                                rowType:@"multipleSelector"
+                                                  title:NSLocalizedString(@"Exclude", nil)];
+    row.selectorOptions = @[];
+    row.value = @[];
+    [section addFormRow:row];
+    
+    [self loadGenres];
+    
+    section = [XLFormSectionDescriptor formSection];
     section.title = NSLocalizedString(@"Restrictions", nil);
     [form addFormSection:section];
     
@@ -126,13 +148,17 @@
     [row.cellConfig setObject:@(NSTextAlignmentRight) forKey:@"textField.textAlignment"];
     row.value = @(50);
     [section addFormRow:row];
-    
-    self.form = form;
 }
 
 -(void)formRowDescriptorValueHasChanged:(XLFormRowDescriptor*)rowDescriptor oldValue:(id)oldValue newValue:(id)newValue
 {
     [super formRowDescriptorValueHasChanged:rowDescriptor oldValue:oldValue newValue:newValue];
+    
+    if ([rowDescriptor.tag isEqualToString:@"lastFmUsername"])
+    {
+        [self loadGenres];
+    }
+    
     if ([rowDescriptor.tag isEqualToString:@"period"])
     {
         if ([[rowDescriptor.value valueData] isEqualToString:@"Week"])
@@ -176,6 +202,40 @@
     }
 }
 
+- (void)loadGenres
+{
+    NSMutableArray* genresNames = [NSMutableArray array];
+    
+    NSArray* genres = [self genresForCurrentUser];
+    if (genres)
+    {
+        for (int i = 0; i < genres.count; i++)
+        {
+            [genresNames addObject:[[genres objectAtIndex:i] objectForKey:@"name"]];
+        }
+    }
+    
+    [self.form formRowWithTag:@"includeGenres"].selectorOptions = genresNames;
+    [self.form formRowWithTag:@"excludeGenres"].selectorOptions = genresNames;
+}
+
+- (NSArray*)genresForCurrentUser
+{
+    NSData* data = [NSData dataWithContentsOfFile:
+                    [NSString stringWithFormat:
+                     @"%@/%@/genres.json",
+                     librariesPath,
+                     [[self.friendPlayer objectForKey:
+                       [self.form formRowWithTag:@"lastFmUsername"].value]
+                      objectForKey:@"libraryPath"]]];
+    if (data)
+    {
+        return [[JSONDecoder decoder] objectWithData:data];
+    }
+    
+    return nil;
+}
+
 - (void)cancel
 {
     [self dismissViewControllerAnimated:YES completion:^{
@@ -214,6 +274,35 @@
     
     ASIFormDataRequest* asiRequest = [[ASIFormDataRequest alloc] init];
     [asiRequest setStringEncoding:NSUTF8StringEncoding];
+    
+    NSArray* includeGenres = [self.form formRowWithTag:@"includeGenres"].value;
+    NSArray* excludeGenres = [self.form formRowWithTag:@"excludeGenres"].value;
+    NSArray* genres = [self genresForCurrentUser];
+    for (int i = 0; i < includeGenres.count; i++)
+    {
+        for (int j = 0; j < genres.count; j++)
+        {
+            if ([includeGenres[i] isEqualToString:genres[j][@"name"]])
+            {
+                url = [url stringByAppendingString:
+                       [NSString stringWithFormat:@"&include-dir=%@",
+                        [asiRequest encodeURL:genres[j][@"path"]]]];
+            }
+        }
+    }
+    for (int i = 0; i < excludeGenres.count; i++)
+    {
+        for (int j = 0; j < genres.count; j++)
+        {
+            if ([excludeGenres[i] isEqualToString:genres[j][@"name"]])
+            {
+                url = [url stringByAppendingString:
+                       [NSString stringWithFormat:@"&exclude-dir=%@",
+                        [asiRequest encodeURL:genres[j][@"path"]]]];
+            }
+        }
+    }
+    
     if ([period isEqualToString:@"Custom"])
     {
         url = [url stringByAppendingString:
@@ -235,6 +324,7 @@
                                             @"Half-year": @(180 * 86400),
                                             @"Year": @(365 * 86400)}[period] intValue]]]]]];
     }
+    
     [asiRequest release];
     
     [self dismissViewControllerAnimated:YES completion:^{
