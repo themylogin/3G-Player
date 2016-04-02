@@ -246,7 +246,7 @@
         if (reply)
         {
             NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
-            if ([[response objectForKey:@"status"] isEqualToString:@"ok"])
+            if (response)
             {
                 return YES;
             }
