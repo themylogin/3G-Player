@@ -18,7 +18,6 @@
 
 #import "ASIFormDataRequest.h"
 #import "CocoaAsyncSocket/GCDAsyncSocket.h"
-#import "JSONKit.h"
 #import "MKNumberBadgeView.h"
 #import "RecommendationsForFromController.h"
 
@@ -892,7 +891,11 @@ static char const* const POSITION = "POSITION";
             [result setObject:current forKey:@"current"];
         }
         
-        [sock writeData:[[result JSONData] copy] withTimeout:10 tag:0];
+        [sock writeData:[[NSJSONSerialization dataWithJSONObject:result
+                                                         options:0
+                                                           error:nil] copy]
+            withTimeout:10
+                    tag:0];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [self pause];
@@ -1317,7 +1320,10 @@ static char const* const POSITION = "POSITION";
         }
         else
         {
-            NSDictionary* data = [[JSONDecoder decoder] objectWithData:[request responseData] error:&error];
+            NSDictionary* data = [NSJSONSerialization
+                                  JSONObjectWithData:[request responseData]
+                                  options:0
+                                  error:&error];
             if (!data)
             {
                 dispatch_async(dispatch_get_main_queue(), ^{

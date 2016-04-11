@@ -11,8 +11,6 @@
 #import "Globals.h"
 #import "LibraryPageController.h"
 
-#import "JSONKit.h"
-
 #import <objc/runtime.h>
 
 static char const* const ALERTVIEW = "ALERTVIEW";
@@ -46,7 +44,10 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
                                 [NSString stringWithFormat:@"/%@/index.json", directory]]];
     if ([self.fileManager fileExistsAtPath:indexJsonPath])
     {
-        return [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfFile:indexJsonPath]];
+        return [NSJSONSerialization
+                JSONObjectWithData:[NSData dataWithContentsOfFile:indexJsonPath]
+                options:0
+                error:nil];
     }
     else
     {

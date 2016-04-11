@@ -10,8 +10,6 @@
 
 #import "Globals.h"
 
-#import "JSONKit.h"
-
 @interface InfoController ()
 
 @property (nonatomic, retain) NSArray* statistics;

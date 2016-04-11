@@ -19,7 +19,6 @@
 		687073371BDABA03000F6013 /* CocoaAsyncSocket in Resources */ = {isa = PBXBuildFile; fileRef = 6870732E1BDABA03000F6013 /* CocoaAsyncSocket */; };
 		687073381BDABA03000F6013 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 6870732F1BDABA03000F6013 /* en.lproj */; };
 		687073391BDABA03000F6013 /* FMEngine in Resources */ = {isa = PBXBuildFile; fileRef = 687073301BDABA03000F6013 /* FMEngine */; };
-		6870733B1BDABA03000F6013 /* JSONKit in Resources */ = {isa = PBXBuildFile; fileRef = 687073321BDABA03000F6013 /* JSONKit */; };
 		6870733C1BDABA03000F6013 /* SearchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 687073341BDABA03000F6013 /* SearchController.m */; };
 		6870733D1BDABA03000F6013 /* SearchController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 687073351BDABA03000F6013 /* SearchController.xib */; };
 		84075B661A3086A3001E395C /* RecentsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84075B641A3086A3001E395C /* RecentsController.m */; };
@@ -48,7 +47,6 @@
 		84C10BFF1782E08E004220BC /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C10BFE1782E08E004220BC /* Default@2x.png */; };
 		84C10C011782E08E004220BC /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 84C10C001782E08E004220BC /* Default-568h@2x.png */; };
 		84C10C091782E20A004220BC /* LibraryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C10C081782E20A004220BC /* LibraryController.m */; };
-		84C10C171782E72F004220BC /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C10C161782E72F004220BC /* JSONKit.m */; };
 		84C29E7D17F8562600D259F3 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84C29E7C17F8562600D259F3 /* AudioToolbox.framework */; };
 		84C29E8317F85A1A00D259F3 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C29E8017F85A1A00D259F3 /* GCDAsyncSocket.m */; };
 		84C29E8417F85A1A00D259F3 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 84C29E8217F85A1A00D259F3 /* GCDAsyncUdpSocket.m */; };
@@ -130,7 +128,6 @@
 		6870732E1BDABA03000F6013 /* CocoaAsyncSocket */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CocoaAsyncSocket; sourceTree = "<group>"; };
 		6870732F1BDABA03000F6013 /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = en.lproj; sourceTree = "<group>"; };
 		687073301BDABA03000F6013 /* FMEngine */ = {isa = PBXFileReference; lastKnownFileType = folder; path = FMEngine; sourceTree = "<group>"; };
-		687073321BDABA03000F6013 /* JSONKit */ = {isa = PBXFileReference; lastKnownFileType = folder; path = JSONKit; sourceTree = "<group>"; };
 		687073331BDABA03000F6013 /* SearchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchController.h; sourceTree = "<group>"; };
 		687073341BDABA03000F6013 /* SearchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchController.m; sourceTree = "<group>"; };
 		687073351BDABA03000F6013 /* SearchController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SearchController.xib; sourceTree = "<group>"; };
@@ -330,7 +327,6 @@
 				6870732E1BDABA03000F6013 /* CocoaAsyncSocket */,
 				6870732F1BDABA03000F6013 /* en.lproj */,
 				687073301BDABA03000F6013 /* FMEngine */,
-				687073321BDABA03000F6013 /* JSONKit */,
 				681B12301CA53E30000FB01A /* Icons.xcassets */,
 				84C4CA111785ADA500A95DB9 /* Globals.h */,
 				84C4CA121785ADA500A95DB9 /* Globals.m */,
@@ -624,7 +620,6 @@
 				687073391BDABA03000F6013 /* FMEngine in Resources */,
 				84C4CA431786F4EB00A95DB9 /* Settings.bundle in Resources */,
 				681B12311CA53E30000FB01A /* Icons.xcassets in Resources */,
-				6870733B1BDABA03000F6013 /* JSONKit in Resources */,
 				84943CBC17CBB33A00A1CD17 /* Icon.png in Resources */,
 				680CC27D1CAB826C006D4A61 /* RecommendationsForFromResultController.xib in Resources */,
 				84CE88841AF34C5B00F1129A /* InfoController.xib in Resources */,
@@ -704,7 +699,6 @@
 				84C10BFB1782E08E004220BC /* AppDelegate.m in Sources */,
 				84D38D5A1AC1E0BB007564D3 /* MKNumberBadgeView.m in Sources */,
 				84C10C091782E20A004220BC /* LibraryController.m in Sources */,
-				84C10C171782E72F004220BC /* JSONKit.m in Sources */,
 				84C919C917841B7C00810B88 /* ASIAuthenticationDialog.m in Sources */,
 				84DEA2DC191FC314000F9832 /* InfoController.m in Sources */,
 				680CC27F1CAB828A006D4A61 /* RecommendationsForFromResultController.m in Sources */,

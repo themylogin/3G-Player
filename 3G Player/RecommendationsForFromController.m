@@ -11,7 +11,6 @@
 #import "Globals.h"
 
 #import "ASIFormDataRequest.h"
-#import "JSONKit.h"
 
 @interface RecommendationsForFromController ()
 
@@ -230,7 +229,9 @@
                       objectForKey:@"libraryPath"]]];
     if (data)
     {
-        return [[JSONDecoder decoder] objectWithData:data];
+        return [NSJSONSerialization JSONObjectWithData:data
+                                               options:0
+                                                 error:nil];
     }
     
     return nil;

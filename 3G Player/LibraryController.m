@@ -14,7 +14,6 @@
 #import "SearchController.h"
 
 #import "ASIHTTPRequest.h"
-#import "JSONKit.h"
 #import "ZipArchive.h"
 
 @interface LibraryController () <UINavigationControllerDelegate>
@@ -345,7 +344,10 @@
     NSString* searchJsonPath = [self.libraryDirectory stringByAppendingString:@"/search.json"];
     if ([[NSFileManager defaultManager] fileExistsAtPath:searchJsonPath])
     {
-        self.searchIndex = [[JSONDecoder decoder] objectWithData:[NSData dataWithContentsOfFile:searchJsonPath]];
+        self.searchIndex = [NSJSONSerialization
+                            JSONObjectWithData:[NSData dataWithContentsOfFile:searchJsonPath]
+                            options:0
+                            error:nil];
     }
     else
     {

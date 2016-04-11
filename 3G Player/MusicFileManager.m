@@ -14,7 +14,6 @@
 #import "KeepAliver.h"
 
 #import "ASIHTTPRequest.h"
-#import "JSONKit.h"
 
 @interface MusicFileManager ()
 
@@ -478,12 +477,16 @@
 
 - (NSMutableArray*)readHistoryFile:(NSString*)path
 {
-    return [[JSONDecoder decoder] mutableObjectWithData:[NSData dataWithContentsOfFile:path]];
+    return [NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:path]
+                                           options:NSJSONReadingMutableContainers
+                                             error:nil];
 }
 
 - (void)writeHistoryFile:(NSString*)path history:(NSArray*)history
 {
-    [[history JSONData] writeToFile:path atomically:YES];
+    [[NSJSONSerialization dataWithJSONObject:history
+                                     options:0
+                                       error:nil] writeToFile:path atomically:YES];
     [self.notificationCenter postNotificationName:@"historyUpdated" object:self userInfo:nil];
 }
 

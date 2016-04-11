@@ -9,7 +9,6 @@
 #import "RecommendationsUtils.h"
 
 #import "ASIHTTPRequest.h"
-#import "JSONKit.h"
 
 #import "Globals.h"
 #import "RecommendationsForFromResultController.h"
@@ -51,7 +50,10 @@
         for (int i = 0; i < results.count; i++)
         {
             NSString* result = [results objectAtIndex:i];
-            NSDictionary* item = [[JSONDecoder decoder] objectWithData:[result dataUsingEncoding:NSUTF8StringEncoding]];
+            NSDictionary* item = [NSJSONSerialization
+                                  JSONObjectWithData:[result dataUsingEncoding:NSUTF8StringEncoding]
+                                  options:0
+                                  error:nil];
             if (item)
             {
                 item = [musicTableService annotateItem:item withPlayer:player];

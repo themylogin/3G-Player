@@ -11,7 +11,6 @@
 #import "Globals.h"
 
 #import "FMEngine.h"
-#import "JSONKit.h"
 
 @interface Scrobbler ()
 
@@ -245,7 +244,9 @@
         [fmEngine release];
         if (reply)
         {
-            NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
+            NSDictionary* response = [NSJSONSerialization JSONObjectWithData:reply
+                                                                     options:0
+                                                                       error:nil];
             if (response)
             {
                 return YES;
@@ -281,7 +282,11 @@
     [fmEngine release];
     if (reply)
     {
-        self.sessionKey = [[[[JSONDecoder decoder] objectWithData:reply] objectForKey:@"session"] objectForKey:@"key"];
+        self.sessionKey = [[[NSJSONSerialization JSONObjectWithData:reply
+                                                                options:0
+                                                              error:nil]
+                            objectForKey:@"session"]
+                           objectForKey:@"key"];
     }
 }
 
@@ -295,7 +300,9 @@
     [fmEngine release];
     if (reply)
     {
-        NSDictionary* recentScrobbles = [[JSONDecoder decoder] objectWithData:reply];
+        NSDictionary* recentScrobbles = [NSJSONSerialization JSONObjectWithData:reply
+                                                                        options:0
+                                                                          error:nil];
         NSDictionary* recentTracks = [recentScrobbles objectForKey:@"recenttracks"];
         return [recentTracks objectForKey:@"track"];
     }
@@ -319,7 +326,9 @@
     [fmEngine release];
     if (reply)
     {
-        NSDictionary* response = [[JSONDecoder decoder] objectWithData:reply];
+        NSDictionary* response = [NSJSONSerialization JSONObjectWithData:reply
+                                                                 options:0
+                                                                   error:nil];
         if (response != nil)
         {
             return YES;
