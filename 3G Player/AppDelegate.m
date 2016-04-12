@@ -193,7 +193,7 @@ dispatch_queue_t serverSocketQueue;
 
 - (void)readSettings
 {
-    NSMutableArray* mutablePlayers = [[NSMutableArray alloc] init];
+    NSMutableArray* mutablePlayers = [NSMutableArray array];
     for (int i = 1; i <= 5; i++)
     {
         NSString* stringUrl = [[NSUserDefaults standardUserDefaults] stringForKey:

@@ -311,7 +311,7 @@ static char const* const POSITION = "POSITION";
     if (path)
     {
         NSURL* url = [NSURL fileURLWithPath:path];
-        self.player = [[AVAudioPlayer alloc] initWithContentsOfURL:url fileTypeHint:AVFileTypeMPEGLayer3 error:nil];
+        self.player = [[[AVAudioPlayer alloc] initWithContentsOfURL:url fileTypeHint:AVFileTypeMPEGLayer3 error:nil] autorelease];
         self.player.delegate = self;
         if (position)
         {
@@ -666,7 +666,7 @@ static char const* const POSITION = "POSITION";
                                                     cancelButtonTitle:nil
                                                destructiveButtonTitle:nil
                                                     otherButtonTitles:nil];
-    NSMutableArray* buttons = [[NSMutableArray alloc] init];
+    NSMutableArray* buttons = [NSMutableArray array];
     
     if ([self.playlistUndoHistory count] > 0)
     {
@@ -871,21 +871,21 @@ static char const* const POSITION = "POSITION";
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
     NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
-    NSString *command = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];
+    NSString *command = [[[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding] autorelease];
     
     if ([command isEqualToString:@"become_superseeded"])
     {
-        NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+        NSMutableDictionary* result = [NSMutableDictionary dictionary];
         if (self.player && self.player.playing)
-        {            
-            NSMutableArray* list = [[NSMutableArray alloc] initWithCapacity:self.playlist.count];
+        {
+            NSMutableArray* list = [NSMutableArray arrayWithCapacity:self.playlist.count];
             for (int i = 0; i < self.playlist.count; i++)
             {
                 [list setObject:[[self.playlist objectAtIndex:i] objectForKey:@"url"] atIndexedSubscript:i];
             }
             [result setObject:list forKey:@"playlist"];
             
-            NSMutableDictionary* current = [[NSMutableDictionary alloc] init];
+            NSMutableDictionary* current = [NSMutableDictionary dictionary];
             [current setObject:[NSNumber numberWithLong:(self.currentIndex)] forKey:@"index"];
             [current setObject:[NSNumber numberWithDouble:(self.player.currentTime)] forKey:@"position"];
             [result setObject:current forKey:@"current"];
@@ -959,7 +959,7 @@ static char const* const POSITION = "POSITION";
     {
         NSDictionary* file = [self.playlist objectAtIndex:i];
         
-        NSMutableString* album = [[NSMutableString alloc] init];
+        NSMutableString* album = [[[NSMutableString alloc] init] autorelease];
         if (!([[file objectForKey:@"album"] isEqualToString:@""]))
         {
             [album appendString:[file objectForKey:@"album"]];
@@ -969,7 +969,7 @@ static char const* const POSITION = "POSITION";
             }
         }
         
-        NSMutableString* title = [album mutableCopy];
+        NSMutableString* title = [[album mutableCopy] autorelease];
         if (!([[file objectForKey:@"artist"] isEqualToString:@""]))
         {
             if (!([title isEqualToString:@""]))
@@ -998,7 +998,7 @@ static char const* const POSITION = "POSITION";
             }
             else
             {
-                [self.sections addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:title, @"title", album, @"album", [[NSMutableArray alloc] init], @"files", nil]];
+                [self.sections addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:title, @"title", album, @"album", [NSMutableArray array], @"files", nil]];
             }
         }
         
@@ -1348,7 +1348,7 @@ static char const* const POSITION = "POSITION";
     NSDictionary* player = [players objectAtIndex:0];
     NSArray* dataPlaylist = [data objectForKey:@"playlist"];
     
-    NSMutableArray* items = [[NSMutableArray alloc] init];
+    NSMutableArray* items = [NSMutableArray array];
     int position = 0;
     for (int i = 0; i < dataPlaylist.count; i++)
     {
@@ -1371,7 +1371,7 @@ static char const* const POSITION = "POSITION";
         }
         else
         {
-            NSMutableDictionary* itemWithPlayer = [item mutableCopy];
+            NSMutableDictionary* itemWithPlayer = [[item mutableCopy] autorelease];
             itemWithPlayer[@"player"] = player;
             [items addObject:itemWithPlayer];
             if (i < [[data objectForKey:@"position"] intValue])
@@ -1480,7 +1480,7 @@ static char const* const POSITION = "POSITION";
                                                     cancelButtonTitle:nil
                                                destructiveButtonTitle:nil
                                                     otherButtonTitles:nil];
-    NSMutableArray* buttons = [[NSMutableArray alloc] init];
+    NSMutableArray* buttons = [NSMutableArray array];
     
     
     ASIFormDataRequest* asiRequest = [[ASIFormDataRequest alloc] init];
@@ -1562,7 +1562,7 @@ static char const* const POSITION = "POSITION";
 
 - (void)invalidatePlaylistUndoHistory
 {
-    self.playlistUndoHistory = [[NSMutableArray alloc] init];
+    self.playlistUndoHistory = [NSMutableArray array];
 }
 
 - (void)undoLastAction
@@ -1652,7 +1652,7 @@ static char const* const POSITION = "POSITION";
             durationInfo = [durationInfo stringByAppendingString:@"if you turn it on now, "];
         }
         
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
         if (playlistDuration < 86400)
         {
             dateFormatter.dateStyle = NSDateFormatterNoStyle;
@@ -1665,7 +1665,7 @@ static char const* const POSITION = "POSITION";
         NSDate* end = [NSDate dateWithTimeIntervalSinceNow:playlistDuration];
         durationInfo = [durationInfo stringByAppendingString:
                         [NSString stringWithFormat:@"it will end at %@", [dateFormatter stringFromDate:end]]];
-                        
+        
         return @[durationInfo];
     }
     else

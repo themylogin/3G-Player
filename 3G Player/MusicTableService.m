@@ -60,7 +60,7 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
     NSDictionary* index = [self loadRawIndexForPlayer:player directory:directory];
     
     NSArray* values = [index allValues];
-    NSMutableArray* valuesWithPlayer = [[NSMutableArray alloc] initWithCapacity:values.count];
+    NSMutableArray* valuesWithPlayer = [[[NSMutableArray alloc] initWithCapacity:values.count] autorelease];
     for (int i = 0; i < values.count; i++)
     {
         [valuesWithPlayer addObject:[self annotateItem:[values objectAtIndex:i] withPlayer:player]];
@@ -95,7 +95,7 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
 
 - (NSDictionary*)annotateItem:(NSDictionary*)item withPlayer:(NSDictionary*)player
 {
-    NSMutableDictionary* value = [item mutableCopy];
+    NSMutableDictionary* value = [[item mutableCopy] autorelease];
     [value setObject:player forKey:@"player"];
     return value;
 }
@@ -180,7 +180,7 @@ static char const* const PLAY_AFTER = "PLAY_AFTER";
                                                     cancelButtonTitle:nil
                                                destructiveButtonTitle:nil
                                                     otherButtonTitles:nil];
-    NSMutableArray* buttons = [[NSMutableArray alloc] init];
+    NSMutableArray* buttons = [NSMutableArray array];
     
     [actionSheet addButtonWithTitle:NSLocalizedString(@"Replace", nil)];
     [buttons addObject:@"REPLACE"];
