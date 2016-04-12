@@ -24,7 +24,7 @@
 extern NSString* librariesPath;
 
 extern NSArray* players;
-extern int leaveFreeSpace;
+extern long leaveFreeSpace;
 extern NSString* lastFmUsername;
 extern NSString* lastFmPassword;
 

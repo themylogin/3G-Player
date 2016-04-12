@@ -71,7 +71,7 @@
 
 - (int)queueSize
 {
-    return [[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"] count];
+    return (int)[[[NSUserDefaults standardUserDefaults] mutableArrayValueForKey:@"lastFmQueue"] count];
 }
 
 - (void)love:(NSDictionary*)file

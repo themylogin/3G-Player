@@ -263,10 +263,17 @@ dispatch_queue_t serverSocketQueue;
     
     CGRect keyboardFrameEnd = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     keyboardFrameEnd = [self.tabBarController.view convertRect:keyboardFrameEnd fromView:nil];
-    
-    [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionBeginFromCurrentState | curve animations:^{
-        self.tabBarController.view.frame = CGRectMake(0, 0, keyboardFrameEnd.size.width, keyboardFrameEnd.origin.y);
-    } completion:nil];
+
+    [UIView
+     animateWithDuration:duration
+     delay:0
+     options:UIViewAnimationOptionBeginFromCurrentState | curve
+     animations:^{
+         CGRect frame = CGRectMake(0, 0, keyboardFrameEnd.size.width, keyboardFrameEnd.origin.y);
+         self.tabBarController.view.frame = frame;
+         [[controllers.library viewControllers] lastObject].view.frame = frame;
+     }
+     completion:nil];
 }
 
 - (void)keyboardWillHide:(NSNotification *)note
@@ -278,9 +285,19 @@ dispatch_queue_t serverSocketQueue;
     CGRect keyboardFrameEnd = [userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     keyboardFrameEnd = [self.tabBarController.view convertRect:keyboardFrameEnd fromView:nil];
     
-    [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionBeginFromCurrentState | curve animations:^{
-        self.tabBarController.view.frame = CGRectMake(0, 0, keyboardFrameEnd.size.width, keyboardFrameEnd.origin.y);
-    } completion:nil];
+    [UIView
+     animateWithDuration:duration
+     delay:0
+     options:UIViewAnimationOptionBeginFromCurrentState | curve
+     animations:^{
+         CGRect frame = CGRectMake(0, 0, keyboardFrameEnd.size.width, keyboardFrameEnd.origin.y);
+         self.tabBarController.view.frame = frame;
+         [[controllers.library viewControllers] lastObject].view.frame = frame;
+     }
+     completion:^(BOOL _){
+         CGRect frame = CGRectMake(0, 0, keyboardFrameEnd.size.width, keyboardFrameEnd.origin.y);
+         [[controllers.library viewControllers] lastObject].view.frame = frame;
+     }];
 }
 
 @end
