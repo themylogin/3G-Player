@@ -56,6 +56,8 @@ static char const* const POSITION = "POSITION";
 
 @property (nonatomic, retain) NSDate* bufferingProgressReportedAt;
 
+@property (nonatomic)         bool pausedIntentionally;
+
 @property (nonatomic)         bool pausedByLowVolume;
 @property (nonatomic, retain) KeepAliver* pausedByLowVolumeKeepAliver;
 
@@ -131,6 +133,8 @@ static char const* const POSITION = "POSITION";
                 [self setIndex:index position:position];
             }
         }
+        
+        self.pausedIntentionally = FALSE;
         
         self.pausedByLowVolume = FALSE;
         self.pausedByLowVolumeKeepAliver = [[KeepAliver alloc] init];
@@ -279,6 +283,13 @@ static char const* const POSITION = "POSITION";
 
 #pragma mark - Play
 
+- (void)play
+{
+    self.pausedIntentionally = FALSE;
+    
+    [self.player play];
+}
+
 - (void)playAtIndex:(long)index
 {
     [self playAtIndex:index atPosition:0];
@@ -287,7 +298,7 @@ static char const* const POSITION = "POSITION";
 - (void)playAtIndex:(long)index atPosition:(NSTimeInterval)position
 {
     [self setIndex:index position:position];
-    [self.player play];
+    [self play];
 }
 
 - (void)setIndex:(long)index position:(NSTimeInterval)position
@@ -371,6 +382,8 @@ static char const* const POSITION = "POSITION";
 
 - (void)pause
 {
+    self.pausedIntentionally = TRUE;
+
     [self saveState];
     [self.player pause];
 }
@@ -385,7 +398,7 @@ static char const* const POSITION = "POSITION";
         }
         else
         {
-            [self.player play];
+            [self play];
         }
     }
     else
@@ -771,7 +784,7 @@ static char const* const POSITION = "POSITION";
     
     [self storePlaylistUndoHistory];
     [self setIndex:[self itemIndexForIndexPath:indexPath] position:0 invalidatingPlaylistUndoHistory:NO];
-    [self.player play];
+    [self play];
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -849,7 +862,7 @@ static char const* const POSITION = "POSITION";
 - (void)audioPlayerEndInterruption:(AVAudioPlayer *)player withOptions:(NSUInteger)flags
 {
     [self.player prepareToPlay];
-    [self.player play];
+    [self play];
 }
 
 - (void)onAudioRouteChange:(NSNotification*)notification
@@ -1074,6 +1087,11 @@ static char const* const POSITION = "POSITION";
     }
     
     if (self.player.playing)
+    {
+        return;
+    }
+    
+    if (self.pausedIntentionally)
     {
         return;
     }
@@ -1601,7 +1619,7 @@ static char const* const POSITION = "POSITION";
                 [self setIndex:undoIndex position:undoPosition invalidatingPlaylistUndoHistory:NO];
                 if (undoWasPlaying)
                 {
-                    [self.player play];
+                    [self play];
                 }
             }
             else
@@ -1690,7 +1708,7 @@ static char const* const POSITION = "POSITION";
             {
                 if (self.player.playing)
                 {
-                    [self.player pause];
+                    [self pause];
                     
                     self.pausedByLowVolume = true;
                     [self.pausedByLowVolumeKeepAliver startWithDuration:900];
@@ -1700,7 +1718,7 @@ static char const* const POSITION = "POSITION";
             {
                 if (self.pausedByLowVolume)
                 {
-                    [self.player play];
+                    [self play];
                     
                     self.pausedByLowVolume = false;
                     [self.pausedByLowVolumeKeepAliver stop];
