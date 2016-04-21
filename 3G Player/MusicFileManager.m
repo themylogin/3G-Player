@@ -165,7 +165,6 @@
     self.bufferingIsError = false;
     self.bufferingExpectedLength = 0;
     
-    //[musicFileManager notifyItemPlay:musicFile];
     [self startBufferingRequest:musicFile];
     [self loadCover:musicFile];
     
@@ -351,8 +350,13 @@
 
 - (NSString*)coverPath:(NSDictionary *)musicFile
 {
-    return [[self absolutePath:[self itemParent:musicFile]]
-             stringByAppendingString:@"/cover.jpg"];
+    NSDictionary* parent = [self itemParent:musicFile];
+    if (parent == nil)
+    {
+        return nil;
+    }
+    
+    return [[self absolutePath:parent] stringByAppendingString:@"/cover.jpg"];
 }
 
 #pragma mark - Removal
@@ -500,6 +504,10 @@
     if (![musicTableService isDirectory:item])
     {
         item = [self itemParent:item];
+        if (item == nil)
+        {
+            return;
+        }
     }
     
     [self notifyItem:item historyFile:self.playHistoryFile];
@@ -618,11 +626,6 @@
 
 - (NSDictionary*)itemForAbsolutePath:(NSString*)absolutePath
 {
-    if ([absolutePath isEqualToString:@""])
-    {
-        return nil;
-    }
-    
     if (![absolutePath hasPrefix:librariesPath])
     {
         return nil;

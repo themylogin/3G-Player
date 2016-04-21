@@ -145,7 +145,10 @@
 
 - (void)actionSheet:(UIActionSheet*)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    [self changePlayer:[players objectAtIndex:buttonIndex - 1]];
+    if (buttonIndex > 0)
+    {
+        [self changePlayer:[players objectAtIndex:buttonIndex - 1]];
+    }
 }
 
 - (void)changePlayer:(NSDictionary*)player
