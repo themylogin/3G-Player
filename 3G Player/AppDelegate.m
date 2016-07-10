@@ -48,6 +48,12 @@ dispatch_queue_t serverSocketQueue;
                                                object:nil];
     [self readSettings];
     
+    if (!([players count] > 0))
+    {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+        exit(0);
+    }
+    
     musicTableService = [[MusicTableService alloc] init];
     musicFileManager = [[MusicFileManager alloc] init];
     scrobbler = [[Scrobbler alloc] init];
@@ -199,7 +205,7 @@ dispatch_queue_t serverSocketQueue;
         NSString* stringUrl = [[NSUserDefaults standardUserDefaults] stringForKey:
                                [NSString stringWithFormat:@"Player%d_URL", i]];
         NSURL* url = [NSURL URLWithString:stringUrl];
-        if (url)
+        if (url && [url host])
         {
             NSString* libraryPath = [NSString stringWithFormat:@"/%@", [url host]];
             

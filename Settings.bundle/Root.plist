@@ -40,7 +40,7 @@
 				<string>100</string>
 			</array>
 			<key>Type</key>
-			<string>PSMultiValueSpecifier</string>
+			<string>PSTextFieldSpecifier</string>
 			<key>Title</key>
 			<string>Leave free space</string>
 			<key>Key</key>
