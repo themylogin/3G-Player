@@ -535,12 +535,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 84C10C041782E08E004220BC /* Build configuration list for PBXNativeTarget "3G Player" */;
 			buildPhases = (
-				EDF5D4EB71C47D70ABA01785 /* 📦 Check Pods Manifest.lock */,
+				EDF5D4EB71C47D70ABA01785 /* Check Pods Manifest.lock */,
 				84C10BE31782E08D004220BC /* Sources */,
 				84C10BE41782E08D004220BC /* Frameworks */,
 				84C10BE51782E08D004220BC /* Resources */,
-				B0E45C637E4323D01A1B0E86 /* 📦 Embed Pods Frameworks */,
-				B367377008263E7454B8F03E /* 📦 Copy Pods Resources */,
+				B0E45C637E4323D01A1B0E86 /* Embed Pods Frameworks */,
+				B367377008263E7454B8F03E /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -561,7 +561,7 @@
 				ORGANIZATIONNAME = themylogin;
 				TargetAttributes = {
 					84C10BE61782E08D004220BC = {
-						DevelopmentTeam = 2F65NDU8DR;
+						DevelopmentTeam = 6Q36KVUBMJ;
 					};
 				};
 			};
@@ -643,14 +643,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		B0E45C637E4323D01A1B0E86 /* 📦 Embed Pods Frameworks */ = {
+		B0E45C637E4323D01A1B0E86 /* Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Embed Pods Frameworks";
+			name = "Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -658,14 +658,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-3G Player/Pods-3G Player-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B367377008263E7454B8F03E /* 📦 Copy Pods Resources */ = {
+		B367377008263E7454B8F03E /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Copy Pods Resources";
+			name = "Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -673,14 +673,14 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-3G Player/Pods-3G Player-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		EDF5D4EB71C47D70ABA01785 /* 📦 Check Pods Manifest.lock */ = {
+		EDF5D4EB71C47D70ABA01785 /* Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Check Pods Manifest.lock";
+			name = "Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -823,7 +823,7 @@
 				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
 				INFOPLIST_FILE = "3G Player/3G Player-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mcornholio.-G-Player";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.themylogin.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -846,7 +846,7 @@
 				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
 				INFOPLIST_FILE = "3G Player/3G Player-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mcornholio.-G-Player";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.themylogin.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
