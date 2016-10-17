@@ -61,6 +61,8 @@ static char const* const POSITION = "POSITION";
 @property (nonatomic)         bool pausedByLowVolume;
 @property (nonatomic, retain) KeepAliver* pausedByLowVolumeKeepAliver;
 
+@property (retain, nonatomic) IBOutlet NSLayoutConstraint *hideToolbarConstraint;
+
 @end
 
 @implementation CurrentController
@@ -150,15 +152,6 @@ static char const* const POSITION = "POSITION";
 {
     [super viewDidLoad];
     
-    CGRect tableViewRect = self.tableView.frame;
-    tableViewRect.size.height = [UIScreen mainScreen].bounds.size.height - 168;
-    self.tableView.frame = tableViewRect;
-    
-    CGRect toolbarRect = self.toolbar.frame;
-    toolbarRect.size.height = 100;
-    toolbarRect.origin.y = tableViewRect.size.height;
-    self.toolbar.frame = toolbarRect;
-    
     [self showScrobblerEnabled];
     
     self.scrobblerBadge = [[MKNumberBadgeView alloc] initWithFrame:CGRectMake(27, 0, 19, 19)];
@@ -171,7 +164,10 @@ static char const* const POSITION = "POSITION";
     #else
         MPVolumeView* volumeView = [[MPVolumeView alloc] initWithFrame:self.volumeView.bounds];
     #endif
+    volumeView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.volumeView addSubview:volumeView];
+    [self.volumeView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[view]-0-|" options:0 metrics:nil views:@{@"view": volumeView}]];
+    [self.volumeView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[view]-0-|" options:0 metrics:nil views:@{@"view": volumeView}]];
     [volumeView release];
     
     [self periodic];
@@ -719,8 +715,9 @@ static char const* const POSITION = "POSITION";
     if (!self.toolbarOpen)
     {
         self.toolbarOpen = YES;
+        [self.view removeConstraint:self.hideToolbarConstraint];
         [UIView animateWithDuration:0.5f animations:^{
-            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, -80);
+            [self.view layoutSubviews];
         }];
     }
 }
@@ -735,8 +732,9 @@ static char const* const POSITION = "POSITION";
     if (self.toolbarOpen)
     {
         self.toolbarOpen = NO;
+        [self.view addConstraint:self.hideToolbarConstraint];
         [UIView animateWithDuration:0.5f animations:^{
-            self.toolbar.frame = CGRectInset(self.toolbar.frame, 0, 80);
+            [self.view layoutSubviews];
         }];
     }
 }
@@ -1727,5 +1725,11 @@ static char const* const POSITION = "POSITION";
         }
     }
 }
+
+- (void)dealloc {
+    [_hideToolbarConstraint release];
+    [super dealloc];
+}
+
 
 @end
