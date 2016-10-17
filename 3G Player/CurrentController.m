@@ -1184,7 +1184,7 @@ static char const* const POSITION = "POSITION";
 
 #pragma mark - Scrobbling
 
-- (void)handleLoveButtonTouchDown:(id)sender
+- (IBAction)handleLoveButtonTap:(id)sender
 {
     if (self.currentIndex != -1)
     {
@@ -1194,7 +1194,7 @@ static char const* const POSITION = "POSITION";
     }
 }
 
-- (void)handleScrobblerButtonTouchDown:(id)sender
+- (IBAction)handleScrobblerButtonTouchDown:(id)sender
 {
     scrobbler.enabled = !scrobbler.enabled;
     [self showScrobblerEnabled];
@@ -1285,7 +1285,7 @@ static char const* const POSITION = "POSITION";
 
 #pragma mark - Lyrics
 
-- (void)handleGoogleButtonTouchDown:(id)sender
+- (IBAction)handleGoogleButtonTap:(id)sender
 {
     if (self.currentIndex != -1)
     {
@@ -1305,7 +1305,7 @@ static char const* const POSITION = "POSITION";
 
 #pragma mark - Superseeding
 
-- (void)handleSuperseedButtonTouchDown:(id)sender
+- (IBAction)handleSuperseedButtonTap:(id)sender
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         NSError* error;

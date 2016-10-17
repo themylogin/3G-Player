@@ -55,7 +55,7 @@
                                 <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
                             <connections>
-                                <action selector="handlePlayPauseButtonTouchDown:" destination="-1" eventType="touchDown" id="208"/>
+                                <action selector="handlePlayPauseButtonTouchDown:" destination="-1" eventType="touchUpInside" id="Uy6-s3-ZBE"/>
                             </connections>
                         </button>
                         <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="111" userLabel="Position">
@@ -92,7 +92,7 @@
                                 <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
                             <connections>
-                                <action selector="handleRepeatButtonTouchDown:" destination="-1" eventType="touchDown" id="207"/>
+                                <action selector="handleRepeatButtonTouchDown:" destination="-1" eventType="touchUpInside" id="HTU-xy-5Em"/>
                             </connections>
                         </button>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="215" userLabel="Volume">
@@ -118,7 +118,7 @@
                                     </accessibility>
                                     <state key="normal" image="Lyrics"/>
                                     <connections>
-                                        <action selector="handleGoogleButtonTouchDown:" destination="-1" eventType="touchDown" id="kYX-WC-LSD"/>
+                                        <action selector="handleGoogleButtonTap:" destination="-1" eventType="touchUpInside" id="0yU-0W-TKR"/>
                                     </connections>
                                 </button>
                             </subviews>
@@ -148,7 +148,7 @@
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
                                     <connections>
-                                        <action selector="handleLoveButtonTouchDown:" destination="-1" eventType="touchDown" id="mAF-bm-vLA"/>
+                                        <action selector="handleLoveButtonTap:" destination="-1" eventType="touchUpInside" id="KI8-zn-xoH"/>
                                     </connections>
                                 </button>
                             </subviews>
@@ -172,7 +172,7 @@
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
                                     <connections>
-                                        <action selector="handleScrobblerButtonTouchDown:" destination="-1" eventType="touchDown" id="ssa-Ri-D9x"/>
+                                        <action selector="handleScrobblerButtonTouchDown:" destination="-1" eventType="touchUpInside" id="CsS-hr-WBm"/>
                                     </connections>
                                 </button>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Enabled" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jhs-5u-VOV">
@@ -202,7 +202,7 @@
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
                                     <connections>
-                                        <action selector="handleSuperseedButtonTouchDown:" destination="-1" eventType="touchDown" id="Gvc-aL-kCF"/>
+                                        <action selector="handleSuperseedButtonTap:" destination="-1" eventType="touchUpInside" id="JDp-oZ-jlH"/>
                                     </connections>
                                 </button>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Go out" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xLN-Hk-qun">
@@ -232,7 +232,7 @@
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
                                     <connections>
-                                        <action selector="handleRecommendationsButtonTouchDown:" destination="-1" eventType="touchDown" id="uJY-qC-7gf"/>
+                                        <action selector="handleRecommendationsButtonTouchDown:" destination="-1" eventType="touchUpInside" id="IfP-kM-qS2"/>
                                     </connections>
                                 </button>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Suggest" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VeZ-ON-XZk">
