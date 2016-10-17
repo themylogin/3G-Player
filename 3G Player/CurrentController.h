@@ -34,15 +34,11 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfter
 - (void)playAtIndex:(long)index;
 
 - (void)pause;
-- (IBAction)handlePlayPauseButtonTouchDown:(id)sender;
 
 - (void)playNextTrack:(BOOL)respectRepeatTrack;
 - (void)playPrevTrack:(BOOL)respectRepeatTrack;
 
 - (void)handleSeeking:(UIEventSubtype)event;
-- (IBAction)handlePositionSliderTouchUpInside:(id)sender;
-
-- (IBAction)handleRepeatButtonTouchDown:(id)sender;
 
 - (IBAction)handlePlaylistLeftSwipe:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handlePlaylistLeftDoubleSwipe:(UISwipeGestureRecognizer*)recognizer;
@@ -51,15 +47,6 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfter
 
 - (IBAction)handleToolbarSwipeUp:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handleToolbarSwipeDown:(UISwipeGestureRecognizer*)recognizer;
-
-- (IBAction)handleGoogleButtonTouchDown:(id)sender;
-
-- (IBAction)handleLoveButtonTouchDown:(id)sender;
-- (IBAction)handleScrobblerButtonTouchDown:(id)sender;
-
-- (IBAction)handleSuperseedButtonTouchDown:(id)sender;
-
-- (IBAction)handleRecommendationsButtonTouchDown:(id)sender;
 
 - (NSArray*)getStatistics;
 
