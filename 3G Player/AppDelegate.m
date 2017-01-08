@@ -7,6 +7,8 @@
 //
 
 #import "AppDelegate.h"
+#import <Fabric/Fabric.h>
+#import <Crashlytics/Crashlytics.h>
 
 #import "CocoaAsyncSocket/GCDAsyncSocket.h"
 
@@ -25,6 +27,8 @@ dispatch_queue_t serverSocketQueue;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [Fabric with:@[[Crashlytics class]]];
+
     application.idleTimerDisabled = YES;
     
     [self setupApplication];

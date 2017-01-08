@@ -16,6 +16,8 @@
 		681B12311CA53E30000FB01A /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 681B12301CA53E30000FB01A /* Icons.xcassets */; };
 		681B12331CA55AFD000FB01A /* silence.wav in Resources */ = {isa = PBXBuildFile; fileRef = 681B12321CA55AFD000FB01A /* silence.wav */; };
 		681B12351CA57406000FB01A /* KeepAliver.m in Sources */ = {isa = PBXBuildFile; fileRef = 681B12341CA57406000FB01A /* KeepAliver.m */; };
+		686EBD3C1E2277BA00658838 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 686EBD3A1E2277BA00658838 /* Fabric.framework */; };
+		686EBD3D1E2277BA00658838 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 686EBD3B1E2277BA00658838 /* Crashlytics.framework */; };
 		687073361BDABA03000F6013 /* ASIHTTPRequest in Resources */ = {isa = PBXBuildFile; fileRef = 6870732D1BDABA03000F6013 /* ASIHTTPRequest */; };
 		687073371BDABA03000F6013 /* CocoaAsyncSocket in Resources */ = {isa = PBXBuildFile; fileRef = 6870732E1BDABA03000F6013 /* CocoaAsyncSocket */; };
 		687073381BDABA03000F6013 /* en.lproj in Resources */ = {isa = PBXBuildFile; fileRef = 6870732F1BDABA03000F6013 /* en.lproj */; };
@@ -126,6 +128,8 @@
 		681B12321CA55AFD000FB01A /* silence.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = silence.wav; sourceTree = "<group>"; };
 		681B12341CA57406000FB01A /* KeepAliver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeepAliver.m; sourceTree = "<group>"; };
 		681B12361CA57B2D000FB01A /* KeepAliver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeepAliver.h; sourceTree = "<group>"; };
+		686EBD3A1E2277BA00658838 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = SOURCE_ROOT; };
+		686EBD3B1E2277BA00658838 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = SOURCE_ROOT; };
 		6870732D1BDABA03000F6013 /* ASIHTTPRequest */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ASIHTTPRequest; sourceTree = "<group>"; };
 		6870732E1BDABA03000F6013 /* CocoaAsyncSocket */ = {isa = PBXFileReference; lastKnownFileType = folder; path = CocoaAsyncSocket; sourceTree = "<group>"; };
 		6870732F1BDABA03000F6013 /* en.lproj */ = {isa = PBXFileReference; lastKnownFileType = folder; path = en.lproj; sourceTree = "<group>"; };
@@ -259,11 +263,13 @@
 				84C4CA211785B36E00A95DB9 /* AVFoundation.framework in Frameworks */,
 				84C4CA1F1785B1BC00A95DB9 /* MediaPlayer.framework in Frameworks */,
 				84C91A0C178581EF00810B88 /* QuartzCore.framework in Frameworks */,
+				686EBD3D1E2277BA00658838 /* Crashlytics.framework in Frameworks */,
 				84C919F517841BE100810B88 /* MobileCoreServices.framework in Frameworks */,
 				84C919F317841BD600810B88 /* SystemConfiguration.framework in Frameworks */,
 				84C919F117841BC600810B88 /* CFNetwork.framework in Frameworks */,
 				84C10BEB1782E08E004220BC /* UIKit.framework in Frameworks */,
 				84C10BED1782E08E004220BC /* Foundation.framework in Frameworks */,
+				686EBD3C1E2277BA00658838 /* Fabric.framework in Frameworks */,
 				D778B386E0E9FE6B9E6D3204 /* libPods-3G Player.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -301,6 +307,8 @@
 		84C10BE91782E08D004220BC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				686EBD3A1E2277BA00658838 /* Fabric.framework */,
+				686EBD3B1E2277BA00658838 /* Crashlytics.framework */,
 				841F38AC1A31BD9B0046CDD2 /* QuickLook.framework */,
 				841F38AA1A31BD5A0046CDD2 /* CoreText.framework */,
 				841F38A81A31BD050046CDD2 /* AssetsLibrary.framework */,
@@ -544,6 +552,7 @@
 				84C10BE51782E08D004220BC /* Resources */,
 				B0E45C637E4323D01A1B0E86 /* Embed Pods Frameworks */,
 				B367377008263E7454B8F03E /* Copy Pods Resources */,
+				686EBD371E22778200658838 /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -564,7 +573,7 @@
 				ORGANIZATIONNAME = themylogin;
 				TargetAttributes = {
 					84C10BE61782E08D004220BC = {
-						DevelopmentTeam = 6Q36KVUBMJ;
+						DevelopmentTeam = 4GMLHKF7NE;
 					};
 				};
 			};
@@ -647,6 +656,20 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		686EBD371E22778200658838 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "./Fabric.framework/run e566308877de60541eb3bb71919cfbae9c73f845 80e0b8ab6707142a183ad7dff30894cee972e471b50fe9dcff06640dc1eb371b";
+		};
 		B0E45C637E4323D01A1B0E86 /* Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -822,6 +845,7 @@
 					"\"$(PROJECT_DIR)/3G Player\"",
 					"\"$(PROJECT_DIR)/3G Player/HockeySDK.embeddedframework\"",
 					"\"$(PROJECT_DIR)/3G Player/HockeySDK.embeddedframework\"",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
@@ -845,6 +869,7 @@
 					"\"$(PROJECT_DIR)/3G Player\"",
 					"\"$(PROJECT_DIR)/3G Player/HockeySDK.embeddedframework\"",
 					"\"$(PROJECT_DIR)/3G Player/HockeySDK.embeddedframework\"",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "3G Player/3G Player-Prefix.pch";
