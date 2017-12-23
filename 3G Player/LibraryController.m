@@ -23,7 +23,6 @@
 
 @property (nonatomic, retain) UILabel* updateLibraryProgressLabel;
 
-@property (nonatomic, retain) NSArray* searchIndex;
 @property (nonatomic, retain) SearchController* searchController;
 @property (nonatomic, retain) UIViewController* searchStartController;
 
@@ -53,8 +52,9 @@
                                                    action:@selector(longPress:)];
         [self.navigationBar addGestureRecognizer:longPress];
         
-        [self loadSearchIndex];
-        self.searchController = [[SearchController alloc] init];
+        self.searchController = [[SearchController alloc] initWithPlayer:self.player
+                                                        libraryDirectory:self.libraryDirectory];
+        [self.searchController loadSearchIndex];
         self.searchStartController = nil;
         
         self.librarySearchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width - 24, 44)];
@@ -258,7 +258,7 @@
             libraryToolbarButtonItem.enabled = YES;
             libraryToolbarButtonItem.customView = self.librarySearchBar;
             
-            [self loadSearchIndex];
+            [self.searchController loadSearchIndex];
             
             LibraryPageController* lastValidController = nil;
             for (LibraryPageController* controller in [self viewControllers])
@@ -342,22 +342,6 @@
 
 #pragma mark - Search
 
-- (void)loadSearchIndex
-{
-    NSString* searchJsonPath = [self.libraryDirectory stringByAppendingString:@"/search.json"];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:searchJsonPath])
-    {
-        self.searchIndex = [NSJSONSerialization
-                            JSONObjectWithData:[NSData dataWithContentsOfFile:searchJsonPath]
-                            options:0
-                            error:nil];
-    }
-    else
-    {
-        self.searchIndex = [NSArray array];
-    }
-}
-
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
 {
     [self stopSearch];
@@ -378,27 +362,7 @@
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
 {
-    searchText = [searchText lowercaseString];
-    searchText = [searchText stringByReplacingOccurrencesOfString:@" " withString:@""];
-    
-    NSMutableArray* results = [NSMutableArray arrayWithCapacity:100];
-    if (![searchText isEqualToString:@""])
-    {
-        for (int i = 0; i < self.searchIndex.count; i++)
-        {
-            if ([self.searchIndex[i][@"key"] hasPrefix:searchText])
-            {
-                NSMutableDictionary* item = [self.searchIndex[i][@"item"] mutableCopy];
-                item[@"player"] = self.player;
-                [results addObject:item];
-                if (results.count == 100)
-                {
-                    break;
-                }
-            }
-        }
-    }
-    [self.searchController setSearchQuery:searchText results:results];
+    [self.searchController search:searchText];
     
     if ([self.viewControllers lastObject] != self.searchController)
     {

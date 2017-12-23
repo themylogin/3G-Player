@@ -10,6 +10,12 @@
 
 @interface SearchController : ItemsListController
 
-- (void)setSearchQuery:(NSString*)query results:(NSArray*)results;
+- (id)initWithPlayer:(NSDictionary*)player libraryDirectory:(NSString*)libraryDirectory;
+
+- (void)loadSearchIndex;
+
+- (void)search:(NSString*)query;
+
+- (BOOL)update;
 
 @end
