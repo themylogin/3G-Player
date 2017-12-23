@@ -1498,7 +1498,6 @@ static char const* const POSITION = "POSITION";
                                                     otherButtonTitles:nil];
     NSMutableArray* buttons = [NSMutableArray array];
     
-    
     ASIFormDataRequest* asiRequest = [[ASIFormDataRequest alloc] init];
     [asiRequest setStringEncoding:NSUTF8StringEncoding];
     

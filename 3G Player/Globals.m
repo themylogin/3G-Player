@@ -10,12 +10,12 @@
 
 
 NSString* librariesPath;
-NSArray* players;
+NSArray* players = nil;
 
 long leaveFreeSpace;
 
-NSString* lastFmUsername;
-NSString* lastFmPassword;
+NSString* lastFmUsername = nil;
+NSString* lastFmPassword = nil;
 
 MusicTableService* musicTableService;
 MusicFileManager* musicFileManager;

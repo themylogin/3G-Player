@@ -240,14 +240,26 @@ dispatch_queue_t serverSocketQueue;
                                         @"url": stringUrl}];
         }
     }
+    if (players)
+    {
+        [players release];
+    }
     players = [NSArray arrayWithArray:mutablePlayers];
     [players retain];
     
     leaveFreeSpace = [[NSUserDefaults standardUserDefaults] integerForKey:@"LeaveFreeSpaceMb"] * 1024 * 1024;
     
+    if (lastFmUsername)
+    {
+        [lastFmUsername release];
+    }
     lastFmUsername = [[NSUserDefaults standardUserDefaults] stringForKey:@"LastFM_Username"];
     [lastFmUsername retain];
     
+    if (lastFmPassword)
+    {
+        [lastFmPassword release];
+    }
     lastFmPassword = [[NSUserDefaults standardUserDefaults] stringForKey:@"LastFM_Password"];
     [lastFmPassword retain];
 }

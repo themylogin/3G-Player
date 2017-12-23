@@ -546,12 +546,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 84C10C041782E08E004220BC /* Build configuration list for PBXNativeTarget "3G Player" */;
 			buildPhases = (
-				EDF5D4EB71C47D70ABA01785 /* Check Pods Manifest.lock */,
+				EDF5D4EB71C47D70ABA01785 /* [CP] Check Pods Manifest.lock */,
 				84C10BE31782E08D004220BC /* Sources */,
 				84C10BE41782E08D004220BC /* Frameworks */,
 				84C10BE51782E08D004220BC /* Resources */,
-				B0E45C637E4323D01A1B0E86 /* Embed Pods Frameworks */,
-				B367377008263E7454B8F03E /* Copy Pods Resources */,
+				B0E45C637E4323D01A1B0E86 /* [CP] Embed Pods Frameworks */,
+				B367377008263E7454B8F03E /* [CP] Copy Pods Resources */,
 				686EBD371E22778200658838 /* Run Script */,
 			);
 			buildRules = (
@@ -670,14 +670,14 @@
 			shellPath = /bin/sh;
 			shellScript = "./Fabric.framework/run e566308877de60541eb3bb71919cfbae9c73f845 80e0b8ab6707142a183ad7dff30894cee972e471b50fe9dcff06640dc1eb371b";
 		};
-		B0E45C637E4323D01A1B0E86 /* Embed Pods Frameworks */ = {
+		B0E45C637E4323D01A1B0E86 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -685,34 +685,40 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-3G Player/Pods-3G Player-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B367377008263E7454B8F03E /* Copy Pods Resources */ = {
+		B367377008263E7454B8F03E /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-3G Player/Pods-3G Player-resources.sh",
+				"${PODS_ROOT}/XLForm/XLForm/XLForm.bundle",
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-3G Player/Pods-3G Player-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		EDF5D4EB71C47D70ABA01785 /* Check Pods Manifest.lock */ = {
+		EDF5D4EB71C47D70ABA01785 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-3G Player-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -840,6 +846,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 4GMLHKF7NE;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/3G Player\"",
@@ -864,6 +871,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 4GMLHKF7NE;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/3G Player\"",
