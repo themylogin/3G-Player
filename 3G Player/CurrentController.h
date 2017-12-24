@@ -43,7 +43,7 @@ typedef enum { AddToTheEnd, AddAfterCurrentAlbum, AddAfterCurrentTrack, AddAfter
 - (IBAction)handlePlaylistLeftSwipe:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handlePlaylistLeftDoubleSwipe:(UISwipeGestureRecognizer*)recognizer;
 
-- (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer;
+- (IBAction)handleLongPress:(UILongPressGestureRecognizer*)recognizer;
 
 - (IBAction)handleToolbarSwipeUp:(UISwipeGestureRecognizer*)recognizer;
 - (IBAction)handleToolbarSwipeDown:(UISwipeGestureRecognizer*)recognizer;

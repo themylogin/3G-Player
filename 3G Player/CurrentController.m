@@ -663,9 +663,9 @@ static char const* const POSITION = "POSITION";
 
 #pragma mark - Playlist actions
 
-- (IBAction)handlePinch:(UIPinchGestureRecognizer*)recognizer
+- (IBAction)handleLongPress:(UILongPressGestureRecognizer *)recognizer
 {
-    if (recognizer.state != UIGestureRecognizerStateEnded)
+    if (recognizer.state != UIGestureRecognizerStateBegan)
     {
         return;
     }
@@ -690,7 +690,7 @@ static char const* const POSITION = "POSITION";
     
     objc_setAssociatedObject(actionSheet, ACTIONSHEET, @"Current playlist", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     objc_setAssociatedObject(actionSheet, BUTTONS, buttons, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    [actionSheet showInView:[self.view window]];
+    [actionSheet showInView:[self.tabBarController view]];
     [actionSheet release];
 }
 
