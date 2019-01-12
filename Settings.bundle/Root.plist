@@ -46,7 +46,7 @@
 			<key>Key</key>
 			<string>LeaveFreeSpaceMB</string>
 			<key>DefaultValue</key>
-			<string>100</string>
+			<string>1000</string>
 		</dict>
 		<dict>
 			<key>Type</key>

@@ -12,7 +12,7 @@
 NSString* librariesPath;
 NSArray* players = nil;
 
-long leaveFreeSpace;
+long leaveFreeSpaceMB;
 
 NSString* lastFmUsername = nil;
 NSString* lastFmPassword = nil;

@@ -247,7 +247,7 @@ dispatch_queue_t serverSocketQueue;
     players = [NSArray arrayWithArray:mutablePlayers];
     [players retain];
     
-    leaveFreeSpace = [[NSUserDefaults standardUserDefaults] integerForKey:@"LeaveFreeSpaceMb"] * 1024 * 1024;
+    leaveFreeSpaceMB = [[NSUserDefaults standardUserDefaults] integerForKey:@"LeaveFreeSpaceMB"];
     
     if (lastFmUsername)
     {
