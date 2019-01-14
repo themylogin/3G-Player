@@ -218,7 +218,7 @@
         {
             if ([track isKindOfClass:[NSDictionary class]] &&
                 [[track objectForKey:@"date"] isKindOfClass:[NSDictionary class]] &&
-                [[[track objectForKey:@"date"] objectForKey:@"uts"]
+                [[NSString stringWithFormat:@"%@", [[track objectForKey:@"date"] objectForKey:@"uts"]]
                  isEqualToString:[arguments objectForKey:@"timestamp"]])
             {
                 return YES;
